@@ -1,0 +1,34 @@
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CityRoots.Core.Interfaces
+{
+    public interface IUnitOfWork
+    {
+        IChatRepository Chat { get; }
+        ICropRepository Crop { get; }
+        ICycleRepository Cycle { get; }
+        ICycleUpdateRepository CycleUpdate { get; }
+        IFarmerRepository Farmer { get; }
+        IFarmRepository Farm { get; }
+        IHarvestRepository Harvest { get; }
+        IInvestmentRequestRepository InvestmentRequest { get; }
+        IInvestorRepository Investor { get; }
+        ILandParcelRepository LandParcel { get; }
+        IMerchantRepository Merchant { get; }
+        INotificationRepository Notification { get; }
+        IOpenInvestmentCycleRepository OpenInvestmentCycle { get; }
+        IPaymentRepository Payment { get; }
+        IPurchaseRepository Purchase { get; }
+        IScheduleRepository Schedule { get; }
+
+        Task<int> CompleteAsync();
+        Task RollbackAsync();
+        Task CommitAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync();
+    }
+}
