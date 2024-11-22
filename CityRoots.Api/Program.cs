@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Routing;
 using CityRoots.Api.Helpers;
+using CityRoots.Core.Interfaces.Services;
 
 namespace CityRoots.Api
 {
@@ -66,15 +67,11 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IMailingService, MailingService>();
+            builder.Services.AddScoped<ICommunicationService, CommunicationService>();
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-            builder.Services.AddControllers()
-     .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-         options.JsonSerializerOptions.WriteIndented = true; // Optional, for readability
-     });
-
+            builder.Services.AddControllers();
+     
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

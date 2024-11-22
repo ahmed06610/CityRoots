@@ -193,6 +193,7 @@ namespace CityRoots.Core.Services
 
             // Populate the AuthDTO object
             authModel.Email = user.Email;
+            
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.IsAuthenticated = true;
             authModel.Roles = roles.ToList();

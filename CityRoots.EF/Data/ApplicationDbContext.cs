@@ -31,6 +31,7 @@ namespace CityRoots.EF.Data
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<FeedBack> feedBacks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -171,6 +172,11 @@ namespace CityRoots.EF.Data
                 .HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<FeedBack>()
+                .HasOne(p => p.User)
+                .WithMany(p=>p.FeedBacks)
+                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

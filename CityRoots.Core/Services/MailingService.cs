@@ -14,34 +14,35 @@ namespace CityRoots.Core.Services
         {
             _mailSettings = mailSettings.Value;
         }
-        public async Task SendEmailAsync(string mailTo, string subject, string body, IList<IFormFile> attachments)
+        public async Task SendEmailAsync(string mailTo, string subject, string body, IList<IFormFile> attachments, string mailfrom = null)
         {
-            var email = new MimeMessage
-            {
-                Sender = MailboxAddress.Parse(_mailSettings.Email),
-                Subject = subject
-            };
+            var email = new MimeMessage();
+            var fromAddress = mailfrom == null ? _mailSettings.Email : mailfrom;
+
+            // Set sender to your email (for authentication) but display mailfrom in the From field for feedback case
+            email.Sender = MailboxAddress.Parse(_mailSettings.Email);
+            email.From.Add(MailboxAddress.Parse(fromAddress));
             email.To.Add(MailboxAddress.Parse(mailTo));
+            email.Subject = subject;
 
             var builder = new BodyBuilder();
+
             if (attachments != null)
             {
-                byte[] fileBytes;
                 foreach (var file in attachments)
                 {
                     if (file.Length > 0)
                     {
                         using var ms = new MemoryStream();
                         file.CopyTo(ms);
-                        fileBytes = ms.ToArray();
-
+                        var fileBytes = ms.ToArray();
                         builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
                     }
                 }
             }
+
             builder.HtmlBody = body;
             email.Body = builder.ToMessageBody();
-            email.From.Add(MailboxAddress.Parse(_mailSettings.Email));
 
             using var smtp = new MailKit.Net.Smtp.SmtpClient();
             await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);

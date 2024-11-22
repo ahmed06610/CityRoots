@@ -27,6 +27,7 @@ namespace CityRoots.EF
         public IPaymentRepository Payment { get; private set; }
         public IPurchaseRepository Purchase { get; private set; }
         public IScheduleRepository Schedule { get; private set; }
+        public IFeedBackRepository FeedBack { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -47,6 +48,7 @@ namespace CityRoots.EF
             Payment = new PaymentRepository(context);
             Purchase = new PurchaseRepository(context);
             Schedule = new ScheduleRepository(context);
+            FeedBack = new FeedBackRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
