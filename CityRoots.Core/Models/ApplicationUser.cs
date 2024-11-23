@@ -20,6 +20,8 @@ namespace CityRoots.Core.Models
       
         public virtual List<Payment> Payments { get; set; }
         public virtual List<Notification> Notifications { get; set; }
+        public virtual List<FeedBack> FeedBacks { get; set; }
+
         public virtual List<Chat> SentChats { get; set; } // Chats sent by the user
         public virtual List<Chat> ReceivedChats { get; set; } // Chats received by the user
     }

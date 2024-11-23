@@ -25,6 +25,7 @@ namespace CityRoots.Core.Interfaces
         IPaymentRepository Payment { get; }
         IPurchaseRepository Purchase { get; }
         IScheduleRepository Schedule { get; }
+        IFeedBackRepository FeedBack { get; }
 
         Task<int> CompleteAsync();
         Task RollbackAsync();

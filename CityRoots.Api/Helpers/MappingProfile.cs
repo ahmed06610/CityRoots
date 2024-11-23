@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CityRoots.Core.DTOs.Auth;
+using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.Models;
 
 namespace CityRoots.Api.Helpers
@@ -21,6 +22,9 @@ namespace CityRoots.Api.Helpers
                     .ForMember(dst => dst.SecurityStamp, opt => opt.Ignore())
                     .ForMember(dst => dst.TwoFactorEnabled, opt => opt.Ignore())
                     .ForSourceMember(src => src.Role, opt => opt.DoNotValidate());
+            CreateMap<FeedBackRequest, FeedBack>();
+            CreateMap<FeedBack,FeedBackDisplay>().
+                ForMember(dst=>dst.UserName,opt=>opt.MapFrom(src=>src.User.Name));
         }
     }
 }
