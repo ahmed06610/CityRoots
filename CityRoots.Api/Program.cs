@@ -68,6 +68,10 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IMailingService, MailingService>();
             builder.Services.AddScoped<ICommunicationService, CommunicationService>();
+            builder.Services.AddScoped<IFarmService,FarmService>();
+            builder.Services.AddScoped<IImageService,ImageService>();
+            builder.Services.AddScoped<ILandParcelService,LandParcelService>();
+            builder.Services.AddHttpClient<IWeatherService, WeatherService>();
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddControllers();

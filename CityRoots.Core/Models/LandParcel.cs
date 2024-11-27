@@ -24,6 +24,7 @@ namespace CityRoots.Core.Models
 
         [Required]
         public string Status { get; set; } // Available, Occupied, etc.
+        public string ImageUrl {  get; set; } 
 
         // Navigation Properties
         public virtual List<Cycle> Cycles { get; set; }
