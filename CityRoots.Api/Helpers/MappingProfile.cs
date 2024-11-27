@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CityRoots.Core.DTOs.Auth;
+using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.DTOs.FeedBack;
+using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.Models;
 
 namespace CityRoots.Api.Helpers
@@ -25,6 +27,17 @@ namespace CityRoots.Api.Helpers
             CreateMap<FeedBackRequest, FeedBack>();
             CreateMap<FeedBack,FeedBackDisplay>().
                 ForMember(dst=>dst.UserName,opt=>opt.MapFrom(src=>src.User.Name));
+            CreateMap<CreateFarmDTO, Farm>();
+            CreateMap<UpdateFarmDTO, Farm>();
+            CreateMap<Farm, FarmDTO>()
+                .ForMember(dest => dest.LandParcels, opt => opt.MapFrom(src => src.LandParcels)); // Map nested objects
+
+            CreateMap<CreateLandParcelDTO, LandParcel>();
+            CreateMap<UpdateLandParcelDTO, LandParcel>();
+            CreateMap<LandParcel, LandParcelDTO>()
+                .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Farm.Location)); // Map Farm's Location
+
+
         }
     }
 }
