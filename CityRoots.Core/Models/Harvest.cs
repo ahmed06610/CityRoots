@@ -10,6 +10,12 @@ namespace CityRoots.Core.Models
 {
     public class Harvest
     {
+        public Harvest()
+        {
+            Date=DateTime.Now;
+            status = "Avaible";
+        }
+
         [Key]
         public int HarvestId { get; set; }
 
@@ -21,11 +27,23 @@ namespace CityRoots.Core.Models
 
         [Required]
         public double Yield { get; set; }
+        [Required]
+        public decimal Price { get; set; }
+        [Required]
+        public string status { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime Date { get; private set; }
+
+        public string ImageUrl { get; set; }
 
         // Navigation Properties
-        public virtual List<Purchase> Purchases { get; set; }
+        public virtual List<PurchaseRequest> Purchases { get; set; }
+        [ForeignKey(nameof(Farmer))]
+        public int FarmerId { get; set; }
+        public Farmer Farmer { get; set; }
+        [ForeignKey(nameof(Cycle))]
+        public int? CycleId {  get; set; }
+        public Cycle Cycle { get; set; }
     }
 
 }

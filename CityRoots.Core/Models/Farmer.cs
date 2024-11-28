@@ -17,6 +17,8 @@ namespace CityRoots.Core.Models
 
         [JsonIgnore] // Ignore to prevent cyclical references
         public virtual List<Farm> Farms { get; set; }
+        [JsonIgnore]
+        public virtual List<Harvest>Harvests { get; set; }
     }
 
 }
