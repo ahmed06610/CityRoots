@@ -71,6 +71,8 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IFarmService,FarmService>();
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<ILandParcelService,LandParcelService>();
+            builder.Services.AddScoped<ICropService, CropService>();
+            builder.Services.AddScoped<IHarvestService, HarvestService>();  
             builder.Services.AddHttpClient<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ICycleService, CycleService>();
             builder.Services.AddScoped<IOpenInvestmentCycleService, OpenInvestmentCycleService>();

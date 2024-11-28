@@ -19,6 +19,8 @@ namespace CityRoots.Core.Models
         public decimal CurrentPrice { get; set; }
 
         public decimal ExpectedPriceChange { get; set; }
+        public string CropType { get; set; }
+
 
         public string RiskLevel { get; set; } // Low, Medium, High
 

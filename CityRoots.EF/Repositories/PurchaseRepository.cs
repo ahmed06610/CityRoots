@@ -4,7 +4,7 @@ using CityRoots.EF.Data;
 
 namespace CityRoots.EF.Repositories
 {
-    public class PurchaseRepository : BaseRepository<Purchase>, IPurchaseRepository
+    public class PurchaseRepository : BaseRepository<PurchaseRequest>, IPurchaseRepository
     {
         private readonly ApplicationDbContext _context;
         public PurchaseRepository(ApplicationDbContext context) : base(context)
