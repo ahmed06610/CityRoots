@@ -10,6 +10,7 @@ namespace CityRoots.Core.DTOs.LandParcel
 {
     public class CreateLandParcelDTO
     {
+
         [Required]
         public int FarmId { get; set; }
         [Required]

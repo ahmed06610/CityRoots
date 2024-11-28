@@ -1,0 +1,62 @@
+﻿using CityRoots.Core.DTOs.Cycle;
+using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CityRoots.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CycleController : ControllerBase
+    {
+        private readonly ICycleService _cycleService;
+
+        public CycleController(ICycleService cycleService)
+        {
+            _cycleService = cycleService;
+        }
+
+        [HttpGet("GetAllCycleasOfFarmerId")]
+        public async Task<IActionResult> GetAllCycles(int FarmerId = 0)
+        {
+            var cycles = await _cycleService.GetAllCyclesAsync(FarmerId);
+            return Ok(cycles);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCycleById(int id)
+        {
+            var cycle = await _cycleService.GetCycleByIdAsync(id);
+            if (cycle == null) return NotFound();
+            return Ok(cycle);
+        }
+
+        [HttpPost("AddCycle")]
+        public async Task<IActionResult> AddCycle([FromBody] CreateCycleDTO createCycleDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var createdCycle = await _cycleService.AddCycleAsync(createCycleDto);
+            return CreatedAtAction(nameof(GetCycleById), new { id = createdCycle.CycleId }, createdCycle);
+        }
+
+        [HttpPut("EditCycle")]
+        public async Task<IActionResult> UpdateCycle([FromBody] UpdateCycleDTO updateCycleDto)
+        {
+
+            var updatedCycle = await _cycleService.UpdateCycleAsync(updateCycleDto);
+            if (updatedCycle == null) return NotFound();
+
+            return Ok(updatedCycle);
+        }
+
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeleteCycle(int id)
+        {
+            var success = await _cycleService.DeleteCycleAsync(id);
+            if (!success) return NotFound();
+            return Ok();
+        }
+    }
+}
