@@ -2,7 +2,7 @@
 
 namespace CityRoots.Core.Interfaces
 {
-    public interface IPurchaseRepository : IBaseRepository<Purchase>
+    public interface IPurchaseRepository : IBaseRepository<PurchaseRequest>
     {
     }
 }

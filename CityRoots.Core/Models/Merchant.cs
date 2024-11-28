@@ -18,7 +18,7 @@ namespace CityRoots.Core.Models
         public string BusinessDetails { get; set; }
 
         // Navigation Properties
-        public virtual List<Purchase> Purchases { get; set; }
+        public virtual List<PurchaseRequest> Purchases { get; set; }
     }
 
 }

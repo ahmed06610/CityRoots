@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CityRoots.Core.Models
 {
-    public class Purchase
+    public class PurchaseRequest
     {
         [Key]
-        public int PurchaseId { get; set; }
+        public int PurchaseRequestId { get; set; }
 
         [Required]
         public int HarvestId { get; set; }
@@ -26,12 +23,15 @@ namespace CityRoots.Core.Models
         public virtual Merchant Merchant { get; set; }
 
         [Required]
-        public double Amount { get; set; }
+        public double RequestedAmount { get; set; } // الكمية المطلوبة
 
         [Required]
-        public decimal Price { get; set; }
+        public decimal RequestedPrice { get; set; } // السعر المطلوب
 
-        public string Status { get; set; } // Pending, Completed, Canceled
+        public string RequestStatus { get; set; } // Pending, Approved, Rejected
+
+        public DateTime RequestDate { get; set; } // تاريخ تقديم الطلب
+
+        public string Notes { get; set; } // ملاحظات اختيارية
     }
-
 }

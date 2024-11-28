@@ -28,7 +28,7 @@ namespace CityRoots.EF.Data
         public DbSet<CycleUpdate> CycleUpdates { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Harvest> Harvests { get; set; }
-        public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<PurchaseRequest> PurchaseRequests { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<FeedBack> feedBacks { get; set; }
@@ -141,13 +141,13 @@ namespace CityRoots.EF.Data
                 .HasForeignKey(h => h.CropId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Purchase>()
+            modelBuilder.Entity<PurchaseRequest>()
                 .HasOne(p => p.Harvest)
                 .WithMany(h => h.Purchases)
                 .HasForeignKey(p => p.HarvestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Purchase>()
+            modelBuilder.Entity<PurchaseRequest>()
                 .HasOne(p => p.Merchant)
                 .WithMany(m => m.Purchases)
                 .HasForeignKey(p => p.MerchantId)
