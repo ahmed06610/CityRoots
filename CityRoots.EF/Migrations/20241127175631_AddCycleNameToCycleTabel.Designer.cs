@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241127175631_AddCycleNameToCycleTabel")]
+    partial class AddCycleNameToCycleTabel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,10 +146,6 @@ namespace CityRoots.EF.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CropId"));
-
-                    b.Property<string>("CropType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("CurrentPrice")
                         .HasColumnType("decimal(18,2)");
@@ -327,36 +326,15 @@ namespace CityRoots.EF.Migrations
                     b.Property<int>("CropId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CycleId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("FarmerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<double>("Yield")
                         .HasColumnType("float");
 
-                    b.Property<string>("status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("HarvestId");
 
                     b.HasIndex("CropId");
-
-                    b.HasIndex("CycleId");
-
-                    b.HasIndex("FarmerId");
 
                     b.ToTable("Harvests");
                 });
@@ -580,13 +558,16 @@ namespace CityRoots.EF.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("CityRoots.Core.Models.PurchaseRequest", b =>
+            modelBuilder.Entity("CityRoots.Core.Models.Purchase", b =>
                 {
-                    b.Property<int>("PurchaseRequestId")
+                    b.Property<int>("PurchaseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseRequestId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
 
                     b.Property<int>("HarvestId")
                         .HasColumnType("int");
@@ -594,30 +575,20 @@ namespace CityRoots.EF.Migrations
                     b.Property<int>("MerchantId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RequestDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RequestStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("RequestedAmount")
-                        .HasColumnType("float");
-
-                    b.Property<decimal>("RequestedPrice")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("PurchaseRequestId");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PurchaseId");
 
                     b.HasIndex("HarvestId");
 
                     b.HasIndex("MerchantId");
 
-                    b.ToTable("PurchaseRequests");
+                    b.ToTable("Purchases");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Schedule", b =>
@@ -874,21 +845,7 @@ namespace CityRoots.EF.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CityRoots.Core.Models.Cycle", "Cycle")
-                        .WithMany()
-                        .HasForeignKey("CycleId");
-
-                    b.HasOne("CityRoots.Core.Models.Farmer", "Farmer")
-                        .WithMany("Harvests")
-                        .HasForeignKey("FarmerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Crop");
-
-                    b.Navigation("Cycle");
-
-                    b.Navigation("Farmer");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.InvestmentRequest", b =>
@@ -984,7 +941,7 @@ namespace CityRoots.EF.Migrations
                     b.Navigation("Payer");
                 });
 
-            modelBuilder.Entity("CityRoots.Core.Models.PurchaseRequest", b =>
+            modelBuilder.Entity("CityRoots.Core.Models.Purchase", b =>
                 {
                     b.HasOne("CityRoots.Core.Models.Harvest", "Harvest")
                         .WithMany("Purchases")
@@ -1114,8 +1071,6 @@ namespace CityRoots.EF.Migrations
             modelBuilder.Entity("CityRoots.Core.Models.Farmer", b =>
                 {
                     b.Navigation("Farms");
-
-                    b.Navigation("Harvests");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Harvest", b =>

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using CityRoots.Core.DTOs.Auth;
 using CityRoots.Core.DTOs.Crop;
+
 using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.DTOs.Farmer;
 using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.LandParcel;
+using CityRoots.Core.DTOs.OpenInvestmentCycle;
 using CityRoots.Core.Models;
 
 namespace CityRoots.Api.Helpers
@@ -58,6 +60,15 @@ namespace CityRoots.Api.Helpers
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ApplicationUser.Name));
 
 
+
+
+            CreateMap<CreateCycleDTO, Cycle>();
+            CreateMap<UpdateCycleDTO, Cycle>();
+            CreateMap<Cycle, CycleDTO>();
+            CreateMap<OpenInvestmentCycle, OpenInvestmentCycleDTO>();
+
+            CreateMap<CreateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
+            CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
 
 
 

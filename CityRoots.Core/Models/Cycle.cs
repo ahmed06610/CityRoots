@@ -24,12 +24,13 @@ namespace CityRoots.Core.Models
 
         [ForeignKey(nameof(CropId))]
         public virtual Crop Crop { get; set; }
+        [Required]
+        public string CycleName { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public double ExpectedYield { get; set; }
 
-        public string AvailableProfitTypes { get; set; } // Cash, Crop Share, Both
 
         // Navigation Properties
         public virtual OpenInvestmentCycle OpenInvestmentCycle { get; set; }

@@ -58,10 +58,11 @@ namespace CityRoots.EF.Repositories
 
         public async Task<IEnumerable<T>> FindAllWithIncludes<T>(Expression<Func<T, bool>>? criteria, params Expression<Func<T, object>>[]? includeProperties) where T : class
         {
-            if (criteria == null)
-                return null;
-
-            IQueryable<T> query = _context.Set<T>().Where(criteria);
+            /* if (criteria == null)
+                 return null;*/
+            IQueryable<T> query = _context.Set<T>();
+            if (criteria!=null)
+                 query = _context.Set<T>().Where(criteria);
 
             query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
