@@ -15,7 +15,7 @@ namespace CityRoots.Api.Controllers
             _harvestService = harvestService;
 
         }
-        [HttpGet("GetAllHarvestsForFarmer")]
+        [HttpPost("GetAllHarvestsForFarmer")]
         public async Task<IActionResult> GetAll([FromBody]string Name=null)
         {
             try
