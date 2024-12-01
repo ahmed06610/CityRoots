@@ -3,7 +3,8 @@ using CityRoots.Core.DTOs.Auth;
 using CityRoots.Core.DTOs.Crop;
 
 using CityRoots.Core.DTOs.Cycle;
-using CityRoots.Core.DTOs.CycleUpdates;
+using CityRoots.Core.DTOs.CycleUpdate;
+
 using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.DTOs.Farmer;
 using CityRoots.Core.DTOs.FeedBack;
@@ -76,6 +77,10 @@ namespace CityRoots.Api.Helpers
             CreateMap<UpdateScheduleDTO, Schedule>().ReverseMap();
             CreateMap<Schedule,ScheduleDisplayDTO>()
                 .ForMember(dest=>dest._for,opt=>opt.MapFrom(src=>src.Cycle.CycleName));
+
+            CreateMap<CreateCycleUpdateDTO, CycleUpdate>();
+            CreateMap<UpdateCycleUpdateDTO, CycleUpdate>();
+            CreateMap<CycleUpdate, CycleUpdateDTO>();
 
 
 
