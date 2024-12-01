@@ -10,6 +10,10 @@ namespace CityRoots.Core.Models
 {
     public class Schedule
     {
+        public Schedule()
+        {
+            Status = "Pending";
+        }
         [Key]
         public int ScheduleId { get; set; }
 

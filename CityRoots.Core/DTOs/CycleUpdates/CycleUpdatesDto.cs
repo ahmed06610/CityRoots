@@ -11,7 +11,7 @@ namespace CityRoots.Core.DTOs.CycleUpdates
         public DateTime UpdateDate { get; set; }
         public decimal GrowthRate { get; set; }
         public string AdditionalNotes { get; set; }
-        public List<string> imageUrls { get; set; }= new List<string>();
+       string imageUrl { get; set; }
 
 
 
