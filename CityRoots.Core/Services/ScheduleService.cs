@@ -51,7 +51,7 @@ namespace CityRoots.Core.Services
 
         public async Task<ScheduleDisplayDTO> Get(int Id)
         {
-            var schedule = (await _unitOfWork.Schedule.FindAllWithIncludes<Schedule>(x=>x.ScheduleId==Id, x=>x.Cycle)).FirstOrDefault();
+            var schedule = await _unitOfWork.Schedule.GetByIdAsync(Id);
             if (schedule is null)
                 throw new Exception($"No Schedules with Id {Id}");
             return mapper.Map<ScheduleDisplayDTO>(schedule);
@@ -60,7 +60,7 @@ namespace CityRoots.Core.Services
         public async Task<IEnumerable<ScheduleDisplayDTO>> GetAll(int CycleId)
         {
 
-            var shedules = await _unitOfWork.Schedule.FindAllWithIncludes<Schedule>(x => x.CycleId == CycleId, x => x.Cycle);
+            var shedules = await _unitOfWork.Schedule.FindAllAsync(x => x.CycleId == CycleId);
             return mapper.Map<IEnumerable<ScheduleDisplayDTO>>(shedules);
         }
 

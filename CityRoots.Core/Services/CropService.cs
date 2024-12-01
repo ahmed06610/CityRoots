@@ -51,8 +51,7 @@ namespace CityRoots.Core.Services
         public async Task<IEnumerable<CropDisplayDto>> GetAll()
         {
             var Crops=await _unitOfWork.Crop.GetAllAsync();
-            if (Crops is null || !Crops.Any())
-                throw new Exception("No crops Found");
+           
             return mapper.Map<IEnumerable<CropDisplayDto>>(Crops);
             
             
