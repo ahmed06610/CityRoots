@@ -80,7 +80,8 @@ namespace CityRoots.Core.Services
         {
 
            var harvests = await unitOfWork.Harvest.GetAllWithIncludes(s); 
-            return mapper.Map<IEnumerable<HarvestDisplayDto>>(harvests);
+          var _harvests=mapper.Map<IEnumerable<HarvestDisplayDto>>(harvests);
+            return _harvests;
         }
 
         public async Task<UpdateHarvestDto> Update(UpdateHarvestDto updateharvest)

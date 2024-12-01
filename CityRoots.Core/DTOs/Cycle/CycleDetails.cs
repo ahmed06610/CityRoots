@@ -12,7 +12,7 @@ namespace CityRoots.Core.DTOs.Cycle
     {
         public string Name { get; set; }
         public string Location {  get; set; }
-        public List<string> LandImagesUrl { get; set; } = new List<string>();
+        public string LandImagesUrl { get; set; } 
         public List<CycleUpdatesDto> CycleUpdates { get; set; } = new List<CycleUpdatesDto>();
 
     }

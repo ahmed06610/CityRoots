@@ -4,12 +4,14 @@ using CityRoots.Core.DTOs.Crop;
 
 using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.DTOs.CycleUpdate;
+
 using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.DTOs.Farmer;
 using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.DTOs.OpenInvestmentCycle;
+using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Models;
 
 namespace CityRoots.Api.Helpers
@@ -59,6 +61,7 @@ namespace CityRoots.Api.Helpers
             CreateMap<Farmer, FarmerDetails>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.ApplicationUser.Email))
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ApplicationUser.Name));
+            CreateMap<CycleUpdate, CycleUpdatesDto>();
 
 
 
@@ -70,6 +73,10 @@ namespace CityRoots.Api.Helpers
 
             CreateMap<CreateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
             CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
+            CreateMap<AddScheduleDto, Schedule>();
+            CreateMap<UpdateScheduleDTO, Schedule>().ReverseMap();
+            CreateMap<Schedule,ScheduleDisplayDTO>()
+                .ForMember(dest=>dest._for,opt=>opt.MapFrom(src=>src.Cycle.CycleName));
 
             CreateMap<CreateCycleUpdateDTO, CycleUpdate>();
             CreateMap<UpdateCycleUpdateDTO, CycleUpdate>();

@@ -21,6 +21,7 @@ namespace CityRoots.EF.Repositories
                 .ThenInclude(x => x.CycleUpdates)
                 .Include(x => x.Cycle)
                 .ThenInclude(x => x.LandParcel)
+                .ThenInclude(x=>x.Farm)
                 .Include(x => x.Farmer)
                 .ThenInclude(x => x.ApplicationUser)
                 .Include(x => x.Crop);
