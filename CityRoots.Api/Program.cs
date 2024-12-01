@@ -76,6 +76,7 @@ namespace CityRoots.Api
             builder.Services.AddHttpClient<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ICycleService, CycleService>();
             builder.Services.AddScoped<IOpenInvestmentCycleService, OpenInvestmentCycleService>();
+            builder.Services.AddScoped<ICycleUpdateService, CycleUpdateService>();
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddControllers();
