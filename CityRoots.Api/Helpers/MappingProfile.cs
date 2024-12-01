@@ -61,7 +61,7 @@ namespace CityRoots.Api.Helpers
             CreateMap<Farmer, FarmerDetails>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.ApplicationUser.Email))
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ApplicationUser.Name));
-            CreateMap<CycleUpdate, CycleUpdatesDto>();
+            CreateMap<CycleUpdate, CycleUpdatesForHarvestDto>();
 
 
 
