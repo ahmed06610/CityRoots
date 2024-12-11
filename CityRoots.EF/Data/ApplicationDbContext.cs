@@ -32,6 +32,7 @@ namespace CityRoots.EF.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<FeedBack> feedBacks { get; set; }
+        public DbSet<AiPredict> AiPredicts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
