@@ -75,8 +75,7 @@ namespace CityRoots.Api.Helpers
             CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
             CreateMap<AddScheduleDto, Schedule>();
             CreateMap<UpdateScheduleDTO, Schedule>().ReverseMap();
-            CreateMap<Schedule,ScheduleDisplayDTO>()
-                .ForMember(dest=>dest._for,opt=>opt.MapFrom(src=>src.Cycle.CycleName));
+            CreateMap<Schedule, ScheduleDisplayDTO>();
 
             CreateMap<CreateCycleUpdateDTO, CycleUpdate>();
             CreateMap<UpdateCycleUpdateDTO, CycleUpdate>();
