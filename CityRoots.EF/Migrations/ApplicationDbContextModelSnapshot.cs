@@ -22,6 +22,36 @@ namespace CityRoots.EF.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CityRoots.Core.Models.AiPredict", b =>
+                {
+                    b.Property<int>("AiPredictId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AiPredictId"));
+
+                    b.Property<string>("ArabicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsIll")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Recommendation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AiPredictId");
+
+                    b.ToTable("AiPredicts");
+                });
+
             modelBuilder.Entity("CityRoots.Core.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
