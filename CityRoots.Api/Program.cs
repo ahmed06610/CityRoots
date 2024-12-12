@@ -78,6 +78,7 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IOpenInvestmentCycleService, OpenInvestmentCycleService>();
             builder.Services.AddScoped<ICycleUpdateService, CycleUpdateService>();
             builder.Services.AddScoped<AiPredictionService, AiPredictionService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
