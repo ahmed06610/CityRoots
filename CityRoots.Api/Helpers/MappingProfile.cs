@@ -11,7 +11,6 @@ using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.DTOs.OpenInvestmentCycle;
-using CityRoots.Core.DTOs.Purchasereque;
 using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Models;
 
@@ -46,8 +45,7 @@ namespace CityRoots.Api.Helpers
             CreateMap<UpdateLandParcelDTO, LandParcel>();
             CreateMap<LandParcel, LandParcelDTO>()
                 .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Farm.Location)); // Map Farm's Location
-            CreateMap<Crop, CropDisplayDto>()
-                .ForMember(dest=>dest.cropType,opt=>opt.MapFrom(src=>src.CropType.Name));
+            CreateMap<Crop, CropDisplayDto>();
             CreateMap<AddCropDto, Crop>().ReverseMap();
             CreateMap<UpdateCropDto, Crop>().ReverseMap();
             CreateMap<Harvest, HarvestDisplayDto>()
@@ -56,8 +54,6 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest=>dest.CycleDetails,opt=>opt.MapFrom(x=>x.Cycle));
             CreateMap<AddHarvestDto,Harvest>().ReverseMap();
             CreateMap<UpdateHarvestDto,Harvest>().ReverseMap();
-            CreateMap<Harvest, HarvestDtoForFarmer>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Crop.Name));
             CreateMap<Cycle, CycleDetails>()
                 .ForMember(dest => dest.LandImagesUrl, opt => opt.MapFrom(src => src.LandParcel.ImageUrl))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.LandParcel.Farm.Location))
@@ -79,19 +75,11 @@ namespace CityRoots.Api.Helpers
             CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
             CreateMap<AddScheduleDto, Schedule>();
             CreateMap<UpdateScheduleDTO, Schedule>().ReverseMap();
-            CreateMap<Schedule, ScheduleDisplayDTO>()
-                .ForMember(dest => dest.StartDate,
-                           opt => opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy HH:mm")))
-                .ForMember(dest => dest.EndDate,
-                           opt => opt.MapFrom(src => src.EndDate.ToString("dd/MM/yyyy HH:mm")));
+            CreateMap<Schedule, ScheduleDisplayDTO>();
 
             CreateMap<CreateCycleUpdateDTO, CycleUpdate>();
             CreateMap<UpdateCycleUpdateDTO, CycleUpdate>();
             CreateMap<CycleUpdate, CycleUpdateDTO>();
-            CreateMap<PurchaseRequest, AllPurchasesRequestForHarvest>();
-            CreateMap<PurchaseRequest, OnePurchaseRequestForHarvest>()
-                .ForMember(dest => dest.merchantName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name))
-                .ForMember(dest=>dest.Requestcount,opt=>opt.MapFrom(src=>src.Harvest.Purchases.Count()));
 
 
 

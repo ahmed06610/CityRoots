@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
 using CityRoots.Core.DTOs.Harvest;
-using CityRoots.Core.DTOs.Purchasereque;
+using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CityRoots.Core.Services
 {
-    public class HarvestService : IHarvestService
+    public class HarvestService:IHarvestService
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
@@ -17,34 +22,32 @@ namespace CityRoots.Core.Services
         private readonly IHttpContextAccessor httpContextAccessor;
 
 
-        public HarvestService(IUnitOfWork unitOfWork, IMapper mapper, IImageService imageService, IHttpContextAccessor httpContextAccessor)
-        {
-            this.unitOfWork = unitOfWork;
+        public HarvestService(IUnitOfWork unitOfWork,IMapper mapper,IImageService imageService,IHttpContextAccessor httpContextAccessor) {
+        this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.imageService = imageService;
             this.httpContextAccessor = httpContextAccessor;
-
+        
         }
 
 
-        public async Task<AddHarvestDto> Add(AddHarvestDto harvest,int farmerid=1)
+        public async Task<AddHarvestDto> Add(AddHarvestDto harvest)
         {
             var addedharvest = mapper.Map<Harvest>(harvest);
 
-            if (harvest.Image != null)
-            {
-                addedharvest.ImageUrl = imageService.SaveImage(harvest.Image, ImagesFolder);
+            if(harvest.Image != null) { 
+            addedharvest.ImageUrl=imageService.SaveImage(harvest.Image,ImagesFolder);
             }
-            //var loggedIn = httpContextAccessor.HttpContext?.User?.FindFirst("LoggedId")?.Value;
-            //if (!string.IsNullOrEmpty(loggedIn) && int.TryParse(loggedIn, out int id))
-            //{
-            //    addedharvest.FarmerId = id; // Assign FarmerId
-            //}
-            //else
-            //{
-            //    throw new Exception("FarmerId is missing or invalid.");
-            //}
-            addedharvest.FarmerId = farmerid;
+            var loggedIn = httpContextAccessor.HttpContext?.User?.FindFirst("LoggedId")?.Value;
+            if (!string.IsNullOrEmpty(loggedIn) && int.TryParse(loggedIn, out int id))
+            {
+                addedharvest.FarmerId = id; // Assign FarmerId
+            }
+            else
+            {
+                throw new Exception("FarmerId is missing or invalid.");
+            }
+
             await unitOfWork.Harvest.AddAsync(addedharvest);
             await unitOfWork.CompleteAsync();
             return harvest;
@@ -52,7 +55,7 @@ namespace CityRoots.Core.Services
 
         public async Task Delete(int id)
         {
-            var harvest = await unitOfWork.Harvest.GetByIdAsync(id);
+            var harvest=await unitOfWork.Harvest.GetByIdAsync(id);
             if (harvest is null)
             {
                 throw new Exception($"There is no Harvests with this id {id}");
@@ -63,27 +66,21 @@ namespace CityRoots.Core.Services
             await unitOfWork.CompleteAsync();
         }
 
-        public async Task<HarvestDtoForFarmer> Get(int id)
+        public async Task<HarvestDisplayDto> Get(int id)
         {
+      
 
-
-            var harvest = await unitOfWork.Harvest.FindTWithIncludes<Harvest>(id, x => x.Crop);
+            var harvest = await unitOfWork.Harvest.GetWithInclude(id);
             if (harvest is null)
                 throw new Exception($"There is no Harvests with this id {id}");
-            return mapper.Map<HarvestDtoForFarmer>(harvest);
+            return mapper.Map<HarvestDisplayDto>(harvest);
         }
 
-        public async Task<IEnumerable<HarvestDtoForFarmer>> GetAll(string s = null,int farmerid=0)
+        public async Task<IEnumerable<HarvestDisplayDto>> GetAll(string s=null)
         {
 
-            var harvests = await unitOfWork.Harvest.FindAllWithIncludes<Harvest>(x => (x.Crop.Name.Contains(s)||s==null)&&(x.FarmerId==farmerid||farmerid==0)
-            ,x=>x.Crop
-            , x=>x.Purchases);
-            var _harvests = new List<HarvestDtoForFarmer>();
-            foreach(var harvest in harvests)
-                _harvests.Add(await CheckStatus(harvest));
-
-
+           var harvests = await unitOfWork.Harvest.GetAllWithIncludes(s); 
+          var _harvests=mapper.Map<IEnumerable<HarvestDisplayDto>>(harvests);
             return _harvests;
         }
 
@@ -102,49 +99,10 @@ namespace CityRoots.Core.Services
                 harvest.ImageUrl = imageService.SaveImage(updateharvest.Image, ImagesFolder);
             }
             unitOfWork.Harvest.Update(harvest);
-
+        
             await unitOfWork.CompleteAsync();
             return updateharvest;
 
-        }
-        private async Task <HarvestDtoForFarmer> CheckStatus(Harvest harvest)
-        {
-          
-            
-                if (harvest.Yield == 0)
-                    harvest.status = "نفذت الكميه";
-                else
-                {
-                    if (harvest.Purchases.Count > 0)
-                    {
-                        harvest.status = "تحت الطلب";
-
-                    }
-
-                }
-                unitOfWork.Harvest.Update(harvest);
-                await unitOfWork.CompleteAsync();
-            
-            return mapper.Map<HarvestDtoForFarmer>(harvest);
-        }
-
-        public async Task<OnePurchaseRequestForHarvest> GetOnePurchaseRequestForHarvest(int Id)
-        {
-            var Request=await unitOfWork.Purchase.FindTWithIncludes<PurchaseRequest>(Id,x=>x.Merchant,
-                x=>x.Merchant.ApplicationUser,
-                x=>x.Harvest,
-                x=>x.Harvest.Purchases
-                );
-            if (Request is null)
-                throw new Exception($"No Requsets With This Id {Id}");
-            return mapper.Map<OnePurchaseRequestForHarvest>(Request);
-
-        }
-
-        public async Task<IEnumerable<AllPurchasesRequestForHarvest>> GetAllPurchasesRequestForHarvest(int harvestId)
-        {
-            var Requests = await unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId);
-            return mapper.Map<IEnumerable<AllPurchasesRequestForHarvest>>(Requests);
         }
     }
 }

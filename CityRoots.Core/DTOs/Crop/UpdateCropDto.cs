@@ -1,7 +1,13 @@
 ﻿using CityRoots.Core.Const;
 using CityRoots.Core.CustomValidation;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace CityRoots.Core.DTOs.Crop
 {
@@ -23,19 +29,11 @@ namespace CityRoots.Core.DTOs.Crop
 
 
         public decimal ExpectedPriceChange { get; set; }
-       
-
         [Required]
         [EnumValidation(typeof(RiskLevel))]
         public string RiskLevel { get; set; }
-        [Required, MinLength(3), MaxLength(150)]
-
-        public string RiskDescription { get; set; }
-       
         [Required]
-        public int CropTypeId { get; set; }
-
-        public IFormFile Image { get; set; }
-
+        [EnumValidation(typeof(CropType))]
+        public string CropType { get; set; }
     }
 }

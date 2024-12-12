@@ -12,11 +12,9 @@ namespace CityRoots.Core.DTOs.Crop
     {
 
         public int CropId {  get; set; }
-        public string ImageUrl { get; set; }
         public string Name { get; set; }
 
         public decimal CurrentPrice { get; set; }
-        public string RiskDescription { get; set; }
 
         public decimal ExpectedPriceChange { get; set; }
 

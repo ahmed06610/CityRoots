@@ -9,9 +9,9 @@ namespace CityRoots.Core.Const
 {
     public enum RiskLevel
     {
-        منخفض=1,
-        متوسط,
-        عالي,
+        Low=1,
+        Medium,
+        High,
 
     
 }

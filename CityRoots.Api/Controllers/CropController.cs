@@ -43,7 +43,7 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] AddCropDto crop)
+        public async Task<IActionResult> Add([FromBody] AddCropDto crop)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -59,7 +59,7 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPut]
-        public async Task<IActionResult> Update([FromForm]  UpdateCropDto crop )
+        public async Task<IActionResult> Update([FromBody]  UpdateCropDto crop )
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

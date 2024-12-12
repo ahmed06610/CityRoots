@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.Const
 {
-    public enum CropType
+    public enum HarvestStatus
     {
-        Grain=1,
-        Fruit,
-        Vegetable
+        Avaible=1,
+        Sold
     }
 }
