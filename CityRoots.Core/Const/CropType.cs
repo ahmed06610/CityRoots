@@ -8,8 +8,8 @@ namespace CityRoots.Core.Const
 {
     public enum CropType
     {
-        Grain=1,
-        Fruit,
-        Vegetable
+        حبوب=1,
+        فاكهه,
+        خضار
     }
 }
