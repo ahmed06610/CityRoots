@@ -186,7 +186,7 @@ namespace CityRoots.EF.Data
                 .OnDelete(DeleteBehavior.Restrict);
          //   modelBuilder.Entity<CropType>().HasData(SeedCropType()); ==> Seeding Data To CropType
         }
-        private static List<CropType> SeedCropType()
+      /*  private static List<CropType> SeedCropType()
         {
             return new List<CropType>() {
             new CropType{CropTypeId=1,Name="حبوب"},
@@ -199,7 +199,7 @@ namespace CityRoots.EF.Data
 
 
 
-}
+}*/
     }
 }
             

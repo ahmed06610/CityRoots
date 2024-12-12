@@ -21,9 +21,9 @@ namespace CityRoots.Core.Models
 
         public decimal ExpectedPriceChange { get; set; }
         public string RiskDescription {  get; set; }
-        [ForeignKey(nameof(CropType))]
         public int CropTypeId {  get; set; }
-      public CropType CropType { get; set; }
+        [ForeignKey(nameof(CropTypeId))]
+        public CropType CropType { get; set; }
 
 
         public string RiskLevel { get; set; } // Low, Medium, High
