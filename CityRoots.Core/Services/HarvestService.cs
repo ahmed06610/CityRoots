@@ -67,7 +67,7 @@ namespace CityRoots.Core.Services
         {
 
 
-            var harvest = await unitOfWork.Harvest.FindTWithIncludes<Harvest>(id, x => x.Crop);
+            var harvest = await unitOfWork.Harvest.FindTWithIncludes<Harvest>(id,"HarvestId", x => x.Crop);
             if (harvest is null)
                 throw new Exception($"There is no Harvests with this id {id}");
             return mapper.Map<HarvestDtoForFarmer>(harvest);
@@ -130,7 +130,7 @@ namespace CityRoots.Core.Services
 
         public async Task<OnePurchaseRequestForHarvest> GetOnePurchaseRequestForHarvest(int Id)
         {
-            var Request=await unitOfWork.Purchase.FindTWithIncludes<PurchaseRequest>(Id,x=>x.Merchant,
+            var Request=await unitOfWork.Purchase.FindTWithIncludes<PurchaseRequest>(Id, "PurchaseRequestId", x=>x.Merchant,
                 x=>x.Merchant.ApplicationUser,
                 x=>x.Harvest,
                 x=>x.Harvest.Purchases

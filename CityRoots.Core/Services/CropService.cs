@@ -46,7 +46,7 @@ namespace CityRoots.Core.Services
 
         public async Task<CropDisplayDto> Get(int id)
         {
-            var crop=await _unitOfWork.Crop.FindTWithIncludes<Crop>(id,c=>c.CropType);
+            var crop=await _unitOfWork.Crop.FindTWithIncludes<Crop>(id, "CropId", c=>c.CropType);
             if (crop is null)
                 throw new Exception($"There is crop with this Id {id}");
             return mapper.Map<CropDisplayDto>(crop);
