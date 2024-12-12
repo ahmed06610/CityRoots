@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211070637_Add RiskDescription To Crop")]
+    partial class AddRiskDescriptionToCrop
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,18 +147,15 @@ namespace CityRoots.EF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CropId"));
 
-                    b.Property<int>("CropTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("CropType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("CurrentPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("ExpectedPriceChange")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -171,26 +171,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasKey("CropId");
 
-                    b.HasIndex("CropTypeId");
-
                     b.ToTable("Crops");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.CropType", b =>
-                {
-                    b.Property<int>("CropTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CropTypeId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CropTypeId");
-
-                    b.ToTable("CropTypes");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>
@@ -356,6 +337,9 @@ namespace CityRoots.EF.Migrations
                     b.Property<int?>("CycleId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("FarmerId")
                         .HasColumnType("int");
 
@@ -363,14 +347,8 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAlLowedToShowUpdatesToMerchant")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("ProductionDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<double>("Yield")
                         .HasColumnType("float");
@@ -670,11 +648,7 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaskDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TaskName")
+                    b.Property<string>("TaskType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -835,17 +809,6 @@ namespace CityRoots.EF.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.Crop", b =>
-                {
-                    b.HasOne("CityRoots.Core.Models.CropType", "CropType")
-                        .WithMany("crops")
-                        .HasForeignKey("CropTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CropType");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>
@@ -1136,11 +1099,6 @@ namespace CityRoots.EF.Migrations
                     b.Navigation("Cycles");
 
                     b.Navigation("Harvests");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.CropType", b =>
-                {
-                    b.Navigation("crops");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>

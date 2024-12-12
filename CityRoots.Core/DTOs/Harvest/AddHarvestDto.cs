@@ -19,7 +19,12 @@ namespace CityRoots.Core.DTOs.Harvest
         [Required,Range(1,60000)]
         
         public decimal Price {  get; set; }
-       
+        [Required]
+        public DateTime ProductionDate { get; set; }
+        [Required]
+        public bool IsAlLowedToShowUpdatesToMerchant { get; set; }
+
+
         public IFormFile Image { get; set; }
       
         

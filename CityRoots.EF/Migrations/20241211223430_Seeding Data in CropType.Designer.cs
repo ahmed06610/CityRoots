@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211223430_Seeding Data in CropType")]
+    partial class SeedingDatainCropType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,6 +194,23 @@ namespace CityRoots.EF.Migrations
                     b.HasKey("CropTypeId");
 
                     b.ToTable("CropTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            CropTypeId = 1,
+                            Name = "حبوب"
+                        },
+                        new
+                        {
+                            CropTypeId = 2,
+                            Name = "فاكهه"
+                        },
+                        new
+                        {
+                            CropTypeId = 3,
+                            Name = "خضار"
+                        });
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>
@@ -356,6 +376,9 @@ namespace CityRoots.EF.Migrations
                     b.Property<int?>("CycleId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("FarmerId")
                         .HasColumnType("int");
 
@@ -363,14 +386,8 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAlLowedToShowUpdatesToMerchant")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("ProductionDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<double>("Yield")
                         .HasColumnType("float");

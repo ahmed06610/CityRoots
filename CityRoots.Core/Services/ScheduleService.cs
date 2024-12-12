@@ -34,7 +34,7 @@ namespace CityRoots.Core.Services
             var schdeule = await _unitOfWork.Schedule.GetByIdAsync(Id);
             if (schdeule is null)
                 throw new Exception($"No Schedules with Id {Id}");
-            schdeule.Status = "Compeleted";
+            schdeule.Status = "اكتملت";
             _unitOfWork.Schedule.Update(schdeule);
             await _unitOfWork.CompleteAsync();
         }
