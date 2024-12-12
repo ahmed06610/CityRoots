@@ -23,6 +23,8 @@ namespace CityRoots.Core.Models
         public decimal GrowthRate { get; set; }
         public string QualityCheck { get; set; }
         public string ImageUrl { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
         public string AdditionalNotes { get; set; }
     }
 
