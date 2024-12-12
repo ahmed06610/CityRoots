@@ -18,6 +18,8 @@ namespace CityRoots.Core.Models
 
         [ForeignKey(nameof(FarmId))]
         public virtual Farm Farm { get; set; }
+        [Required]
+        public string ParcelName { get; set; }
 
         [Required]
         public double Price { get; set; }

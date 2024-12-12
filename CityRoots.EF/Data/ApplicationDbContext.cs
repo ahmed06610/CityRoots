@@ -1,4 +1,4 @@
-﻿    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CityRoots.Core.Models;
 
@@ -33,6 +33,7 @@ namespace CityRoots.EF.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<FeedBack> feedBacks { get; set; }
         public DbSet<CropType> CropTypes { get; set; }
+        public DbSet<AiPredict> AiPredicts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -28,6 +28,7 @@ namespace CityRoots.EF
         public IPurchaseRepository Purchase { get; private set; }
         public IScheduleRepository Schedule { get; private set; }
         public IFeedBackRepository FeedBack { get; private set; }
+        public IAiPredictRepository AiPredict { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -49,6 +50,7 @@ namespace CityRoots.EF
             Purchase = new PurchaseRepository(context);
             Schedule = new ScheduleRepository(context);
             FeedBack = new FeedBackRepository(context);
+            AiPredict = new AiPredictRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

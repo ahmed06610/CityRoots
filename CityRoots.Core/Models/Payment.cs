@@ -13,6 +13,8 @@ namespace CityRoots.Core.Models
 
         public DateTime PaymentDate { get; set; }
         public string PaymentMethod { get; set; } // e.g., PayPal, Credit Card
+        public string Statue { get; set; } // Aceppted, Rejected
+        public string Type { get; set; } // Investment, Purchase
 
         [Required]
         public string PayerId { get; set; }

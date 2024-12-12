@@ -15,15 +15,18 @@ namespace CityRoots.Core.DTOs.Cycle
         public string CycleName { get; set; }
         [Required]
         public int ParcelId { get; set; }
+        public string ParcelName { get; set; }
         [Required]
         public int CropId { get; set; }
         [Required]
         public DateTime StartDate { get; set; }
         [Required]
         public DateTime EndDate { get; set; }
+        public string TimeToStart { get; set; }
         public double ExpectedYield { get; set; }
         public bool IsOpenForInvestment { get; set; } // Indicates if this cycle is open for investment
         public OpenInvestmentCycleDTO? OpenInvestmentCycleDTO { get; set; }
+        public List<CurrentInvestors>? currentInvestors { get; set; }
 
     }
 
@@ -37,5 +40,10 @@ namespace CityRoots.Core.DTOs.Cycle
         public int CurrentInvestorCount { get; set; }
         public decimal CurrentTotalInvestment { get; set; }
         public string AvailableProfitTypes { get; set; } // Cash, Crop Share, Both
+    }
+    public class CurrentInvestors
+    {
+        public string FullName { get; set; }
+        public decimal InvestmentAmount { get; set; }
     }
 }
