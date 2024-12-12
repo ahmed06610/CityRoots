@@ -40,13 +40,13 @@ namespace CityRoots.EF.Repositories
             _context.Set<T>().Update(entity);
             return entity;
         }
-        public async Task<T> FindTWithIncludes<T>(int id, params Expression<Func<T, object>>[] includeProperties) where T : class
+        public async Task<T> FindTWithIncludes<T>(int id,string keyname, params Expression<Func<T, object>>[] includeProperties) where T : class
         {
             IQueryable<T> query = _context.Set<T>();
 
             query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
-            var Entity = await query.FirstOrDefaultAsync(e => Microsoft.EntityFrameworkCore.EF.Property<object>(e, "Id").Equals(id));
+            var Entity = await query.FirstOrDefaultAsync(e => Microsoft.EntityFrameworkCore.EF.Property<object>(e, keyname).Equals(id));
             return Entity;
         }
         public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria)
