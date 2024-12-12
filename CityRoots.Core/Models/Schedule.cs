@@ -24,11 +24,13 @@ namespace CityRoots.Core.Models
         public virtual Cycle Cycle { get; set; }
 
         [Required]
-        public string TaskType { get; set; }
+        public string TaskName { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Status { get; set; } // Pending, In Progress, Completed
+        public string TaskDescription { get; set; }
+
     }
 
 }

@@ -16,10 +16,14 @@ namespace CityRoots.Core.DTOs.Harvest
         public double Yield { get; set; }
         [Required]
         public decimal Price{get; set;}
-        [Required,EnumDataType(typeof(HarvestStatus))]
-        public string status {  get; set; }
+       
         [Required]
         public IFormFile Image { get; set; }
+        [Required]
+        public DateTime ProductionDate { get; set; }
+        [Required]
+        public bool IsAlLowedToShowUpdatesToMerchant { get; set; }
+
 
     }
 }

@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211223430_Seeding Data in CropType")]
+    partial class SeedingDatainCropType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +24,6 @@ namespace CityRoots.EF.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CityRoots.Core.Models.AiPredict", b =>
-                {
-                    b.Property<int>("AiPredictId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AiPredictId"));
-
-                    b.Property<string>("ArabicName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Diagnosis")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EnglishName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsIll")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Recommendation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AiPredictId");
-
-                    b.ToTable("AiPredicts");
-                });
 
             modelBuilder.Entity("CityRoots.Core.Models.ApplicationUser", b =>
                 {
@@ -221,6 +194,23 @@ namespace CityRoots.EF.Migrations
                     b.HasKey("CropTypeId");
 
                     b.ToTable("CropTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            CropTypeId = 1,
+                            Name = "حبوب"
+                        },
+                        new
+                        {
+                            CropTypeId = 2,
+                            Name = "فاكهه"
+                        },
+                        new
+                        {
+                            CropTypeId = 3,
+                            Name = "خضار"
+                        });
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>
@@ -274,10 +264,6 @@ namespace CityRoots.EF.Migrations
                     b.Property<int>("CycleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("GrowthRate")
                         .HasColumnType("decimal(18,2)");
 
@@ -286,10 +272,6 @@ namespace CityRoots.EF.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("QualityCheck")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -394,6 +376,9 @@ namespace CityRoots.EF.Migrations
                     b.Property<int?>("CycleId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("FarmerId")
                         .HasColumnType("int");
 
@@ -401,14 +386,8 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAlLowedToShowUpdatesToMerchant")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("ProductionDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<double>("Yield")
                         .HasColumnType("float");
@@ -501,10 +480,6 @@ namespace CityRoots.EF.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParcelName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -639,14 +614,6 @@ namespace CityRoots.EF.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Statue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

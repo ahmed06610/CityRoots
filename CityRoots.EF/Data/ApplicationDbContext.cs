@@ -1,4 +1,4 @@
-﻿    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CityRoots.Core.Models;
 
@@ -32,6 +32,7 @@ namespace CityRoots.EF.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<FeedBack> feedBacks { get; set; }
+        public DbSet<CropType> CropTypes { get; set; }
         public DbSet<AiPredict> AiPredicts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -176,10 +177,29 @@ namespace CityRoots.EF.Data
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FeedBack>()
                 .HasOne(p => p.User)
-                .WithMany(p=>p.FeedBacks)
+                .WithMany(p => p.FeedBacks)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Crop>()
+                .HasOne(x => x.CropType)
+                .WithMany(x => x.crops)
+                .OnDelete(DeleteBehavior.Restrict);
+         //   modelBuilder.Entity<CropType>().HasData(SeedCropType()); ==> Seeding Data To CropType
         }
-    }
+        private static List<CropType> SeedCropType()
+        {
+            return new List<CropType>() {
+            new CropType{CropTypeId=1,Name="حبوب"},
+            new CropType{CropTypeId=2,Name="فاكهه" },
+            new CropType{CropTypeId=3,Name="خضار"}
+            };
+
+
+
+
+
 
 }
+    }
+}
+            

@@ -16,11 +16,11 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpPost("GetAllHarvestsForFarmer")]
-        public async Task<IActionResult> GetAll([FromBody]string Name=null)
+        public async Task<IActionResult> GetAll([FromBody] string Name = null, int farmerid = 0)
         {
             try
             {
-                return Ok(await _harvestService.GetAll(Name));
+                return Ok(await _harvestService.GetAll(Name, farmerid = 0));
             }
             catch (Exception ex)
             {
@@ -43,14 +43,14 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] AddHarvestDto harvest)
+        public async Task<IActionResult> Add([FromForm] AddHarvestDto harvest, int farmerid = 1)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             try
             {
 
-                return Ok(await _harvestService.Add(harvest));
+                return Ok(await _harvestService.Add(harvest, farmerid));
 
             }
             catch (Exception ex)
@@ -90,6 +90,29 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+        [HttpGet("GetTheRequestsofHarvest/{harvestId}")]
+        public async Task<IActionResult> GetAllRequests(int harvestId)
+        {
+            try
+            {
+                return Ok(await _harvestService.GetAllPurchasesRequestForHarvest(harvestId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetRequest/{RequestId}")]
+        public async Task<IActionResult> GetRequest(int RequestId)
+        {
+            try { 
+            return Ok(await _harvestService.GetOnePurchaseRequestForHarvest(RequestId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

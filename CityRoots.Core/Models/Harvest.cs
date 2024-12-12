@@ -12,8 +12,7 @@ namespace CityRoots.Core.Models
     {
         public Harvest()
         {
-            Date=DateTime.Now;
-            status = "Avaible";
+            status = "متاح";
         }
 
         [Key]
@@ -32,7 +31,8 @@ namespace CityRoots.Core.Models
         [Required]
         public string status { get; set; }
 
-        public DateTime Date { get; private set; }
+        public DateTime ProductionDate { get;  set; }
+        public bool IsAlLowedToShowUpdatesToMerchant {  get; set; }
 
         public string ImageUrl { get; set; }
 
