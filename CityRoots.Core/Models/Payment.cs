@@ -16,6 +16,14 @@ namespace CityRoots.Core.Models
         public string Statue { get; set; } // Aceppted, Rejected
         public string Type { get; set; } // Investment, Purchase
 
+        public int? CycleId { get; set; }
+        [ForeignKey(nameof(CycleId))]
+        public virtual Cycle Cycle { get; set; }
+
+        public int? HarvestId { get; set; }
+        [ForeignKey(nameof(HarvestId))]
+        public virtual Harvest Harvest { get; set; }
+
         [Required]
         public string PayerId { get; set; }
 
