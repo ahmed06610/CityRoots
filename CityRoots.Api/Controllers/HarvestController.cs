@@ -103,16 +103,6 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetRequest/{RequestId}")]
-        public async Task<IActionResult> GetRequest(int RequestId)
-        {
-            try { 
-            return Ok(await _harvestService.GetOnePurchaseRequestForHarvest(RequestId));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        
     }
 }

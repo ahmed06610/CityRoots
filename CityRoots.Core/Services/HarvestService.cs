@@ -67,9 +67,10 @@ namespace CityRoots.Core.Services
         {
 
 
-            var harvest = await unitOfWork.Harvest.FindTWithIncludes<Harvest>(id,"HarvestId", x => x.Crop);
+            var harvest = await unitOfWork.Harvest.FindTWithIncludes<Harvest>(id,"HarvestId", x => x.Crop,x=>x.Purchases);
             if (harvest is null)
                 throw new Exception($"There is no Harvests with this id {id}");
+            harvest.Purchases=await GetAllRequests(id);
             return mapper.Map<HarvestDtoForFarmer>(harvest);
         }
 
@@ -78,11 +79,21 @@ namespace CityRoots.Core.Services
 
             var harvests = await unitOfWork.Harvest.FindAllWithIncludes<Harvest>(x => (x.Crop.Name.Contains(s)||s==null)&&(x.FarmerId==farmerid||farmerid==0)
             ,x=>x.Crop
-            , x=>x.Purchases);
+            ,x=>x.Purchases
+            
+           
+            );
+          
             var _harvests = new List<HarvestDtoForFarmer>();
-            foreach(var harvest in harvests)
-                _harvests.Add(await CheckStatus(harvest));
 
+            foreach (var harvest in harvests)
+            { await CheckStatus(harvest);
+                if (harvest.status == "تحت الطلب")
+                    harvest.Purchases = await GetAllRequests(harvest.HarvestId);
+
+                _harvests.Add(mapper.Map<HarvestDtoForFarmer>(harvest));
+            }
+         
 
             return _harvests;
         }
@@ -107,7 +118,7 @@ namespace CityRoots.Core.Services
             return updateharvest;
 
         }
-        private async Task <HarvestDtoForFarmer> CheckStatus(Harvest harvest)
+        private async Task <Harvest> CheckStatus(Harvest harvest)
         {
           
             
@@ -125,26 +136,32 @@ namespace CityRoots.Core.Services
                 unitOfWork.Harvest.Update(harvest);
                 await unitOfWork.CompleteAsync();
             
-            return mapper.Map<HarvestDtoForFarmer>(harvest);
+            return harvest;
         }
 
-        public async Task<OnePurchaseRequestForHarvest> GetOnePurchaseRequestForHarvest(int Id)
-        {
-            var Request=await unitOfWork.Purchase.FindTWithIncludes<PurchaseRequest>(Id, "PurchaseRequestId", x=>x.Merchant,
-                x=>x.Merchant.ApplicationUser,
-                x=>x.Harvest,
-                x=>x.Harvest.Purchases
-                );
-            if (Request is null)
-                throw new Exception($"No Requsets With This Id {Id}");
-            return mapper.Map<OnePurchaseRequestForHarvest>(Request);
+      
 
-        }
 
         public async Task<IEnumerable<AllPurchasesRequestForHarvest>> GetAllPurchasesRequestForHarvest(int harvestId)
         {
-            var Requests = await unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId);
+            var Requests = await unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId
+            ,x=>x.Merchant,
+            x=>x.Merchant.ApplicationUser
+            ,x=>x.Harvest
+            ,x => x.Harvest.Purchases
+            
+            );
             return mapper.Map<IEnumerable<AllPurchasesRequestForHarvest>>(Requests);
+        }
+        private async Task<List<PurchaseRequest>> GetAllRequests(int harvestId)
+        {
+            var Requests = (await unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId
+           , x => x.Merchant,
+           x => x.Merchant.ApplicationUser
+          
+
+           )).ToList();
+            return Requests;
         }
     }
 }
