@@ -38,11 +38,13 @@ namespace CityRoots.Core.Models
 
         // Navigation Properties
         public virtual List<PurchaseRequest> Purchases { get; set; }
-        [ForeignKey(nameof(Farmer))]
         public int FarmerId { get; set; }
+        [ForeignKey(nameof(FarmerId))]
+
         public Farmer Farmer { get; set; }
-        [ForeignKey(nameof(Cycle))]
         public int? CycleId {  get; set; }
+        [ForeignKey(nameof(CycleId))]
+
         public Cycle Cycle { get; set; }
     }
 

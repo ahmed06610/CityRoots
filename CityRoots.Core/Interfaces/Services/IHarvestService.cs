@@ -15,7 +15,6 @@ namespace CityRoots.Core.Interfaces.Services
         Task<AddHarvestDto> Add(AddHarvestDto harvest,int farmerid);
         Task<UpdateHarvestDto> Update(UpdateHarvestDto harvest);
         Task Delete(int id);
-        Task<OnePurchaseRequestForHarvest> GetOnePurchaseRequestForHarvest(int PruchaseRequestid);
         Task<IEnumerable<AllPurchasesRequestForHarvest>> GetAllPurchasesRequestForHarvest(int harvestId);
     }
 }

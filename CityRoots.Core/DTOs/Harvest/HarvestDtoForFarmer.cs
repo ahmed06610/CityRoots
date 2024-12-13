@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CityRoots.Core.DTOs.Purchasereque;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,8 @@ namespace CityRoots.Core.DTOs.Harvest
         public decimal price {  get; set; }
         public DateTime ProductionDate { get; set; }
         public string Status {  get; set; }
+        public int ReuestsCount {  get; set; }
+        public List<AllPurchasesRequestForHarvest> Purchases {  get; set; }
+
     }
 }
