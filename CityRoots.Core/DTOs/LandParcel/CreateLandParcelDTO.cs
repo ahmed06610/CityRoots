@@ -17,6 +17,7 @@ namespace CityRoots.Core.DTOs.LandParcel
         public double Price { get; set; }
         [Required]
         public string Status { get; set; }
+        public string ParcelName { get; set; }
         public IFormFile Image { get; set; } // Accept image file from the client
     }
 
