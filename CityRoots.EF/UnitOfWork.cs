@@ -29,6 +29,7 @@ namespace CityRoots.EF
         public IScheduleRepository Schedule { get; private set; }
         public IFeedBackRepository FeedBack { get; private set; }
         public IAiPredictRepository AiPredict { get; private set; }
+        public ICycleNotificationLogRepository CycleNotificationLog { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -51,6 +52,7 @@ namespace CityRoots.EF
             Schedule = new ScheduleRepository(context);
             FeedBack = new FeedBackRepository(context);
             AiPredict = new AiPredictRepository(context);
+            CycleNotificationLog = new CycleNotificationLogRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

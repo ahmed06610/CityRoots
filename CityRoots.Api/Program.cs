@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using CityRoots.Api.Helpers;
 using CityRoots.Core.Interfaces.Services;
 using Hangfire;
-using CityRoots.Core.Services;
 using Hangfire.SqlServer;
 using Hangfire.Dashboard;
 
@@ -101,6 +100,8 @@ namespace CityRoots.Api
             builder.Services.AddScoped<ICycleUpdateService, CycleUpdateService>();
             builder.Services.AddScoped<AiPredictionService, AiPredictionService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<CycleNotificationLogService, CycleNotificationLogService>();
+
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();

@@ -1,31 +1,33 @@
 ﻿using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Notification;
+using CityRoots.Core.Interfaces;
+using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TimeZoneConverter;
 
-namespace CityRoots.Core.Interfaces.Services
+namespace CityRoots.Core.Services
 {
     public class CycleNotificationService : ICycleNotificationService
     {
         private readonly INotificationService _notificationService;
-        private readonly ICycleService _cycleService; // Assume this service provides access to cycle details.
+        private readonly ICycleService _cycleService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly CycleNotificationLogService _cycleNotificationLogService;
 
-        public CycleNotificationService(INotificationService notificationService, ICycleService cycleService, IUnitOfWork unitOfWork)
+        public CycleNotificationService(
+            INotificationService notificationService,
+            ICycleService cycleService,
+            IUnitOfWork unitOfWork,
+            CycleNotificationLogService cycleNotificationLogService)
         {
             _notificationService = notificationService;
             _cycleService = cycleService;
             _unitOfWork = unitOfWork;
+            _cycleNotificationLogService = cycleNotificationLogService;
         }
 
         public async Task HandleCycleNotificationAsync(Cycle cycle)
         {
-            // Convert current time to Egypt timezone
             var egyptZone = TZConvert.GetTimeZoneInfo("Africa/Cairo");
             var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
 
@@ -41,36 +43,51 @@ namespace CityRoots.Core.Interfaces.Services
                         "InvestorId",
                         i => i.ApplicationUser)).ApplicationUser.UserName;
 
-                    await NotifyInvestmentRequestAsync(cycle.CycleId, farmerId, investorName, investment.RequestedAmount);
+                    if (!await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.InvestmentRequest,investment.InvestmentRequestId))
+                    {
+                        await NotifyInvestmentRequestAsync(cycle.CycleId, farmerId, investorName, investment.RequestedAmount);
+                        await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.InvestmentRequest,investment.InvestmentRequestId);
+                    }
                 }
             }
 
             // Notify when investment goal is met before the cycle start date
-            if (cycle.OpenInvestmentCycle!=null &&cycle.OpenInvestmentCycle.CurrentTotalInvestment >= cycle.OpenInvestmentCycle.ExpectedFinancialGoal
-                && now < cycle.StartDate)
+            if (cycle.OpenInvestmentCycle != null &&
+                cycle.OpenInvestmentCycle.CurrentTotalInvestment >= cycle.OpenInvestmentCycle.ExpectedFinancialGoal &&
+                now < cycle.StartDate &&
+                !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.InvestmentGoalMet))
             {
                 await NotifyInvestmentGoalMetAsync(cycle.CycleId, farmerId);
+                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.InvestmentGoalMet);
             }
 
             // Notify if the cycle start is approaching and the investment goal is insufficient
-            if (cycle.OpenInvestmentCycle != null && now.AddDays(2) >= cycle.StartDate
-                && cycle.OpenInvestmentCycle.CurrentTotalInvestment < cycle.OpenInvestmentCycle.ExpectedFinancialGoal)
+            if (cycle.OpenInvestmentCycle != null &&
+                now.AddDays(2) >= cycle.StartDate &&
+                cycle.OpenInvestmentCycle.CurrentTotalInvestment < cycle.OpenInvestmentCycle.ExpectedFinancialGoal &&
+                !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.InsufficientInvestment))
             {
                 await NotifyInsufficientInvestmentAsync(cycle.CycleId, farmerId, cycle.StartDate);
+                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.InsufficientInvestment);
             }
 
             // Notify when the cycle starts
-            if (now.Date == cycle.StartDate.Date)
+            if (now.Date >= cycle.StartDate.Date &&
+                !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.CycleStarted))
             {
                 await NotifyCycleStartedAsync(cycle.CycleId, farmerId);
+                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.CycleStarted);
             }
 
             // Notify if the cycle end is approaching
-            if (now.AddDays(2) >= cycle.EndDate)
+            if (now.AddDays(2) >= cycle.EndDate &&
+                !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.CycleEndApproaching))
             {
                 await NotifyCycleEndApproachingAsync(cycle.CycleId, farmerId, cycle.EndDate);
+                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.CycleEndApproaching);
             }
         }
+
         public async Task NotifyInvestmentRequestAsync(int cycleId, string userId, string investorName, decimal amount)
         {
             var cycle = await _cycleService.GetCycleByIdAsync(cycleId);

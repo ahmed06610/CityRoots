@@ -27,6 +27,7 @@ namespace CityRoots.Core.Interfaces
         IScheduleRepository Schedule { get; }
         IFeedBackRepository FeedBack { get; }
         IAiPredictRepository AiPredict { get; }
+        ICycleNotificationLogRepository CycleNotificationLog { get; }
 
         Task<int> CompleteAsync();
         Task RollbackAsync();
