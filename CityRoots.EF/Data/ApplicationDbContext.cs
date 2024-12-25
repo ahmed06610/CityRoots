@@ -1,11 +1,9 @@
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CityRoots.Core.Models;
 
 namespace CityRoots.EF.Data
 {
-
-
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext() { }
@@ -55,7 +53,7 @@ namespace CityRoots.EF.Data
                 .HasForeignKey<Investor>(i => i.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Define a one-to-one relationship between ApplicationUser and Investor
+            // Define a one-to-one relationship between ApplicationUser and Merchant
             modelBuilder.Entity<ApplicationUser>()
                 .HasOne(a => a.Merchant)
                 .WithOne(m => m.ApplicationUser)
@@ -126,7 +124,7 @@ namespace CityRoots.EF.Data
             // Payment - Payer relationship
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Payer)
-                .WithMany(u => u.Payments) // This could also be PayerPayments if you have different navigation collections.
+                .WithMany(u => u.Payments)
                 .HasForeignKey(p => p.PayerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -136,6 +134,7 @@ namespace CityRoots.EF.Data
                 .WithMany()
                 .HasForeignKey(p => p.PayeeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             // Harvest-Crop and Harvest-Purchase (one-to-many relationships)
             modelBuilder.Entity<Harvest>()
                 .HasOne(h => h.Crop)
@@ -158,14 +157,14 @@ namespace CityRoots.EF.Data
             // Chat - Sender relationship
             modelBuilder.Entity<Chat>()
                 .HasOne(c => c.Sender)
-                .WithMany(u => u.SentChats) // Collection for chats sent by the user
+                .WithMany(u => u.SentChats)
                 .HasForeignKey(c => c.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Chat - Receiver relationship
             modelBuilder.Entity<Chat>()
                 .HasOne(c => c.Receiver)
-                .WithMany(u => u.ReceivedChats) // Collection for chats received by the user
+                .WithMany(u => u.ReceivedChats)
                 .HasForeignKey(c => c.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -175,31 +174,25 @@ namespace CityRoots.EF.Data
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<FeedBack>()
                 .HasOne(p => p.User)
                 .WithMany(p => p.FeedBacks)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Crop>()
                 .HasOne(x => x.CropType)
                 .WithMany(x => x.crops)
                 .OnDelete(DeleteBehavior.Restrict);
-         //   modelBuilder.Entity<CropType>().HasData(SeedCropType()); ==> Seeding Data To CropType
         }
-      /*  private static List<CropType> SeedCropType()
-        {
-            return new List<CropType>() {
-            new CropType{CropTypeId=1,Name="حبوب"},
-            new CropType{CropTypeId=2,Name="فاكهه" },
-            new CropType{CropTypeId=3,Name="خضار"}
-            };
-
-
-
-
-
-
-}*/
     }
+    /*  private static List<CropType> SeedCropType()
+  {
+      return new List<CropType>() {
+      new CropType{CropTypeId=1,Name="حبوب"},
+      new CropType{CropTypeId=2,Name="فاكهه" },
+      new CropType{CropTypeId=3,Name="خضار"}
+      };
+}*/
 }
-            

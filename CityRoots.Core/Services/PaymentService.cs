@@ -100,5 +100,23 @@ namespace CityRoots.Core.Services
                 AssociatedHarvest = assoh
             };
         }
+
+
+        public async Task DeletePaymentsByCycleIdAsync(int cycleId)
+        {
+            // Find all payments related to the cycleId
+            var payments = await _unitOfWork.Payment.FindAllAsync(p => p.CycleId == cycleId);
+
+            if (payments.Any())
+            {
+                // Remove related payments
+                foreach (var payment in payments)
+                {
+                   await _unitOfWork.Payment.DeleteAsync(payment);
+
+                }
+                await _unitOfWork.CommitAsync();  // Save changes to the database
+            }
+        }
     }
 }

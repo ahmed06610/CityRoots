@@ -26,15 +26,24 @@ namespace CityRoots.Core.Services
 
         public async Task<OpenInvestmentCycleDTO> CreateOpenInvestmentCycleAsync(CreateOpenInvestmentCycleDTO dto)
         {
-            var cycle = await _unitOfWork.Cycle.GetByIdAsync(dto.CycleId);
-            if (cycle == null) throw new KeyNotFoundException("Cycle not found.");
+            try
+            {
+                var cycle = await _unitOfWork.Cycle.GetByIdAsync((int)dto.CycleId!);
+                if (cycle == null) throw new KeyNotFoundException("Cycle not found.");
 
-            var openInvestmentCycle = _mapper.Map<OpenInvestmentCycle>(dto);
+                var openInvestmentCycle = _mapper.Map<OpenInvestmentCycle>(dto);
 
-            await _unitOfWork.OpenInvestmentCycle.AddAsync(openInvestmentCycle);
-            await _unitOfWork.CompleteAsync();
+                await _unitOfWork.OpenInvestmentCycle.AddAsync(openInvestmentCycle);
+                await _unitOfWork.CompleteAsync();
 
-            return _mapper.Map<OpenInvestmentCycleDTO>(openInvestmentCycle);
+                return _mapper.Map<OpenInvestmentCycleDTO>(openInvestmentCycle);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+      
         }
 
         public async Task<OpenInvestmentCycleDTO> UpdateOpenInvestmentCycleAsync(UpdateOpenInvestmentCycleDTO dto)
