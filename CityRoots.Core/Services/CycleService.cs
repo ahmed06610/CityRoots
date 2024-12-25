@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
@@ -15,12 +16,16 @@ namespace CityRoots.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IOpenInvestmentCycleService _openInvestmentCycleService;
+        private readonly IPaymentService _paymentService;
 
 
-        public CycleService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CycleService(IUnitOfWork unitOfWork, IMapper mapper, IOpenInvestmentCycleService openInvestmentCycleService, IPaymentService paymentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _openInvestmentCycleService = openInvestmentCycleService;
+            _paymentService = paymentService;
         }
 
         public async Task<List<CycleDTO>> GetAllCyclesAsync(int FarmerId = 0)
@@ -54,7 +59,18 @@ namespace CityRoots.Core.Services
             var createdCycle = await _unitOfWork.Cycle.AddAsync(cycle);
             await _unitOfWork.CompleteAsync();
 
-            return _mapper.Map<CycleDTO>(createdCycle);
+            if (createCycleDto.openInvestmentCycleDTO != null)
+            {
+                createCycleDto.openInvestmentCycleDTO.CycleId = createdCycle.CycleId;
+              
+                    await _openInvestmentCycleService.CreateOpenInvestmentCycleAsync(createCycleDto.openInvestmentCycleDTO);
+
+              
+            }
+            await _unitOfWork.CompleteAsync();
+            var result =await mapping(createdCycle);
+
+            return result;
         }
 
         public async Task<CycleDTO> UpdateCycleAsync(UpdateCycleDTO updateCycleDto)
@@ -62,8 +78,16 @@ namespace CityRoots.Core.Services
             var existingCycle = await _unitOfWork.Cycle.GetByIdAsync(updateCycleDto.CycleId);
             if (existingCycle == null) return null;
 
+
             _mapper.Map(updateCycleDto, existingCycle);
             _unitOfWork.Cycle.Update(existingCycle);
+            if (updateCycleDto.UpdateOpenInvestmentCycleDTO != null)
+            {
+                updateCycleDto.UpdateOpenInvestmentCycleDTO.CycleId= existingCycle.CycleId;
+                updateCycleDto.UpdateOpenInvestmentCycleDTO.OpenInvestmentCycleId=(await _unitOfWork.OpenInvestmentCycle
+                    .FindTWithExpression<OpenInvestmentCycle>(o=>o.CycleId==existingCycle.CycleId)).OpenInvestmentCycleId;
+               await _openInvestmentCycleService.UpdateOpenInvestmentCycleAsync(updateCycleDto.UpdateOpenInvestmentCycleDTO);
+            }
             await _unitOfWork.CompleteAsync();
 
             return _mapper.Map<CycleDTO>(existingCycle);
@@ -73,8 +97,14 @@ namespace CityRoots.Core.Services
         {
             var cycle = await _unitOfWork.Cycle.GetByIdAsync(id);
             if (cycle == null) return false;
-
+            var openInvestmentCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(o => o.CycleId == id);
+            if (openInvestmentCycle != null)
+            {
+                await _openInvestmentCycleService.DeleteOpenInvestmentCycleAsync(openInvestmentCycle.OpenInvestmentCycleId);
+            }
+           await _paymentService.DeletePaymentsByCycleIdAsync(id);
             await _unitOfWork.Cycle.DeleteAsync(cycle);
+            
             await _unitOfWork.CompleteAsync();
             return true;
         }
@@ -97,16 +127,18 @@ namespace CityRoots.Core.Services
                 var CurrentInvestors = new List<CurrentInvestors>();
                 foreach (var investment in cycle.InvestmentRequests)
                 {
-                    var invest =await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
-                        i => i.ApplicationUser);
-                    var CurrentInvstment = new CurrentInvestors
-                    {
-                        FullName = invest.ApplicationUser.UserName,
-                        InvestmentAmount = investment.RequestedAmount,
-                    };
-                    CurrentInvestors.Add(CurrentInvstment);
+                    if (investment.RequestStatus == InvestmentStatues.Accepted.ToString()) {
+                        var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
+                            i => i.ApplicationUser);
+                        var CurrentInvstment = new CurrentInvestors
+                        {
+                            FullName = invest.ApplicationUser.UserName,
+                            InvestmentAmount = investment.RequestedAmount,
+                        };
+                        CurrentInvestors.Add(CurrentInvstment);
+                    }
+                    cycleDto.currentInvestors = CurrentInvestors;
                 }
-                cycleDto.currentInvestors = CurrentInvestors;
             }
 
             cycleDto.TimeToStart = GetRemainingTimeMessage(cycleDto.StartDate,cycleDto.EndDate);

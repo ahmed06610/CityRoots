@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CityRoots.Core.DTOs.OpenInvestmentCycle;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,5 +22,6 @@ namespace CityRoots.Core.DTOs.Cycle
         [Required]
         public DateTime EndDate { get; set; }
         public double ExpectedYield { get; set; }
+        public CreateOpenInvestmentCycleDTO? openInvestmentCycleDTO { get; set; }
     }
 }

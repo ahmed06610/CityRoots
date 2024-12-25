@@ -8,7 +8,7 @@ namespace CityRoots.Core.DTOs.OpenInvestmentCycle
 {
     public class CreateOpenInvestmentCycleDTO
     {
-        public int CycleId { get; set; }
+        public int? CycleId { get; set; }
         public decimal ExpectedFinancialGoal { get; set; }
         public decimal MinimumInvestment { get; set; }
         public decimal MaximumInvestment { get; set; }

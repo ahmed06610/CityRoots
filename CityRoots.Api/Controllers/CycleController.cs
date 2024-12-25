@@ -35,9 +35,17 @@ namespace CityRoots.Api.Controllers
         public async Task<IActionResult> AddCycle([FromBody] CreateCycleDTO createCycleDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var createdCycle = await _cycleService.AddCycleAsync(createCycleDto);
+                return CreatedAtAction(nameof(GetCycleById), new { id = createdCycle.CycleId }, createdCycle);
+            }
+            catch (Exception ex)
+            {
 
-            var createdCycle = await _cycleService.AddCycleAsync(createCycleDto);
-            return CreatedAtAction(nameof(GetCycleById), new { id = createdCycle.CycleId }, createdCycle);
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [HttpPut("EditCycle")]
