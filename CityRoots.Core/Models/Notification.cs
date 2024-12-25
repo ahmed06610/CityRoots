@@ -17,8 +17,12 @@ namespace CityRoots.Core.Models
         [Required]
         public string Content { get; set; }
 
-        public DateTime Date { get; set; }
-        public bool IsRead { get; set; }
-    }
+        [Required]
+        public string Type { get; set; } // e.g., Schedule, Cycle, Harvest
 
+        public DateTime Date { get; set; } = DateTime.Now;
+        public bool IsRead { get; set; } = false;
+
+        public string? AdditionalData { get; set; } // JSON or serialized data for extra details
+    }
 }

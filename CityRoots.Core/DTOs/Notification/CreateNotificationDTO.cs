@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CityRoots.Core.DTOs.Notification
+{
+    public class CreateNotificationDTO
+    {
+        public string UserId { get; set; }
+        public string Content { get; set; }
+        public string Type { get; set; } // e.g., "Schedule", "Cycle", "Harvest"
+        public string? AdditionalData { get; set; } // Optional JSON for extended details
+    }
+}
