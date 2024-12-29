@@ -30,6 +30,8 @@ namespace CityRoots.EF
         public IFeedBackRepository FeedBack { get; private set; }
         public IAiPredictRepository AiPredict { get; private set; }
         public ICycleNotificationLogRepository CycleNotificationLog { get; private set; }
+        public IHarvestNotificationLogRepository HarvestNotificationLog { get; private set; }
+        public IScheduleNotificationLogRepository ScheduleNotificationLog { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -53,6 +55,8 @@ namespace CityRoots.EF
             FeedBack = new FeedBackRepository(context);
             AiPredict = new AiPredictRepository(context);
             CycleNotificationLog = new CycleNotificationLogRepository(context);
+            HarvestNotificationLog= new HarvestNotificationLogRepository(context);
+            ScheduleNotificationLog = new ScheduleNotificationLogRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

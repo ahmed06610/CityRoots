@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227233439_RemoveNotificationsend from PurchaseRequest And Add date attribute for HarvestNotificationService")]
+    partial class RemoveNotificationsendfromPurchaseRequestAndAdddateattributeforHarvestNotificationService
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -810,30 +813,6 @@ namespace CityRoots.EF.Migrations
                     b.ToTable("Schedules");
                 });
 
-            modelBuilder.Entity("CityRoots.Core.Models.ScheduleNotificationLog", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<DateTime>("NotificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("scheduleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("scheduleNotificationType")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("scheduleId");
-
-                    b.ToTable("scheduleNotificationLogs");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1239,17 +1218,6 @@ namespace CityRoots.EF.Migrations
                         .IsRequired();
 
                     b.Navigation("Cycle");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.ScheduleNotificationLog", b =>
-                {
-                    b.HasOne("CityRoots.Core.Models.Schedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("scheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

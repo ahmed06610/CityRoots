@@ -7,6 +7,11 @@ namespace CityRoots.Core.Models
 {
     public class PurchaseRequest
     {
+        public PurchaseRequest()
+        {
+            RequestStatus = "pending";
+            RequestDate = DateTime.Now;
+        }
         [Key]
         public int PurchaseRequestId { get; set; }
 
@@ -30,7 +35,7 @@ namespace CityRoots.Core.Models
 
         public string RequestStatus { get; set; } // Pending, Approved, Rejected
 
-        public DateTime RequestDate { get; set; } // تاريخ تقديم الطلب
+        public DateTime RequestDate { get;  private set; } // تاريخ تقديم الطلب
 
         public string Notes { get; set; } // ملاحظات اختيارية
     }
