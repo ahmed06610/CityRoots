@@ -10,8 +10,8 @@ namespace CityRoots.Core.Interfaces.Services
 {
     public interface IFarmService
     {
-        Task<List<Farm>> GetAllFarmsAsync(int FarmerId);
-        Task<Farm> GetFarmByIdAsync(int id);
+        Task<List<FarmDTO>> GetAllFarmsAsync(int FarmerId);
+        Task<FarmDTO> GetFarmByIdAsync(int id);
         Task<FarmDTO> AddFarmAsync(CreateFarmDTO farm);
         Task<FarmDTO> UpdateFarmAsync(UpdateFarmDTO farm);
         Task<bool> DeleteFarmAsync(int id);

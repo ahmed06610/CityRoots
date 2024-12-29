@@ -25,8 +25,10 @@ namespace CityRoots.Core.DTOs.Cycle
         public string TimeToStart { get; set; }
         public double ExpectedYield { get; set; }
         public bool IsOpenForInvestment { get; set; } // Indicates if this cycle is open for investment
+        public int? NumbersOfRequestsInvestments { get; set; }
         public OpenInvestmentCycleDTO? OpenInvestmentCycleDTO { get; set; }
         public List<CurrentInvestors>? currentInvestors { get; set; }
+        public List<RequestsForInvestment>? requestsForInvestments { get; set; }
 
     }
 
@@ -45,5 +47,11 @@ namespace CityRoots.Core.DTOs.Cycle
     {
         public string FullName { get; set; }
         public decimal InvestmentAmount { get; set; }
+    }
+    public class RequestsForInvestment
+    {
+        public string FullName { get; set; }
+        public decimal InvestmentAmount { get; set; }
+        public string TypeOfProfit { get; set; }
     }
 }

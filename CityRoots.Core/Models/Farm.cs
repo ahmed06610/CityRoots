@@ -12,6 +12,8 @@ namespace CityRoots.Core.Models
     {
         [Key]
         public int FarmId { get; set; }
+        [Required]
+        public string FarmName { get; set; }
 
         [Required]
         public int FarmerId { get; set; }

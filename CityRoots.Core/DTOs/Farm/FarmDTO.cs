@@ -10,8 +10,10 @@ namespace CityRoots.Core.DTOs.Farm
     public class FarmDTO
     {
         public int FarmId { get; set; }
+        public string FarmName { get; set; }
         public string Location { get; set; }
         public double Size { get; set; }
-        public List<LandParcelDTO> LandParcels { get; set; }
+        public int numbersOfLands { get; set; }
+        public List<LandParcelDTO>? LandParcels { get; set; }
     }
 }

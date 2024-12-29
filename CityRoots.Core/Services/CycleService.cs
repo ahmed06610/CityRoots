@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tensorflow;
 
 namespace CityRoots.Core.Services
 {
@@ -125,8 +126,10 @@ namespace CityRoots.Core.Services
             if (cycle.InvestmentRequests != null)
             {
                 var CurrentInvestors = new List<CurrentInvestors>();
+                var ReqestForInvestment = new List<RequestsForInvestment>();
                 foreach (var investment in cycle.InvestmentRequests)
                 {
+                    cycleDto.NumbersOfRequestsInvestments = 0;
                     if (investment.RequestStatus == InvestmentStatues.Accepted.ToString()) {
                         var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
                             i => i.ApplicationUser);
@@ -137,6 +140,22 @@ namespace CityRoots.Core.Services
                         };
                         CurrentInvestors.Add(CurrentInvstment);
                     }
+                    else if( investment.RequestStatus == InvestmentStatues.Pending.ToString())
+                    {
+                        cycleDto.NumbersOfRequestsInvestments += 1;
+
+                        var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
+                           i => i.ApplicationUser);
+                        var requestForInvestment = new RequestsForInvestment
+                        {
+                            FullName = invest.ApplicationUser.UserName,
+                            InvestmentAmount = investment.RequestedAmount,
+                            TypeOfProfit = investment.RequestedProfitType.ToString(),
+                        };
+                        ReqestForInvestment.Add(requestForInvestment);
+
+                    }
+                    cycleDto.requestsForInvestments = ReqestForInvestment;
                     cycleDto.currentInvestors = CurrentInvestors;
                 }
             }

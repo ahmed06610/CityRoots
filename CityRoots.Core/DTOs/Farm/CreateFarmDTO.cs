@@ -9,6 +9,7 @@ namespace CityRoots.Core.DTOs.Farm
     public class CreateFarmDTO
     {
         public int FarmerId { get; set; }
+        public string FarmName { get; set; }
         public string Location { get; set; }
         public double Size { get; set; }
     }

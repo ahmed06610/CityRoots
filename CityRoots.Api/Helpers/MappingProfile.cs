@@ -45,7 +45,11 @@ namespace CityRoots.Api.Helpers
             CreateMap<CreateLandParcelDTO, LandParcel>();
             CreateMap<UpdateLandParcelDTO, LandParcel>();
             CreateMap<LandParcel, LandParcelDTO>()
-                .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Farm.Location)); // Map Farm's Location
+     .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Farm.Location))
+     .ForMember(dest => dest.Status, opt => opt.MapFrom(src =>
+         src.Cycles != null && src.Cycles.Any(cycle => cycle.StartDate <= DateTime.Now && cycle.EndDate >= DateTime.Now)
+             ? "Occupied"
+             : "Available"));
             CreateMap<Crop, CropDisplayDto>()
                 .ForMember(dest=>dest.cropType,opt=>opt.MapFrom(src=>src.CropType.Name));
             CreateMap<AddCropDto, Crop>().ReverseMap();

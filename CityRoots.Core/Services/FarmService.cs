@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CityRoots.Core.DTOs.Farm;
 using AutoMapper;
+using CityRoots.Core.DTOs.LandParcel;
 
 namespace CityRoots.Core.Services
 {
@@ -23,14 +24,23 @@ namespace CityRoots.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<Farm>> GetAllFarmsAsync(int FarmerId=0)
+        public async Task<List<FarmDTO>> GetAllFarmsAsync(int FarmerId=0)
         {
-            return (await _unitOfWork.Farm.FindAllAsync(f=>f.FarmerId==FarmerId || FarmerId==0)).ToList();
+             var Farms= (await _unitOfWork.Farm.FindAllWithIncludes<Farm>(f=>f.FarmerId==FarmerId || FarmerId==0,
+                f=>f.LandParcels)).ToList();
+            var farms = new List<FarmDTO>();
+            foreach (var farm in Farms)
+            {
+               var f= await mapping(farm);
+                farms.Add(f);
+            }
+            return farms;
         }
 
-        public async Task<Farm> GetFarmByIdAsync(int id)
+        public async Task<FarmDTO> GetFarmByIdAsync(int id)
         {
-            return await _unitOfWork.Farm.GetByIdAsync(id);
+            var farm = await _unitOfWork.Farm.FindTWithIncludes<Farm>(id, "FarmId", f => f.LandParcels);
+            return await mapping(farm);
         }
 
         public async Task<FarmDTO> AddFarmAsync(CreateFarmDTO createFarmDto)
@@ -62,6 +72,19 @@ namespace CityRoots.Core.Services
             await _unitOfWork.Farm.DeleteAsync(farm);
             await _unitOfWork.CompleteAsync();
             return true;
+        }
+        private async Task<FarmDTO> mapping(Farm farm)
+        {
+            var farmLands = new List<LandParcel>();
+            foreach (var land in farm.LandParcels)
+            {
+                var lands = await _unitOfWork.LandParcel.FindTWithIncludes<LandParcel>(land.ParcelId, "ParcelId", l => l.Cycles);
+                farmLands.Add(land);
+            }
+            farm.LandParcels= farmLands;
+            var farmDto= _mapper.Map<FarmDTO>(farm);
+            farmDto.numbersOfLands=farmLands.Count();
+            return farmDto;
         }
     }
 }
