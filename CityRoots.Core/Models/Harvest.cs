@@ -46,6 +46,7 @@ namespace CityRoots.Core.Models
         [ForeignKey(nameof(CycleId))]
 
         public Cycle Cycle { get; set; }
+
     }
 
 }

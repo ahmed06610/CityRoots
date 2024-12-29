@@ -43,7 +43,7 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost("AddTask")]
-        public async Task<IActionResult> Add(AddScheduleDto addScheduleDto)
+        public async Task<IActionResult> Add([FromBody]AddScheduleDto addScheduleDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -82,7 +82,7 @@ namespace CityRoots.Api.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
         [HttpGet("MakeTaskCompeleted/{Id}")]

@@ -100,12 +100,19 @@ namespace CityRoots.Api
             builder.Services.AddScoped<ICycleUpdateService, CycleUpdateService>();
             builder.Services.AddScoped<AiPredictionService, AiPredictionService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IPurchaseRequestService, PurchaseRequestService>();
+            builder.Services.AddScoped<IHarvestNotificationService, HarvestNotificationService>();
             builder.Services.AddScoped<CycleNotificationLogService, CycleNotificationLogService>();
+            builder.Services.AddScoped< HarvestNotificationLogService>();
+            builder.Services.AddScoped<ScheduleNotificationLogService>();
+
 
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<ICycleNotificationService, CycleNotificationService>();
+            builder.Services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();  
+           
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddControllers();

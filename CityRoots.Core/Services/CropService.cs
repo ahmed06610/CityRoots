@@ -11,7 +11,7 @@ namespace CityRoots.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper mapper;
         private readonly IImageService imageService;
-        private const string ImagesFolder = "uploads/landparcels";
+        private const string ImagesFolder = "uploads/Crops";
         public CropService(IUnitOfWork unitOfWork,IMapper mapper,IImageService imageService) {
         this._unitOfWork = unitOfWork;
             this.imageService = imageService;
