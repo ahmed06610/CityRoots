@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using CityRoots.Core.Interfaces.Services;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,8 @@ namespace CityRoots.Core.Interfaces
         IFeedBackRepository FeedBack { get; }
         IAiPredictRepository AiPredict { get; }
         ICycleNotificationLogRepository CycleNotificationLog { get; }
+        IHarvestNotificationLogRepository HarvestNotificationLog { get; }
+        IScheduleNotificationLogRepository ScheduleNotificationLog { get; }
 
         Task<int> CompleteAsync();
         Task RollbackAsync();

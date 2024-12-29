@@ -33,6 +33,9 @@ namespace CityRoots.EF.Data
         public DbSet<CropType> CropTypes { get; set; }
         public DbSet<AiPredict> AiPredicts { get; set; }
         public DbSet<CycleNotificationLog> cycleNotificationLogs { get; set; }
+        public DbSet<HarvestNotificationLog> HarvestNotificationLogs { get; set; }
+        public DbSet<ScheduleNotificationLog> scheduleNotificationLogs { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -13,7 +13,7 @@ namespace CityRoots.Core.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IImageService imageService;
-        private const string ImagesFolder = "uploads/landparcels";
+        private const string ImagesFolder = "uploads/Harvests";
         private readonly IHttpContextAccessor httpContextAccessor;
 
 
