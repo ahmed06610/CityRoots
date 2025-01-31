@@ -90,6 +90,7 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IMailingService, MailingService>();
             builder.Services.AddScoped<ICommunicationService, CommunicationService>();
             builder.Services.AddScoped<IFarmService,FarmService>();
+            builder.Services.AddScoped<IFarmerService,FarmerService>();
             builder.Services.AddScoped<IImageService,ImageService>();
             builder.Services.AddScoped<ILandParcelService,LandParcelService>();
             builder.Services.AddScoped<ICropService, CropService>();
@@ -105,6 +106,7 @@ namespace CityRoots.Api
             builder.Services.AddScoped<CycleNotificationLogService, CycleNotificationLogService>();
             builder.Services.AddScoped< HarvestNotificationLogService>();
             builder.Services.AddScoped<ScheduleNotificationLogService>();
+            builder.Services.AddScoped<RecommendationService,RecommendationService>();
 
 
 

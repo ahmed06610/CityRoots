@@ -20,11 +20,15 @@ namespace CityRoots.Core.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<PaymentDTO>> GetPaymentsAsync(PaymentFilterDTO filter)
+        public async Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter)
         {
             var query =await _unitOfWork.Payment.FindAllWithIncludes<Payment>(p=>(p.PayerId==filter.Id||p.PayeeId==filter.Id),
                 p => p.Payer,
-                p => p.Payee);
+                p => p.Payee,
+                 p => p.Cycle,
+                p => p.Harvest,
+                p => p.Harvest.Crop
+                );
 
             // Apply filters
             if (!string.IsNullOrEmpty(filter.Type))
@@ -39,17 +43,59 @@ namespace CityRoots.Core.Services
             if (filter.EndDate.HasValue)
                 query = query.Where(p => p.PaymentDate <= filter.EndDate.Value);
 
-            var payments =  query.Select(p => new PaymentDTO
-                                       {
-                                           PaymentId = p.PaymentId,
-                                           PaymentDate = p.PaymentDate,
-                                           Amount = p.Amount,
-                                           Type = p.Type,
-                                           Payer = p.Payer.Name,
-                                           Payee = p.Payee.Name,
-                                           PaymentMethod = p.PaymentMethod,
-                                           Status = p.Statue
-                                       }).ToList();
+            /* var payments =  query.Select(p => new PaymentDTO
+                                        {
+                                            PaymentId = p.PaymentId,
+                                            PaymentDate = p.PaymentDate,
+                                            Amount = p.Amount,
+                                            Type = p.Type,
+                                            Payer = p.Payer.Name,
+                                            Payee = p.Payee.Name,
+                                            PaymentMethod = p.PaymentMethod,
+                                            Status = p.Statue
+                                        }).ToList();*/
+            var payments = new List<PaymentDetailsDTO>();
+
+            foreach (var payment in query)
+            {
+                if (payment == null) return null;
+
+                AssociatedCycleDTO assoc = null;
+                AssociatedHarvestDTO assoh = null;
+
+                if (payment.Type == PaymentType.Investment.ToString())
+                {
+                    assoc = new AssociatedCycleDTO
+                    {
+                        CycleId = payment.Cycle.CycleId,
+                        CycleName = payment.Cycle.CycleName,
+                    };
+                }
+                else
+                {
+                    assoh = new AssociatedHarvestDTO
+                    {
+                        HarvestId = payment.Harvest.HarvestId,
+                        HarvestName = payment.Harvest.Crop.Name,
+                    };
+                }
+                var pay= new PaymentDetailsDTO
+                {
+                    PaymentId = payment.PaymentId,
+                    PaymentDate = payment.PaymentDate,
+                    Amount = payment.Amount,
+                    Type = payment.Type,
+                    PayerName = payment.Payer.Name,
+                    PayerEmail = payment.Payer.Email,
+                    PayeeName = payment.Payee.Name,
+                    PayeeEmail = payment.Payee.Email,
+                    PaymentMethod = payment.PaymentMethod,
+                    Status = payment.Statue,
+                    AssociatedCycle = assoc,
+                    AssociatedHarvest = assoh
+                };
+                payments.Add(pay);
+            }
 
             return payments;
         }
