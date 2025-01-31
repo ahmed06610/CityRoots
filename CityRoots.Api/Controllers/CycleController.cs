@@ -17,9 +17,9 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("GetAllCycleasOfFarmerId")]
-        public async Task<IActionResult> GetAllCycles(int FarmerId = 0)
+        public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool f = true)
         {
-            var cycles = await _cycleService.GetAllCyclesAsync(FarmerId);
+            var cycles = await _cycleService.GetAllCyclesAsync(FarmerId, f);
             return Ok(cycles);
         }
 
@@ -27,6 +27,14 @@ namespace CityRoots.Api.Controllers
         public async Task<IActionResult> GetCycleById(int id)
         {
             var cycle = await _cycleService.GetCycleByIdAsync(id);
+            if (cycle == null) return NotFound();
+            return Ok(cycle);
+        }
+
+        [HttpGet("GetCycleForInvestor")]
+        public async Task<IActionResult> GetCycleForInvestor(int cycleId,int investorId)
+        {
+            var cycle = await _cycleService.GetCycleByIdForInvestorAsync(cycleId,investorId);
             if (cycle == null) return NotFound();
             return Ok(cycle);
         }

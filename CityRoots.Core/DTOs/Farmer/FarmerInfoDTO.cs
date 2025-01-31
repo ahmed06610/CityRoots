@@ -13,6 +13,7 @@ namespace CityRoots.Core.DTOs.Farmer
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Bio { get; set; }
+        public int? Rate { get; set; }
 
     }
 }

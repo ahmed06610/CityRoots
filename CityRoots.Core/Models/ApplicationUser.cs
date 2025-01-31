@@ -13,6 +13,7 @@ namespace CityRoots.Core.Models
         public virtual Investor Investor { get; set; }
         // Add the ResetPasswordCode property
         public string? ResetPasswordCode { get; set; }
+        public int? Rate {  get; set; }
 
         // Add the ResetCodeExpiry property
         public DateTime? ResetCodeExpiry { get; set; }

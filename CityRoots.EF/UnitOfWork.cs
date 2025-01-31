@@ -32,6 +32,9 @@ namespace CityRoots.EF
         public ICycleNotificationLogRepository CycleNotificationLog { get; private set; }
         public IHarvestNotificationLogRepository HarvestNotificationLog { get; private set; }
         public IScheduleNotificationLogRepository ScheduleNotificationLog { get; private set; }
+        public IInteractionOfInvestor InteractionOfInvestor { get; private set; }
+        public IInteractionOfMerchant InteractionOfMerchant { get; private set; }
+        public IFavoriteFarmers FavoriteFarmers  { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -57,6 +60,9 @@ namespace CityRoots.EF
             CycleNotificationLog = new CycleNotificationLogRepository(context);
             HarvestNotificationLog= new HarvestNotificationLogRepository(context);
             ScheduleNotificationLog = new ScheduleNotificationLogRepository(context);
+            InteractionOfInvestor = new InteractionOfInvestorRepository(context);
+            InteractionOfMerchant = new InteractionOfMerchantRepository(context);
+            FavoriteFarmers = new FavoriteFarmersRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

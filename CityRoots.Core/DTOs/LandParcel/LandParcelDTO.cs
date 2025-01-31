@@ -11,7 +11,6 @@ namespace CityRoots.Core.DTOs.LandParcel
         public int ParcelId { get; set; }
         public int FarmId { get; set; }
         public string FarmLocation { get; set; } // From related Farm
-        public double Price { get; set; }
         public string Status { get; set; }
         public string ImageUrl { get; set; }
     }

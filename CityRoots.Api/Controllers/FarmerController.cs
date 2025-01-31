@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.Farmer;
 using CityRoots.Core.Interfaces;
+using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +14,11 @@ namespace CityRoots.Api.Controllers
     public class FarmerController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public FarmerController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        private readonly IFarmerService _farmerService;
+        public FarmerController(IUnitOfWork unitOfWork, IFarmerService farmerService)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
+            _farmerService = farmerService;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
@@ -25,20 +26,10 @@ namespace CityRoots.Api.Controllers
         [HttpGet("GetFarmerInformation")]
         public async Task<IActionResult> GetAsync(int id)
         {
-          
-            var farmer = await _unitOfWork.Farmer.GetByIdAsync(id);
-            if (farmer == null)
-                return NotFound($"No farmer with id: {id}");
-            var user = await _userManager.FindByIdAsync(farmer.ApplicationUserId);
-            var info = new FarmerInfoDTO
-            {
-                FarmerId = farmer.FarmerId,
-                Name = user.Name,
-                Email = user.Email,
-                Phone = user.PhoneNumber,
-                Bio = farmer.Bio,
-                
-            };
+          var info =await _farmerService.GetFarmerInfo(id);
+            if (info == null)
+                return NotFound();
+           
             return Ok(info);
         }
         [HttpPut]
@@ -50,17 +41,8 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ModelState);
             if (await _unitOfWork.Farmer.GetByIdAsync(model.FarmerId) == null)
                 return BadRequest($"No farmer with id: {model.FarmerId}");
-            var updated = await _userManager.FindByIdAsync(_unitOfWork.Farmer.GetByIdAsync(model.FarmerId).Result.ApplicationUserId);
-            updated.PhoneNumber = model.Phone;
-            updated.Name = model.FarmerName;
-            await _userManager.UpdateAsync(updated);
-            var farmerup = await _unitOfWork.Farmer.GetByIdAsync(model.FarmerId);
-            farmerup.Bio = model.Bio;
-             _unitOfWork.Farmer.Update(farmerup);
-            await _unitOfWork.CompleteAsync();
-
-            var infoUpdated = new FarmerInfoDTO { Name = updated.Name, Phone = updated.PhoneNumber, Email = updated.Email, FarmerId = model.FarmerId,Bio=model.Bio };
-            return Ok(infoUpdated);
+            var infoUpdated = await _farmerService.UpdateFarmer(model);
+                    return Ok(infoUpdated);
         }
     }
 }

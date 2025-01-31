@@ -9,7 +9,7 @@ namespace CityRoots.Core.Interfaces.Services
 {
     public interface IPaymentService
     {
-        Task<List<PaymentDTO>> GetPaymentsAsync(PaymentFilterDTO filter);
+        Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter);
         Task<PaymentDetailsDTO> GetPaymentDetailsAsync(int paymentId);
         Task DeletePaymentsByCycleIdAsync(int cycleId);
     }

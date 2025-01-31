@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CityRoots.Core.Models;
+using CityRoots.Core.Models.Recommendations;
 
 namespace CityRoots.EF.Data
 {
@@ -35,6 +36,9 @@ namespace CityRoots.EF.Data
         public DbSet<CycleNotificationLog> cycleNotificationLogs { get; set; }
         public DbSet<HarvestNotificationLog> HarvestNotificationLogs { get; set; }
         public DbSet<ScheduleNotificationLog> scheduleNotificationLogs { get; set; }
+        public DbSet<InteractionOfInvestor> interactionOfInvestors { get; set; }
+        public DbSet<InteractionOfMerchant> interactionOfMerchants { get; set; }
+        public DbSet<FavoriteFarmers> favoriteFarmers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

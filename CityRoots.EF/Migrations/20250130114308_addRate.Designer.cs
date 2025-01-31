@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250130114308_addRate")]
+    partial class addRate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -384,27 +387,6 @@ namespace CityRoots.EF.Migrations
                         .IsUnique();
 
                     b.ToTable("Farmers");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.FavoriteFarmers", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FarmerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("favoriteFarmers");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.FeedBack", b =>
@@ -800,44 +782,6 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("MerchantId");
 
                     b.ToTable("PurchaseRequests");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.Recommendations.InteractionOfInvestor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CycleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InvestorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("interactionOfInvestors");
-                });
-
-            modelBuilder.Entity("CityRoots.Core.Models.Recommendations.InteractionOfMerchant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HarvestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MerchantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("interactionOfMerchants");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Schedule", b =>
