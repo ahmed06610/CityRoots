@@ -20,6 +20,8 @@ namespace CityRoots.Core.DTOs.Reccommendation
         public decimal InvestedAmount { get; set; }
         public string ReturnType { get; set; }
         public string FarmerName { get; set; }
+        public int CropId { get; set; }
+        public string CropName { get; set; }
     }
     public class VisitedCyclesDTO
     {

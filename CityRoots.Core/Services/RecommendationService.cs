@@ -94,7 +94,8 @@ namespace CityRoots.Core.Services
                 i => i.Cycle,
                 i => i.Cycle.OpenInvestmentCycle,
                 i => i.Cycle.LandParcel.Farm.Farmer,
-                i => i.Cycle.LandParcel.Farm.Farmer.ApplicationUser
+                i => i.Cycle.LandParcel.Farm.Farmer.ApplicationUser,
+                i => i.Cycle.Crop
             );
 
             return investments.Select(i => new InvestorHistoryDTO
@@ -103,7 +104,10 @@ namespace CityRoots.Core.Services
                 CycleName = i.Cycle.CycleName,
                 InvestedAmount = i.RequestedAmount,
                 ReturnType = i.Cycle.OpenInvestmentCycle.AvailableProfitTypes,
-                FarmerName = i.Cycle.LandParcel.Farm.Farmer.ApplicationUser?.UserName ?? "Unknown"
+                FarmerName = i.Cycle.LandParcel.Farm.Farmer.ApplicationUser?.UserName ?? "Unknown",
+                CropId = i.Cycle.CropId,
+                CropName = i.Cycle.Crop.Name,
+                
             }).ToList();
         }
 
