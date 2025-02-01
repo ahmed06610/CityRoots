@@ -7,10 +7,12 @@ using CityRoots.Core.DTOs.CycleUpdate;
 
 using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.DTOs.Farmer;
+using CityRoots.Core.DTOs.FavouriteFarmers;
 using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.DTOs.OpenInvestmentCycle;
+using CityRoots.Core.DTOs.Payment;
 using CityRoots.Core.DTOs.Purchasereque;
 using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Models;
@@ -96,6 +98,21 @@ namespace CityRoots.Api.Helpers
             CreateMap<CycleUpdate, CycleUpdateDTO>();
             CreateMap<PurchaseRequest, AllPurchasesRequestForHarvest>()
            .ForMember(dest => dest.merchantName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name));
+            CreateMap<FavoriteFarmers, FavouriteFarmerDTO>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.FarmerUser.Email))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FarmerUser.Name))
+                .ForMember(dest => dest.phoneNumber, opt => opt.MapFrom(src => src.FarmerUser.PhoneNumber))
+                .ForMember(dest => dest.bio, opt => opt.MapFrom(src => src.FarmerUser.Farmer.Bio))
+                .ForMember(dest=>dest.FarmerId,opt=>opt.MapFrom(src=>src.FarmerId));
+            CreateMap<Payment, InvestorPaymentReportsDto>()
+                .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
+                .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
+                .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue));
+                
+           
+
+                
+                
             
             
            

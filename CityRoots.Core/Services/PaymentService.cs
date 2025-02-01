@@ -1,11 +1,14 @@
-﻿using CityRoots.Core.Const;
+﻿using AutoMapper;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Payment;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,10 +17,14 @@ namespace CityRoots.Core.Services
     public class PaymentService : IPaymentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public PaymentService(IUnitOfWork unitOfWork)
+        public PaymentService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public async Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter)
@@ -163,6 +170,37 @@ namespace CityRoots.Core.Services
                 }
                 await _unitOfWork.CommitAsync();  // Save changes to the database
             }
+        }
+     //For Investors
+        public async Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+            {
+                throw new Exception("User ID not found in token");
+
+            }
+            var payments = (await _unitOfWork.Payment.FindAllWithIncludes<Payment>(x=>x.PayerId==userId,
+                x=>x.Payee,
+                x=>x.Cycle)).ToList();
+            return _mapper.Map<List<InvestorPaymentReportsDto>>(payments);  
+        }
+
+        public async Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+            {
+                throw new Exception("User ID not found in token");
+
+            }
+            var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
+                x => x.Payee,
+                x => x.Payer,
+                x => x.Cycle);
+            if (payment.Payer.Id != userId)
+                throw new Exception("You are not authorized to see this payment");
+            return _mapper.Map<InvestorPaymentReportsDto>(payment);
         }
     }
 }

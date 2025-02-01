@@ -31,5 +31,29 @@ namespace CityRoots.Api.Controllers
 
             return Ok(payment);
         }
+        [HttpGet("GetInvestorPayments")]
+        public async Task<IActionResult> GetPaymentsForInvestor()
+        {
+            try
+            {
+                return Ok(await _paymentService.GetInvestorPaymentReportsAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetInvesstorPaymentDetails/{PaymentId}")]
+        public async Task<IActionResult> GetInvesstorPaymentDetails(int PaymentId)
+        {
+            try
+            {
+                return Ok(await _paymentService.GetInvestorPaymentReportDetails(PaymentId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
