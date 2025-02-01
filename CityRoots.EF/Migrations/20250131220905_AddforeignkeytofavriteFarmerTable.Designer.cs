@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250131220905_AddforeignkeytofavriteFarmerTable")]
+    partial class AddforeignkeytofavriteFarmerTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasKey("AiPredictId");
 
-                    b.ToTable("AiPredicts", (string)null);
+                    b.ToTable("AiPredicts");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.ApplicationUser", b =>
@@ -166,7 +169,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Crop", b =>
@@ -206,7 +209,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("CropTypeId");
 
-                    b.ToTable("Crops", (string)null);
+                    b.ToTable("Crops");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.CropType", b =>
@@ -223,7 +226,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasKey("CropTypeId");
 
-                    b.ToTable("CropTypes", (string)null);
+                    b.ToTable("CropTypes");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Cycle", b =>
@@ -259,7 +262,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("ParcelId");
 
-                    b.ToTable("Cycles", (string)null);
+                    b.ToTable("Cycles");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.CycleNotificationLog", b =>
@@ -286,7 +289,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("CycleId");
 
-                    b.ToTable("cycleNotificationLogs", (string)null);
+                    b.ToTable("cycleNotificationLogs");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.CycleUpdate", b =>
@@ -330,7 +333,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("CycleId");
 
-                    b.ToTable("CycleUpdates", (string)null);
+                    b.ToTable("CycleUpdates");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Farm", b =>
@@ -359,7 +362,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("FarmerId");
 
-                    b.ToTable("Farms", (string)null);
+                    b.ToTable("Farms");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Farmer", b =>
@@ -383,7 +386,7 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Farmers", (string)null);
+                    b.ToTable("Farmers");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.FavoriteFarmers", b =>
@@ -398,7 +401,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("FarmerId");
 
-                    b.ToTable("favoriteFarmers", (string)null);
+                    b.ToTable("favoriteFarmers");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.FeedBack", b =>
@@ -426,7 +429,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("feedBacks", (string)null);
+                    b.ToTable("feedBacks");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Harvest", b =>
@@ -474,7 +477,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("FarmerId");
 
-                    b.ToTable("Harvests", (string)null);
+                    b.ToTable("Harvests");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.HarvestNotificationLog", b =>
@@ -505,7 +508,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("HarvestId");
 
-                    b.ToTable("HarvestNotificationLogs", (string)null);
+                    b.ToTable("HarvestNotificationLogs");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.InvestmentRequest", b =>
@@ -542,7 +545,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("InvestorId");
 
-                    b.ToTable("InvestmentRequests", (string)null);
+                    b.ToTable("InvestmentRequests");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Investor", b =>
@@ -566,7 +569,7 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Investors", (string)null);
+                    b.ToTable("Investors");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.LandParcel", b =>
@@ -599,7 +602,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("FarmId");
 
-                    b.ToTable("LandParcels", (string)null);
+                    b.ToTable("LandParcels");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Merchant", b =>
@@ -623,7 +626,7 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Merchants", (string)null);
+                    b.ToTable("Merchants");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Notification", b =>
@@ -659,7 +662,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.OpenInvestmentCycle", b =>
@@ -700,7 +703,7 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("CycleId")
                         .IsUnique();
 
-                    b.ToTable("OpenInvestmentCycles", (string)null);
+                    b.ToTable("OpenInvestmentCycles");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Payment", b =>
@@ -753,7 +756,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("PayerId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.PurchaseRequest", b =>
@@ -793,7 +796,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("MerchantId");
 
-                    b.ToTable("PurchaseRequests", (string)null);
+                    b.ToTable("PurchaseRequests");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Recommendations.InteractionOfInvestor", b =>
@@ -812,7 +815,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("interactionOfInvestors", (string)null);
+                    b.ToTable("interactionOfInvestors");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Recommendations.InteractionOfMerchant", b =>
@@ -831,7 +834,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("interactionOfMerchants", (string)null);
+                    b.ToTable("interactionOfMerchants");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.Schedule", b =>
@@ -867,7 +870,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("CycleId");
 
-                    b.ToTable("Schedules", (string)null);
+                    b.ToTable("Schedules");
                 });
 
             modelBuilder.Entity("CityRoots.Core.Models.ScheduleNotificationLog", b =>
@@ -891,7 +894,7 @@ namespace CityRoots.EF.Migrations
 
                     b.HasIndex("scheduleId");
 
-                    b.ToTable("scheduleNotificationLogs", (string)null);
+                    b.ToTable("scheduleNotificationLogs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

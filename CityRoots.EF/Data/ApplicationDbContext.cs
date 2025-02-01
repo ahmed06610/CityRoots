@@ -193,6 +193,7 @@ namespace CityRoots.EF.Data
                 .HasOne(x => x.CropType)
                 .WithMany(x => x.crops)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<FavoriteFarmers>().HasKey(x => new { x.userId, x.FarmerId });
         }
     }
     /*  private static List<CropType> SeedCropType()

@@ -12,5 +12,7 @@ namespace CityRoots.Core.Interfaces.Services
         Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter);
         Task<PaymentDetailsDTO> GetPaymentDetailsAsync(int paymentId);
         Task DeletePaymentsByCycleIdAsync(int cycleId);
+        Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync();
+        Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId);
     }
 }

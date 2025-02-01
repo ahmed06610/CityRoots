@@ -113,7 +113,9 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<ICycleNotificationService, CycleNotificationService>();
-            builder.Services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();  
+            builder.Services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
+            builder.Services.AddScoped<IFavouriteFarmersService, FavouriteFarmersService>();
+            builder.Services.AddSingleton<PayPalService>();
            
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
