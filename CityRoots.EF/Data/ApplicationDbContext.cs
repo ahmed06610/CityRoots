@@ -194,6 +194,9 @@ namespace CityRoots.EF.Data
                 .WithMany(x => x.crops)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<FavoriteFarmers>().HasKey(x => new { x.userId, x.FarmerId });
+            modelBuilder.Entity<Payment>()
+        .HasIndex(p => p.PaypalOrderId)
+        .IsUnique();
         }
     }
     /*  private static List<CropType> SeedCropType()

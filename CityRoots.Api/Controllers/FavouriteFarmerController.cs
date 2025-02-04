@@ -1,4 +1,5 @@
-﻿using CityRoots.Core.Interfaces.Services;
+﻿using CityRoots.Core.DTOs.FavouriteFarmers;
+using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,33 +16,33 @@ namespace CityRoots.Api.Controllers
             _favouriteFarmersService = favouriteFarmersService;
 
         }
-        [HttpGet("Favourites")]
-        public async Task<IActionResult> Get() {
+        [HttpGet("Favourites/{UserId}")]
+        public async Task<IActionResult> Get(string UserId) {
             try {
-                return Ok(await _favouriteFarmersService.GetAllFavourites());
+                return Ok(await _favouriteFarmersService.GetAllFavourites(UserId));
 
             }
             catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("{FarmerId}")]
-        public async Task<IActionResult> AddFarmerToFavourite(string FarmerId)
+        [HttpPost]
+        public async Task<IActionResult> AddFarmerToFavourite(FavouriteFarmerRequestDTO request)
         {
             try {
-                await _favouriteFarmersService.AddToFavourites(FarmerId);
+                await _favouriteFarmersService.AddToFavourites(request.FarmerId,request.UserId);
                 return Ok("Added");
             }
             catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete("{FarmerId}")]
-        public async Task<IActionResult> DeleteFarmerFromFavourite(string FarmerId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteFarmerFromFavourite(FavouriteFarmerRequestDTO request)
         {
             try
             {
-                await _favouriteFarmersService.RemoveFromFavourites(FarmerId);
+                await _favouriteFarmersService.RemoveFromFavourites(request.FarmerId,request.UserId);
                 return Ok("Deleted");
             }
             catch (Exception ex)

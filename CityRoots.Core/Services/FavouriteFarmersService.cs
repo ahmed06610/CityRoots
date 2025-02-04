@@ -26,14 +26,14 @@ namespace CityRoots.Core.Services
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
-        public async Task AddToFavourites(string FarmerId)
+        public async Task AddToFavourites(string FarmerId,string? userId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-            {
-                throw new Exception("User ID not found in token");
+            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId is null)
+            //{
+            //    throw new Exception("User ID not found in token");
 
-            }
+            //}
             var favoriteFarmer = new FavoriteFarmers
             {
                 FarmerId = FarmerId,
@@ -43,14 +43,14 @@ namespace CityRoots.Core.Services
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task<List<FavouriteFarmerDTO>> GetAllFavourites()
+        public async Task<List<FavouriteFarmerDTO>> GetAllFavourites(string? userId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           // userId = "afe5a2cf-4b8a-4dc7-ac6d-025698ded2d2";
-            if (userId is null) {
-                throw new Exception("User ID not found in token");
+           // var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+           //// userId = "afe5a2cf-4b8a-4dc7-ac6d-025698ded2d2";
+           // if (userId is null) {
+           //     throw new Exception("User ID not found in token");
             
-            }
+           // }
             var farmers=(await _unitOfWork.FavoriteFarmers.FindAllWithIncludes<FavoriteFarmers>(
                 x=>x.userId==userId,
                 x=>x.FarmerUser,
@@ -59,14 +59,14 @@ namespace CityRoots.Core.Services
         }
 
       
-        public async Task RemoveFromFavourites(string FarmerId)
+        public async Task RemoveFromFavourites(string FarmerId,string? userId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-            {
-                throw new Exception("User ID not found in token");
+            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId is null)
+            //{
+            //    throw new Exception("User ID not found in token");
 
-            }
+            //}
             var favoriteFarmer = new FavoriteFarmers
             {
                 FarmerId = FarmerId,
