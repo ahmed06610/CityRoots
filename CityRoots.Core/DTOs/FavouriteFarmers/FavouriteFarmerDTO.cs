@@ -8,6 +8,7 @@ namespace CityRoots.Core.DTOs.FavouriteFarmers
 {
     public class FavouriteFarmerDTO
     {
+        public string userId {  get; set; }
         public string FarmerId { get; set; }
         public string Name { get; set; }
         public string Email {  get; set; }

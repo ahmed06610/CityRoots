@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace CityRoots.Core.Models
 {
+
     public class Payment
     {
         [Key]
@@ -17,6 +19,8 @@ namespace CityRoots.Core.Models
         public string Type { get; set; } // Investment, Purchase
 
         public int? CycleId { get; set; }
+        
+        public string? PaypalOrderId { get; set; }
         [ForeignKey(nameof(CycleId))]
         public virtual Cycle Cycle { get; set; }
 

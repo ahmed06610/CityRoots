@@ -172,14 +172,14 @@ namespace CityRoots.Core.Services
             }
         }
      //For Investors
-        public async Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync()
+        public async Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync(string userId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-            {
-                throw new Exception("User ID not found in token");
+            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId is null)
+            //{
+            //    throw new Exception("User ID not found in token");
 
-            }
+            //}
             var payments = (await _unitOfWork.Payment.FindAllWithIncludes<Payment>(x=>x.PayerId==userId,
                 x=>x.Payee,
                 x=>x.Cycle)).ToList();
@@ -188,18 +188,18 @@ namespace CityRoots.Core.Services
 
         public async Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-            {
-                throw new Exception("User ID not found in token");
+            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId is null)
+            //{
+            //    throw new Exception("User ID not found in token");
 
-            }
+            //}
             var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
                 x => x.Payee,
                 x => x.Payer,
                 x => x.Cycle);
-            if (payment.Payer.Id != userId)
-                throw new Exception("You are not authorized to see this payment");
+            //if (payment.Payer.Id != userId)
+            //    throw new Exception("You are not authorized to see this payment");
             return _mapper.Map<InvestorPaymentReportsDto>(payment);
         }
     }
