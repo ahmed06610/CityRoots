@@ -151,11 +151,10 @@ namespace CityRoots.Api
             }
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+           
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            
             app.UseHangfireDashboard("/Hangfire", new DashboardOptions
             {
                 Authorization = new[] { new AllowAllAuthorizationFilter() }

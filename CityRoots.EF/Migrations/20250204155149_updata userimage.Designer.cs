@@ -4,6 +4,7 @@ using CityRoots.EF.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CityRoots.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250204155149_updata userimage")]
+    partial class updatauserimage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -738,9 +741,6 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PaypalOrderId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Statue")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -758,10 +758,6 @@ namespace CityRoots.EF.Migrations
                     b.HasIndex("PayeeId");
 
                     b.HasIndex("PayerId");
-
-                    b.HasIndex("PaypalOrderId")
-                        .IsUnique()
-                        .HasFilter("[PaypalOrderId] IS NOT NULL");
 
                     b.ToTable("Payments");
                 });

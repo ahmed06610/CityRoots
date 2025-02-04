@@ -3,6 +3,7 @@ using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Auth;
 using CityRoots.Core.Helpers;
 using CityRoots.Core.Interfaces;
+using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace CityRoots.Core.Services
 {
@@ -35,8 +37,10 @@ namespace CityRoots.Core.Services
         private readonly IMailingService _mailingService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHostingEnvironment _webHostEnvironment; // Inject IWebHostEnvironment
+        private readonly IImageService _imageService;
+        private const string ImagesFolder = "uploads/UsersUploads";
         public AuthService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IMapper mapper, IOptions<JWT> jwt, IUrlHelperFactory urlHelperFactory, IHttpContextAccessor httpContextAccessor, IMailingService mailingService, IHostingEnvironment webHostEnvironment)
+            IMapper mapper, IOptions<JWT> jwt, IUrlHelperFactory urlHelperFactory, IHttpContextAccessor httpContextAccessor, IMailingService mailingService, IHostingEnvironment webHostEnvironment, IImageService imageService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -47,116 +51,132 @@ namespace CityRoots.Core.Services
             _mailingService = mailingService;
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
+            _imageService = imageService;
         }
         public async Task<AuthDTO> RegisterAsync(RegisterDTO model)
         {
-            if (await _userManager.FindByEmailAsync(model.Email) is not null)
-                return new AuthDTO { Message = "Email is already registered!" };
+           
+                    if (await _userManager.FindByEmailAsync(model.Email) is not null)
+                        return new AuthDTO { Message = "Email is already registered!" };
 
-            var user = _mapper.Map<ApplicationUser>(model);
-            var result = await _userManager.CreateAsync(user, model.Password);
+                    var user = _mapper.Map<ApplicationUser>(model);
+                   
 
-            if (!result.Succeeded)
-            {
-                var errors = string.Empty;
-                foreach (var error in result.Errors)
-                {
-                    errors += $"{error.Description}, ";
+                    var result = await _userManager.CreateAsync(user, model.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Empty;
+                        foreach (var error in result.Errors)
+                        {
+                            errors += $"{error.Description}, ";
+                        }
+                        return new AuthDTO { Message = errors };
+                    }
+
+
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    //Add Investor or Farmer or Merchant Account
+
+
+                    if (model.Role == Roles.Farmer.ToString())
+                    {
+                        var farmer = new Farmer
+                        {
+                            ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
+                            Bio = model.Bio
+
+                        };
+
+                        await _unitOfWork.Farmer.AddAsync(farmer);
+                        await _unitOfWork.CompleteAsync();
+                    }
+                    else if (model.Role == Roles.Investor.ToString())
+                    {
+                        var investor = new Investor
+                        {
+                            ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
+                            Bio = model.Bio
+
+                        };
+                        await _unitOfWork.Investor.AddAsync(investor);
+                        await _unitOfWork.CompleteAsync();
+                    }
+                    else if (model.Role == Roles.Merchant.ToString())
+                    {
+                        var merchant = new Merchant
+                        {
+                            ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
+                            BusinessDetails = model.Bio
+                        };
+                        await _unitOfWork.Merchant.AddAsync(merchant);
+                        await _unitOfWork.CompleteAsync();
+                    }
+
+                    //
+                    var jwtSecurityToken = await CreateJwtToken(user);
+
+                    //Verification Code
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext(
+                        _httpContextAccessor.HttpContext,
+                        _httpContextAccessor.HttpContext.GetRouteData(),
+                        new ActionDescriptor()));
+
+
+                    var verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host
+                        + urlHelper.Action("ConfirmEmail", "Authentication", new { userId = userId, code = code });
+
+
+                    var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "EmailTemplate.html");
+
+                    if (!File.Exists(filePath))
+                    {
+                        throw new FileNotFoundException("Email template not found.", filePath);
+                    }
+
+                    var str = new StreamReader(filePath);
+
+                    var mailText = str.ReadToEnd();
+                    str.Close();
+
+                    mailText = mailText.Replace("[name]", user.Name).Replace("[email]", user.Email).Replace("[link]", verificationUrl);
+                    await _mailingService.SendEmailAsync(user.Email, "verification Code", mailText);
+
+                    ////////////////////////////////////////
+                   
+                    // Save Image after successful creation to be sure it is really valid record
+                    if (model.ImageFile != null)
+                    {
+                        user.ImageProfileUrl = _imageService.SaveImage(model.ImageFile, ImagesFolder);
+                        await _userManager.UpdateAsync(user); // Save the image URL to DB
+                    }
+
+
+                    var role = "";
+
+                    string roleValue = model.Role.Replace(" ", ""); // Remove spaces
+
+                    if (string.Equals(roleValue, Roles.Investor.ToString(), StringComparison.OrdinalIgnoreCase))
+                        role = Roles.Investor.ToString();
+                    else if (string.Equals(roleValue, Roles.Farmer.ToString(), StringComparison.OrdinalIgnoreCase))
+                        role = Roles.Farmer.ToString();
+                    else
+                        role = Roles.Merchant.ToString();
+
+
+                    return new AuthDTO
+                    {
+                        Email = user.Email,
+                        IsAuthenticated = true,
+                        ExpiresOn = jwtSecurityToken.ValidTo,
+                        Roles = new List<string> { role },
+                        Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+                    };
                 }
-                return new AuthDTO { Message = errors };
-            }
-
-            await _userManager.AddToRoleAsync(user, model.Role);
-            //Add Investor or Farmer or Merchant Account
-
-
-            if (model.Role == Roles.Farmer.ToString())
-            {
-                var farmer = new Farmer
-                {
-                    ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
-                    Bio = model.Bio
-
-                };
-
-                await _unitOfWork.Farmer.AddAsync(farmer);
-                await _unitOfWork.CompleteAsync();
-            }
-            else if(model.Role == Roles.Investor.ToString())
-            {
-                var investor = new Investor
-                {
-                    ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
-                    Bio = model.Bio
-
-                };
-                await _unitOfWork.Investor.AddAsync(investor);
-                await _unitOfWork.CompleteAsync();
-            }
-            else if (model.Role == Roles.Merchant.ToString())
-            {
-                var merchant = new Merchant
-                {
-                    ApplicationUserId = _userManager.FindByEmailAsync(model.Email).Result.Id,
-                    BusinessDetails = model.Bio
-                };
-                await _unitOfWork.Merchant.AddAsync(merchant);
-                await _unitOfWork.CompleteAsync();
-            }
-
-            //
-            var jwtSecurityToken = await CreateJwtToken(user);
-
-            //Verification Code
-            var userId = await _userManager.GetUserIdAsync(user);
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext(
-                _httpContextAccessor.HttpContext,
-                _httpContextAccessor.HttpContext.GetRouteData(),
-                new ActionDescriptor()));
-
-
-            var verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host
-                + urlHelper.Action("ConfirmEmail", "Authentication", new { userId = userId, code = code });
-
-
-            var filePath = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "EmailTemplate.html");
-
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException("Email template not found.", filePath);
-            }
-
-            var str = new StreamReader(filePath);
-
-            var mailText = str.ReadToEnd();
-            str.Close();
-
-            mailText = mailText.Replace("[name]", user.Name).Replace("[email]", user.Email).Replace("[link]", verificationUrl);
-            await _mailingService.SendEmailAsync(user.Email, "verification Code", mailText);
-
-            ////////////////////////////////////////
-
-            var role = "";
-
-            string roleValue = model.Role.Replace(" ", ""); // Remove spaces
-
-            if (string.Equals(roleValue, Roles.Investor.ToString(), StringComparison.OrdinalIgnoreCase))
-                role = Roles.Investor.ToString();
-            else if (string.Equals(roleValue, Roles.Farmer.ToString(), StringComparison.OrdinalIgnoreCase))
-                role = Roles.Farmer.ToString();
-            else
-                role = Roles.Merchant.ToString();
-
-            return new AuthDTO
-            {
-                Email = user.Email,
-                IsAuthenticated = true,
-                ExpiresOn = jwtSecurityToken.ValidTo,
-                Roles = new List<string> { role },
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
-            };
-        }
+               
+            
 
         public async Task<AuthDTO> LoginAsync(LoginDTO model)
         {
