@@ -18,6 +18,7 @@ namespace CityRoots.Core.Models
         // Add the ResetCodeExpiry property
         public DateTime? ResetCodeExpiry { get; set; }
         public string? VerificationCode { get; set; }
+        public string? ImageProfileUrl { get; set; }
       
         public virtual List<Payment> Payments { get; set; }
         public virtual List<Notification> Notifications { get; set; }

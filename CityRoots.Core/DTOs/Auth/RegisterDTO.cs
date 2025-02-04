@@ -1,4 +1,5 @@
 ﻿using CityRoots.Core.CustomValidation;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,5 +24,6 @@ namespace CityRoots.Core.DTOs.Auth
         public string Role { get; set; }
         public string? UserName { get; set; }
         public string Bio { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }

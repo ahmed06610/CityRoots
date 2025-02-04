@@ -33,7 +33,7 @@ namespace CityRoots.Api.Controllers
             _unitOfWork = unitOfWork;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDTO model)
+        public async Task<IActionResult> RegisterAsync([FromForm] RegisterDTO model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
