@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Cycle;
+using CityRoots.Core.DTOs.Recommendation;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Tensorflow;
@@ -38,7 +40,7 @@ namespace CityRoots.Core.Services
             _cycleUpdateService = cycleUpdateService;
         }
 
-        public async Task<List<CycleDTO>> GetAllCyclesAsync(int FarmerId = 0,bool f=true)
+        public async Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int FarmerId = 0,bool f=true)
         {
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(null,
                 c => c.LandParcel,
@@ -46,7 +48,7 @@ namespace CityRoots.Core.Services
                 c => c.LandParcel.Farm.Farmer,
                 c => c.InvestmentRequests)).ToList();
             cycles = cycles.Where(c => c.LandParcel.Farm.FarmerId == FarmerId || FarmerId == 0).ToList();
-            var cyclesDTOs = new List<CycleDTO>();
+            var cyclesDTOs = new List<CycleForFarmerDTO>();
 
             foreach (var cycle in cycles)
             {
@@ -55,9 +57,26 @@ namespace CityRoots.Core.Services
             }
             return cyclesDTOs;
         }
+        public async Task<List<CycleDTO>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null)
+        {
+            Expression<Func<Cycle, bool>> criteria = c =>
+        (Recommendation != null && Recommendation.recommended_cycle_ids.Contains(c.CycleId)) ||
+        (Recommendation == null && c.OpenInvestmentCycle != null);
+            var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(criteria,
+                c => c.LandParcel,
+                c => c.LandParcel.Farm,
+                c => c.OpenInvestmentCycle 
+              )).ToList();
+            var cyclesDTOs = new List<CycleDTO>();
 
-
-        public async Task<CycleDTO> GetCycleByIdAsync(int id)
+            foreach (var cycle in cycles)
+            {
+                var cycleDto = await mapping(cycle, false);
+                cyclesDTOs.Add(cycleDto);
+            }
+            return cyclesDTOs;
+        }
+        public async Task<CycleForFarmerDTO> GetCycleByIdAsync(int id)
         {
             var cycle = await _unitOfWork.Cycle.GetByIdAsync(id);
             return await mapping(cycle);
@@ -83,13 +102,15 @@ namespace CityRoots.Core.Services
                 var cycleUpdates = await _cycleUpdateService.GetAllUpdatesByCycleIdAsync(Cycleid);
                 cycleForInvestor.cycleUpdates = cycleUpdates.ToList();
             }
+            cycleForInvestor.RequestReview = true ? (await _unitOfWork.InvestmentRequest.FindTWithExpression<InvestmentRequest>
+                (ir => ir.InvestorId==InvestorId && ir.CycleId == Cycleid
+               && ir.RequestStatus == InvestmentStatues.Pending.ToString()) is not null) : false;
             cycleForInvestor.InvestmentCycle = investmentCycle;
             cycleForInvestor.Farmer = farmerInfo;
             cycleForInvestor.landParcel= landParcel;
             cycleForInvestor.CycleName = cycleName;
             return cycleForInvestor;
         }
-
         public async Task<CycleDTO> AddCycleAsync(CreateCycleDTO createCycleDto)
         {
             var cycle = _mapper.Map<Cycle>(createCycleDto);
@@ -109,7 +130,6 @@ namespace CityRoots.Core.Services
 
             return result;
         }
-
         public async Task<CycleDTO> UpdateCycleAsync(UpdateCycleDTO updateCycleDto)
         {
             var existingCycle = await _unitOfWork.Cycle.GetByIdAsync(updateCycleDto.CycleId);
@@ -129,7 +149,6 @@ namespace CityRoots.Core.Services
 
             return _mapper.Map<CycleDTO>(existingCycle);
         }
-
         public async Task<bool> DeleteCycleAsync(int id)
         {
             var cycle = await _unitOfWork.Cycle.GetByIdAsync(id);
@@ -145,9 +164,9 @@ namespace CityRoots.Core.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-        private async Task<CycleDTO> mapping(Cycle cycle,bool f=true)
+        private async Task<CycleForFarmerDTO> mapping(Cycle cycle,bool f=true)
         {
-            var cycleDto = _mapper.Map<CycleDTO>(cycle);
+            var cycleDto = _mapper.Map<CycleForFarmerDTO>(cycle);
             var openCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(oc => oc.CycleId == cycle.CycleId);
             if (openCycle == null)
             {

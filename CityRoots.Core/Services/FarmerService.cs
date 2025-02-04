@@ -39,7 +39,7 @@ namespace CityRoots.Core.Services
                 Phone = user.PhoneNumber,
                 Rate=user.Rate,
                 Bio = farmer.Bio,
-
+                ImageUrl=user.ImageProfileUrl,
             };
             return info;
         }

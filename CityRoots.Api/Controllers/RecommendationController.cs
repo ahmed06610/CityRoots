@@ -15,10 +15,19 @@ namespace CityRoots.Api.Controllers
             this.reccommendation = reccommendation;
         }
 
-        [HttpGet]
-       public async Task<IActionResult> Get(int InvestorId)
+        [HttpGet("ReccommendationForInvestor")]
+       public async Task<IActionResult> GetReccommendationForInvestor(int InvestorId)
         {
-          var res= await reccommendation.GetRecommendationDataAsync(InvestorId);
+          var res= await reccommendation.GetInvestorRecommendationDataAsync(InvestorId);
+
+            if (res == null)
+                return NotFound();
+            return Ok(res);
+        }
+        [HttpGet("ReccommendationForMerchant")]
+        public async Task<IActionResult> GetReccommendationForMerchant(int MerchantId)
+        {
+            var res = await reccommendation.GetMerchantRecommendationDataAsync(MerchantId);
 
             if (res == null)
                 return NotFound();

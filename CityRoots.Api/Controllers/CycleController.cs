@@ -19,7 +19,13 @@ namespace CityRoots.Api.Controllers
         [HttpGet("GetAllCycleasOfFarmerId")]
         public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool f = true)
         {
-            var cycles = await _cycleService.GetAllCyclesAsync(FarmerId, f);
+            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId, f);
+            return Ok(cycles);
+        }
+        [HttpGet("GetAllCycleasOfInvestor")]
+        public async Task<IActionResult> GetAllCycles()
+        {
+            var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
             return Ok(cycles);
         }
 

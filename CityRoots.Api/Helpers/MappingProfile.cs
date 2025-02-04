@@ -81,6 +81,7 @@ namespace CityRoots.Api.Helpers
             CreateMap<CreateCycleDTO, Cycle>();
             CreateMap<UpdateCycleDTO, Cycle>();
             CreateMap<Cycle, CycleDTO>();
+            CreateMap<Cycle, CycleForFarmerDTO>();
             CreateMap<OpenInvestmentCycle, OpenInvestmentCycleDTO>();
 
             CreateMap<CreateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
