@@ -34,9 +34,9 @@ namespace CityRoots.Core.Services
             var farmerId = cycle.LandParcel.Farm.Farmer.ApplicationUser.Id;
 
             // Notify pending investment requests
-            if (cycle.InvestmentRequests.Any(i => i.RequestStatus == InvestmentStatues.Pending.ToString()))
+            if (cycle.InvestmentRequests.Any(i => i.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString()))
             {
-                foreach (var investment in cycle.InvestmentRequests.Where(i => i.RequestStatus == InvestmentStatues.Pending.ToString()))
+                foreach (var investment in cycle.InvestmentRequests.Where(i => i.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString()))
                 {
                     var investorName = (await _unitOfWork.Investor.FindTWithIncludes<Investor>(
                         investment.InvestorId,

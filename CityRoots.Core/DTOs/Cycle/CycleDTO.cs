@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CityRoots.Core.DTOs.InvestmentRequests;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -58,5 +59,6 @@ namespace CityRoots.Core.DTOs.Cycle
         public string FullName { get; set; }
         public decimal InvestmentAmount { get; set; }
         public string TypeOfProfit { get; set; }
+        public int InvestmentRequestId { get; set; }
     }
 }

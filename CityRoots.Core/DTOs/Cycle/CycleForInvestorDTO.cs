@@ -16,6 +16,7 @@ namespace CityRoots.Core.DTOs.Cycle
         public LandParcelDTO landParcel { get; set; }
         public CycleDTO InvestmentCycle { get; set; }
         public bool IsInvestorSub {  get; set; }
+        public int?  InvestmentRequestId {  get; set; }
         public bool RequestReview {  get; set; }
         public List<CycleUpdateDTO>? cycleUpdates { get; set; }
 

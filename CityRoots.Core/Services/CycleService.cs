@@ -25,10 +25,11 @@ namespace CityRoots.Core.Services
         private readonly ILandParcelService _landParcel;
         private readonly IOpenInvestmentCycleService _investmentCycleService;
         private readonly ICycleUpdateService _cycleUpdateService;
+        private readonly IInvestmentRequestService _investmentRequestService;
 
         public CycleService(IUnitOfWork unitOfWork, IMapper mapper, IOpenInvestmentCycleService openInvestmentCycleService,
             IPaymentService paymentService, IFarmerService farmerService, ILandParcelService landParcel,
-            IOpenInvestmentCycleService investmentCycleService, ICycleUpdateService cycleUpdateService)
+            IOpenInvestmentCycleService investmentCycleService, ICycleUpdateService cycleUpdateService, IInvestmentRequestService investmentRequestService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -38,6 +39,7 @@ namespace CityRoots.Core.Services
             _landParcel = landParcel;
             _investmentCycleService = investmentCycleService;
             _cycleUpdateService = cycleUpdateService;
+            _investmentRequestService = investmentRequestService;
         }
 
         public async Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int FarmerId = 0,bool ForFarmer = true)
@@ -68,7 +70,7 @@ namespace CityRoots.Core.Services
             else if (InvestorId != 0)
             {
                 // Criteria to find Cycle for Specific Investor
-                criteria = c => c.InvestmentRequests.Any(ir => ir.InvestorId == InvestorId && ir.RequestStatus == InvestmentStatues.Accepted.ToString());
+                criteria = c => c.InvestmentRequests.Any(ir => ir.InvestorId == InvestorId && ir.RequestStatus == InvestmentStatues.مقبول.ToString());
             }
             else
             {
@@ -109,16 +111,18 @@ namespace CityRoots.Core.Services
             var farmerInfo = await _farmerService.GetFarmerInfo(cycle.LandParcel.Farm.FarmerId);
             var landParcel = await _landParcel.GetLandParcelByIdAsync(cycle.LandParcel.ParcelId);
             var investmentCycle=(await mapping(cycle,false));
-            var x = true ? (await _unitOfWork.InvestmentRequest.FindTWithExpression<InvestmentRequest>(ir => ir.InvestorId == InvestorId && ir.CycleId == Cycleid && ir.RequestStatus == InvestmentStatues.Accepted.ToString())) != null : false;
-            if (x == true)
+            var x = (await _unitOfWork.InvestmentRequest.FindTWithExpression<InvestmentRequest>(ir => ir.InvestorId == InvestorId && ir.CycleId == Cycleid ));
+            if (x is not null)
             {
-                cycleForInvestor.IsInvestorSub=true;
-                var cycleUpdates = await _cycleUpdateService.GetAllUpdatesByCycleIdAsync(Cycleid);
-                cycleForInvestor.cycleUpdates = cycleUpdates.ToList();
+                cycleForInvestor.InvestmentRequestId = x.InvestmentRequestId;
+                if (x.RequestStatus == InvestmentStatues.مقبول.ToString())
+                {
+                    cycleForInvestor.IsInvestorSub = true;
+                    var cycleUpdates = await _cycleUpdateService.GetAllUpdatesByCycleIdAsync(Cycleid);
+                    cycleForInvestor.cycleUpdates = cycleUpdates.ToList();
+                }
             }
-            cycleForInvestor.RequestReview = true ? (await _unitOfWork.InvestmentRequest.FindTWithExpression<InvestmentRequest>
-                (ir => ir.InvestorId==InvestorId && ir.CycleId == Cycleid
-               && ir.RequestStatus == InvestmentStatues.Pending.ToString()) is not null) : false;
+            cycleForInvestor.RequestReview = true ? (x is not null && x.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString()) : false;
             cycleForInvestor.InvestmentCycle = investmentCycle;
             cycleForInvestor.Farmer = farmerInfo;
             cycleForInvestor.landParcel= landParcel;
@@ -196,34 +200,39 @@ namespace CityRoots.Core.Services
             {
                 var CurrentInvestors = new List<CurrentInvestors>();
                 var ReqestForInvestment = new List<RequestsForInvestment>();
-                foreach (var investment in cycle.InvestmentRequests)
-                {
+                
                     cycleDto.NumbersOfRequestsInvestments = 0;
-                    if (investment.RequestStatus == InvestmentStatues.Accepted.ToString()) {
-                        var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
-                            i => i.ApplicationUser);
-                        var CurrentInvstment = new CurrentInvestors
-                        {
-                            FullName = invest.ApplicationUser.UserName,
-                            InvestmentAmount = investment.RequestedAmount,
-                        };
-                        CurrentInvestors.Add(CurrentInvstment);
-                    }
-                    else if( investment.RequestStatus == InvestmentStatues.Pending.ToString())
+                    var investmentOfCycle =await _investmentRequestService.GetAllRequestsForCycle(cycle.CycleId);
+                    foreach (var req in investmentOfCycle)
                     {
-                        cycleDto.NumbersOfRequestsInvestments += 1;
-
-                        var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investment.InvestorId, "InvestorId",
-                           i => i.ApplicationUser);
-                        var requestForInvestment = new RequestsForInvestment
+                        if (req.RequestStatus == InvestmentStatues.مقبول.ToString())
                         {
-                            FullName = invest.ApplicationUser.UserName,
-                            InvestmentAmount = investment.RequestedAmount,
-                            TypeOfProfit = investment.RequestedProfitType.ToString(),
-                        };
-                        ReqestForInvestment.Add(requestForInvestment);
+                            var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(req.InvestorId, "InvestorId",
+                                i => i.ApplicationUser);
+                            var CurrentInvstment = new CurrentInvestors
+                            {
+                                FullName = invest.ApplicationUser.UserName,
+                                InvestmentAmount = req.RequestedAmount,
+                            };
+                            CurrentInvestors.Add(CurrentInvstment);
+                        }
+                        else if (req.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString())
+                        {
+                            cycleDto.NumbersOfRequestsInvestments += 1;
 
-                    }
+                            var invest = await _unitOfWork.Investor.FindTWithIncludes<Investor>(req.InvestorId, "InvestorId",
+                               i => i.ApplicationUser);
+                            var requestForInvestment = new RequestsForInvestment
+                            {
+                                FullName = invest.ApplicationUser.UserName,
+                                InvestmentAmount = req.RequestedAmount,
+                                TypeOfProfit = req.RequestedProfitType.ToString(),
+                                InvestmentRequestId=req.InvestmentRequestId,
+                            };
+                            ReqestForInvestment.Add(requestForInvestment);
+
+                        }
+                    
                     cycleDto.requestsForInvestments = ReqestForInvestment;
                     cycleDto.currentInvestors = CurrentInvestors;
                 }

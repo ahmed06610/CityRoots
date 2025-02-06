@@ -11,7 +11,9 @@ namespace CityRoots.Core.DTOs.InvestmentRequests
     public class InvestmentrequestDisplay
     {
         public int InvestmentRequestId { get; set; }
+        public int InvestorId { get; set; }
         public string cycleName {  get; set; }
+        public int CycleId {  get; set; }
         public string farmerName {  get; set; }
         public  DateTime RequestDate { get; set; }
         public string RequestedProfitType { get; set; }

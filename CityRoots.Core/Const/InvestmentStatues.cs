@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.Const
 {
-     enum InvestmentStatues
+    public enum InvestmentStatues
     {
-        Accepted ,
-        Rejected ,
-        Pending ,
+        مقبول,
+        مرفوض ,
+        قيد_الانتظار ,
     }
 }

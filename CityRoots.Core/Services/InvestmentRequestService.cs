@@ -24,7 +24,7 @@ namespace CityRoots.Core.Services
         {
             var investmentRequest=_mapper.Map<InvestmentRequest>(request);
             investmentRequest.RequestDate = DateTime.Now;
-            investmentRequest.RequestStatus = "قيد الانتظار";
+            investmentRequest.RequestStatus = "قيد_الانتظار";
             await _unitOfWork.InvestmentRequest.AddAsync(investmentRequest);
             await _unitOfWork.CompleteAsync();
             return investmentRequest;
