@@ -35,6 +35,7 @@ namespace CityRoots.EF
         public IInteractionOfInvestor InteractionOfInvestor { get; private set; }
         public IInteractionOfMerchant InteractionOfMerchant { get; private set; }
         public IFavoriteFarmers FavoriteFarmers  { get; private set; }
+        public IRateRepository Rate { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -63,6 +64,7 @@ namespace CityRoots.EF
             InteractionOfInvestor = new InteractionOfInvestorRepository(context);
             InteractionOfMerchant = new InteractionOfMerchantRepository(context);
             FavoriteFarmers = new FavoriteFarmersRepository(context);
+            Rate=new RateRepository(context);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

@@ -39,6 +39,7 @@ namespace CityRoots.EF.Data
         public DbSet<InteractionOfInvestor> interactionOfInvestors { get; set; }
         public DbSet<InteractionOfMerchant> interactionOfMerchants { get; set; }
         public DbSet<FavoriteFarmers> favoriteFarmers { get; set; }
+        public DbSet<Rate> Rates { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -197,6 +198,8 @@ namespace CityRoots.EF.Data
             modelBuilder.Entity<Payment>()
         .HasIndex(p => p.PaypalOrderId)
         .IsUnique();
+            modelBuilder.Entity<Rate>().HasKey(x => new { x.UserId, x.FarmerId });
+
         }
     }
     /*  private static List<CropType> SeedCropType()
