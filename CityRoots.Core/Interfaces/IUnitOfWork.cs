@@ -35,6 +35,7 @@ namespace CityRoots.Core.Interfaces
         IInteractionOfMerchant InteractionOfMerchant { get; }
         IInteractionOfInvestor InteractionOfInvestor { get; }
         IFavoriteFarmers FavoriteFarmers { get; }
+        IRateRepository Rate { get; }
 
         Task<int> CompleteAsync();
         Task RollbackAsync();
