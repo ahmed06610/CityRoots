@@ -10,10 +10,12 @@ using CityRoots.Core.DTOs.Farmer;
 using CityRoots.Core.DTOs.FavouriteFarmers;
 using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.DTOs.Harvest;
+using CityRoots.Core.DTOs.InvestmentRequests;
 using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.DTOs.OpenInvestmentCycle;
 using CityRoots.Core.DTOs.Payment;
 using CityRoots.Core.DTOs.Purchasereque;
+using CityRoots.Core.DTOs.Rate;
 using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Models;
 
@@ -109,14 +111,17 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
                 .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
                 .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue));
-                
-           
+            CreateMap<InvestmentRequest, InvestmentrequestDisplay>()
+                .ForMember(dest => dest.cycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
+                .ForMember(dest => dest.farmerName, opt => opt.MapFrom(src => src.Cycle.LandParcel.Farm.Farmer.ApplicationUser.Name));
+                CreateMap<CreateInvestmentRequest, InvestmentRequest>();
+            CreateMap<RateRequest, Rate>();
 
-                
-                
-            
-            
-           
+
+
+
+
+
 
 
 

@@ -111,6 +111,8 @@ namespace CityRoots.Api
             builder.Services.AddScoped< HarvestNotificationLogService>();
             builder.Services.AddScoped<ScheduleNotificationLogService>();
             builder.Services.AddScoped<RecommendationService,RecommendationService>();
+            builder.Services.AddScoped<IInvestmentRequestService, InvestmentRequestService>();
+            builder.Services.AddScoped<IRateService, RateService>();
 
 
 
