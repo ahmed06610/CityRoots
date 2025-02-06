@@ -40,7 +40,7 @@ namespace CityRoots.Core.Services
             _cycleUpdateService = cycleUpdateService;
         }
 
-        public async Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int FarmerId = 0,bool f=true)
+        public async Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int FarmerId = 0,bool ForFarmer = true)
         {
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(null,
                 c => c.LandParcel,
@@ -52,20 +52,34 @@ namespace CityRoots.Core.Services
 
             foreach (var cycle in cycles)
             {
-                var cycleDto = await mapping(cycle,f);
+                var cycleDto = await mapping(cycle, ForFarmer);
                 cyclesDTOs.Add(cycleDto);
             }
             return cyclesDTOs;
         }
-        public async Task<List<CycleDTO>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null)
+        public async Task<List<CycleDTO>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null,int InvestorId =0)
         {
-            Expression<Func<Cycle, bool>> criteria = c =>
-        (Recommendation != null && Recommendation.recommended_cycle_ids.Contains(c.CycleId)) ||
-        (Recommendation == null && c.OpenInvestmentCycle != null);
+            Expression<Func<Cycle, bool>> criteria = null;
+
+            if (Recommendation != null && Recommendation.recommended_cycle_ids != null && Recommendation.recommended_cycle_ids.Any())
+            {
+                criteria = c => Recommendation.recommended_cycle_ids.Contains(c.CycleId);
+            }
+            else if (InvestorId != 0)
+            {
+                // Criteria to find Cycle for Specific Investor
+                criteria = c => c.InvestmentRequests.Any(ir => ir.InvestorId == InvestorId && ir.RequestStatus == InvestmentStatues.Accepted.ToString());
+            }
+            else
+            {
+                // Get All Open Cycles
+                criteria = c => c.OpenInvestmentCycle != null;
+            }
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(criteria,
                 c => c.LandParcel,
                 c => c.LandParcel.Farm,
-                c => c.OpenInvestmentCycle 
+                c => c.OpenInvestmentCycle,
+                c => c.InvestmentRequests
               )).ToList();
             var cyclesDTOs = new List<CycleDTO>();
 
@@ -164,7 +178,7 @@ namespace CityRoots.Core.Services
             await _unitOfWork.CompleteAsync();
             return true;
         }
-        private async Task<CycleForFarmerDTO> mapping(Cycle cycle,bool f=true)
+        private async Task<CycleForFarmerDTO> mapping(Cycle cycle,bool ForFarmer=true)
         {
             var cycleDto = _mapper.Map<CycleForFarmerDTO>(cycle);
             var openCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(oc => oc.CycleId == cycle.CycleId);
@@ -178,7 +192,7 @@ namespace CityRoots.Core.Services
                 var openCycleDto = _mapper.Map<OpenInvestmentCycleDTO>(openCycle);
                 cycleDto.OpenInvestmentCycleDTO = openCycleDto;
             }
-            if (cycle.InvestmentRequests != null&&f==true)
+            if (cycle.InvestmentRequests != null&& ForFarmer == true)
             {
                 var CurrentInvestors = new List<CurrentInvestors>();
                 var ReqestForInvestment = new List<RequestsForInvestment>();

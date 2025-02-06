@@ -17,15 +17,21 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("GetAllCycleasOfFarmerId")]
-        public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool f = true)
+        public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool ForFarmer = true)
         {
-            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId, f);
+            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId, ForFarmer);
             return Ok(cycles);
         }
-        [HttpGet("GetAllCycleasOfInvestor")]
+        [HttpGet("BrowsingCycleasForInvestors")]
         public async Task<IActionResult> GetAllCycles()
         {
             var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
+            return Ok(cycles);
+        }
+        [HttpGet("GetAllCycleasOfInvestor")]
+        public async Task<IActionResult> GetAllCycles(int InvestorId)
+        {
+            var cycles = await _cycleService.GetAllCyclesForInvestorsAsync(InvestorId:InvestorId);
             return Ok(cycles);
         }
 

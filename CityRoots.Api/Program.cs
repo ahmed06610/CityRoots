@@ -17,6 +17,7 @@ using CityRoots.Core.Interfaces.Services;
 using Hangfire;
 using Hangfire.SqlServer;
 using Hangfire.Dashboard;
+using CityRoots.Core.CustomValidation;
 
 namespace CityRoots.Api
 {
@@ -48,6 +49,8 @@ namespace CityRoots.Api
             // Configure the password constraints
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
+                options.User.AllowedUserNameCharacters = null;
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = true;
@@ -55,6 +58,7 @@ namespace CityRoots.Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequiredUniqueChars = 1;
             })
+            .AddUserValidator<CustomUserValidator<ApplicationUser>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
