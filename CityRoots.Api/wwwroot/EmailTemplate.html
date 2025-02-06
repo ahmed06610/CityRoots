@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
     <!--[if gte mso 9]>
       <xml>
@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,700,700i"
           rel="stylesheet" />
     <!--<![endif]-->
-    <title>Welcome</title>
+    <title>مرحبا بك</title>
     <!--[if gte mso 9]>
       <style type="text/css" media="all">
         sup {
@@ -40,6 +40,8 @@
             min-width: 100% !important;
             width: 100% !important;
             -webkit-text-size-adjust: none;
+            direction: rtl; /* Important for right-to-left display */
+            font-family: 'Muli', sans-serif;
         }
 
         .email--background {
@@ -50,6 +52,7 @@
 
         .email--inner-container {
             padding: 0 5% 40px;
+            direction: rtl; /* Ensure content inside is also RTL */
         }
 
         img {
@@ -59,12 +62,14 @@
         }
 
         p {
-            font-family: 'Muli';
+            font-family: 'Muli', sans-serif;
             font-size: 16px;
             line-height: 1.5;
             color: #a2a2a2;
             padding: 10px !important;
             margin: 0 !important;
+            direction: rtl; /* Add RTL direction to paragraphs */
+            text-align: right; /* Align text to the right */
         }
 
         .email--container, .pre-header {
@@ -82,7 +87,7 @@
         }
 
         .cta {
-            font-family: 'Muli';
+            font-family: 'Muli', sans-serif;
             display: inline-block;
             padding: 10px 20px;
             color: #fff;
@@ -92,6 +97,7 @@
             text-transform: uppercase;
             border-radius: 5px;
             font-size: 13px;
+            direction: ltr; /* Important for the link to be LTR */
         }
 
         .footer-junk {
@@ -109,17 +115,17 @@
         <div class="email--container">
 
             <div class="email--inner-container">
-                <p>Welcome, [name]</p>
-                <p>You are currently registered in "بذور" using</p>
+                <p>أهلاً ومرحباً بك يا [name]!</p>
+                <p>أنت تسجل حالياً في "جذور" باستخدام:</p>
                 <p>[email]</p>
-                <p>To confirm your email</p>
-                <a href="[link]" class="cta">Click here</a>
+                <p>لتأكيد بريدك الإلكتروني، اضغط هنا:</p>
+                <a href="[link]" class="cta">تأكيد البريد الإلكتروني</a>
             </div>
 
         </div>
 
         <div class="footer-junk">
-            <a href="#">Unsubscribe</a>
+            <a href="#">إلغاء الاشتراك</a>
         </div>
 
     </div>
