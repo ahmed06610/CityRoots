@@ -31,7 +31,7 @@ namespace CityRoots.Api.Controllers
         [HttpGet("GetAllCycleasOfInvestor")]
         public async Task<IActionResult> GetAllCycles(int InvestorId)
         {
-            var cycles = await _cycleService.GetAllCyclesForInvestorsAsync(InvestorId:InvestorId);
+            var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId:InvestorId);
             return Ok(cycles);
         }
 

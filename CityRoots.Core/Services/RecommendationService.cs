@@ -177,7 +177,7 @@ namespace CityRoots.Core.Services
 
         }
 
-        public async Task<List<CycleDTO>> GetInvestorRecommendationDataAsync(int investorId)
+        public async Task<List<CycleForBrowsing>> GetInvestorRecommendationDataAsync(int investorId)
         {
             var availableCycles = await GetAvailableCyclesAsync();
             var investorHistory = await GetInvestorHistoryAsync(investorId);

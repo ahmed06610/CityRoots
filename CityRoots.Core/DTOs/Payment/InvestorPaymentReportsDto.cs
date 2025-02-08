@@ -14,6 +14,7 @@ namespace CityRoots.Core.DTOs.Payment
         public string Type { get; set; }
         public string CycleName {  get; set; }
         public string PayeeName {  get; set; }
+        public string PayeeEmail {  get; set; }
         public string PaymentMethod{  get; set; }
         public string status {  get; set; }
         public string PayPalOrderId { get; set; }

@@ -24,12 +24,23 @@ namespace CityRoots.Core.DTOs.Cycle
         [Required]
         public DateTime EndDate { get; set; }
         public string TimeToStart { get; set; }
+        public string CropName { get; set; }
         public double ExpectedYield { get; set; }
         public bool IsOpenForInvestment { get; set; } // Indicates if this cycle is open for investment
         public OpenInvestmentCycleDTO? OpenInvestmentCycleDTO { get; set; }
        
 
     }
+    public class CycleForBrowsing : CycleDTO
+    {
+        public int Rate { get; set; }
+    }
+    public class CycleForInvestorDTO : CycleDTO
+    {
+        public string Statue { get; set; }
+        public decimal InvestmentOfInvestor { get; set; }
+    }
+
     public class CycleForFarmerDTO:CycleDTO
     {
         public int? NumbersOfRequestsInvestments { get; set; }

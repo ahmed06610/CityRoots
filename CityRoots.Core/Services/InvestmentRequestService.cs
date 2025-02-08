@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.InvestmentRequests;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
@@ -15,10 +16,12 @@ namespace CityRoots.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public InvestmentRequestService(IUnitOfWork unitOfWork,IMapper mapper)
+        private readonly IOpenInvestmentCycleService _openInvestmentCycle;
+        public InvestmentRequestService(IUnitOfWork unitOfWork, IMapper mapper, IOpenInvestmentCycleService openInvestmentCycle)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _openInvestmentCycle = openInvestmentCycle;
         }
         public async Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request)
         {
@@ -79,10 +82,17 @@ namespace CityRoots.Core.Services
 
             if (request is null)
                 throw new Exception($"No requests with this Id {id}");
+            if(status== InvestmentStatues.مقبول.ToString())
+            {
+                var op=(await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId,"CycleId",c=>c.OpenInvestmentCycle)).OpenInvestmentCycle;
+                op.CurrentTotalInvestment += request.RequestedAmount;
+                op.CurrentInvestorCount++;
+                _unitOfWork.OpenInvestmentCycle.Update(op);
+            }
             request.RequestStatus = status;
             _unitOfWork.InvestmentRequest.Update(request);
             await _unitOfWork.CompleteAsync();
-
+            request.Cycle = null;
             return request;
         }
     }

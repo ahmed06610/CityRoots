@@ -99,6 +99,15 @@ namespace CityRoots.Api.Helpers
             CreateMap<CreateCycleUpdateDTO, CycleUpdate>();
             CreateMap<UpdateCycleUpdateDTO, CycleUpdate>();
             CreateMap<CycleUpdate, CycleUpdateDTO>();
+            CreateMap<Cycle, CycleForInvestorDTO>();
+            CreateMap<Cycle, CycleForBrowsing>()
+                .ForMember(dest => dest.IsOpenForInvestment, opt => opt.MapFrom(src => src.OpenInvestmentCycle != null))
+                .ForMember(dest => dest.OpenInvestmentCycleDTO, opt => opt.MapFrom(src => src.OpenInvestmentCycle))
+                .ForMember(dest => dest.ParcelName, opt => opt.MapFrom(src => src.LandParcel.ParcelName));
+
+
+
+
             CreateMap<PurchaseRequest, AllPurchasesRequestForHarvest>()
            .ForMember(dest => dest.merchantName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name));
             CreateMap<FavoriteFarmers, FavouriteFarmerDTO>()
@@ -110,7 +119,8 @@ namespace CityRoots.Api.Helpers
             CreateMap<Payment, InvestorPaymentReportsDto>()
                 .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
                 .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
-                .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue));
+                .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue))
+                .ForMember(dest=>dest.PayeeEmail,opt=>opt.MapFrom(src=>src.Payee.Email));
             CreateMap<InvestmentRequest, InvestmentrequestDisplay>()
                 .ForMember(dest => dest.cycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
                 .ForMember(dest => dest.farmerName, opt => opt.MapFrom(src => src.Cycle.LandParcel.Farm.Farmer.ApplicationUser.Name));

@@ -12,10 +12,11 @@ namespace CityRoots.Core.Interfaces.Services
     public interface ICycleService
     {
         Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int CycleerId,bool ForFarmer);
-        Task<List<CycleDTO>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation = null, int InvestorId = 0);
+        Task<List<CycleForBrowsing>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation = null);
+        Task<List<CycleForInvestorDTO>> GetAllPrivateCyclesForInvestor(int InvestorId);
 
         Task<CycleForFarmerDTO> GetCycleByIdAsync(int id);
-        Task<CycleForInvestorDTO> GetCycleByIdForInvestorAsync(int Cycleid, int InvestorId);
+        Task<CycleDetailsForInvestorDTO> GetCycleByIdForInvestorAsync(int Cycleid, int InvestorId);
 
         Task<CycleDTO> AddCycleAsync(CreateCycleDTO cycle);
         Task<CycleDTO> UpdateCycleAsync(UpdateCycleDTO cycle);

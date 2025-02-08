@@ -1,4 +1,5 @@
-﻿using CityRoots.Core.DTOs.InvestmentRequests;
+﻿using CityRoots.Core.Const;
+using CityRoots.Core.DTOs.InvestmentRequests;
 using CityRoots.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -90,7 +91,7 @@ namespace CityRoots.Api.Controllers
             try
             {
                
-                return Ok(await _investmentRequestService.UpdateInvestmentRequest(Id, "مقبول"));
+                return Ok(await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مقبول.ToString()));
             }
             catch (Exception ex)
             {
@@ -103,8 +104,8 @@ namespace CityRoots.Api.Controllers
         {
             try
             {
-               
-                return Ok(await _investmentRequestService.UpdateInvestmentRequest(Id, "مرفوض"));
+                await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مقبول.ToString());
+                return Ok();
             }
             catch (Exception ex)
             {

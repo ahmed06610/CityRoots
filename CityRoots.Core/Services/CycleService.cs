@@ -59,7 +59,7 @@ namespace CityRoots.Core.Services
             }
             return cyclesDTOs;
         }
-        public async Task<List<CycleDTO>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null,int InvestorId =0)
+        public async Task<List<CycleForBrowsing>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null)
         {
             Expression<Func<Cycle, bool>> criteria = null;
 
@@ -67,11 +67,7 @@ namespace CityRoots.Core.Services
             {
                 criteria = c => Recommendation.recommended_cycle_ids.Contains(c.CycleId);
             }
-            else if (InvestorId != 0)
-            {
-                // Criteria to find Cycle for Specific Investor
-                criteria = c => c.InvestmentRequests.Any(ir => ir.InvestorId == InvestorId && ir.RequestStatus == InvestmentStatues.مقبول.ToString());
-            }
+           
             else
             {
                 // Get All Open Cycles
@@ -80,17 +76,49 @@ namespace CityRoots.Core.Services
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(criteria,
                 c => c.LandParcel,
                 c => c.LandParcel.Farm,
+                c => c.LandParcel.Farm.Farmer,
+                c => c.LandParcel.Farm.Farmer.ApplicationUser,
                 c => c.OpenInvestmentCycle,
-                c => c.InvestmentRequests
+                c => c.InvestmentRequests,
+                c => c.Crop
+
               )).ToList();
-            var cyclesDTOs = new List<CycleDTO>();
+            var cyclesDTOs = new List<CycleForBrowsing>();
 
             foreach (var cycle in cycles)
             {
-                var cycleDto = await mapping(cycle, false);
+                var f= cycle.LandParcel.Farm.Farmer.ApplicationUser.Id;
+                var x = (await _unitOfWork.Rate.FindAllWithIncludes<Rate>(r => r.FarmerId == f));
+                var rate = x is not null? (int)x.Average(r => r.Rating) : 0;
+                var cycleDto = _mapper.Map<CycleForBrowsing>(cycle);
+                cycleDto.Rate =rate;
+                cycleDto.TimeToStart = GetRemainingTimeMessage(cycleDto.StartDate, cycleDto.EndDate);
                 cyclesDTOs.Add(cycleDto);
             }
             return cyclesDTOs;
+        }
+        public async Task<List<CycleForInvestorDTO>> GetAllPrivateCyclesForInvestor(int InvestorId)
+        {
+           
+
+            var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(c => c.InvestmentRequests.Any(ir => ir.InvestorId == InvestorId && ir.RequestStatus == InvestmentStatues.مقبول.ToString()),
+                c => c.LandParcel,
+                c => c.LandParcel.Farm,
+                c => c.OpenInvestmentCycle,
+                c => c.InvestmentRequests,
+                c => c.Crop
+
+              )).ToList();
+            var cyclesDTOs = new List<CycleForInvestorDTO>();
+
+            foreach (var cycle in cycles)
+            {
+                var cycleDto = await mappingForInvestor(cycle,InvestorId);
+                cyclesDTOs.Add(cycleDto);
+            }
+            return cyclesDTOs;
+
+
         }
         public async Task<CycleForFarmerDTO> GetCycleByIdAsync(int id)
         {
@@ -98,9 +126,9 @@ namespace CityRoots.Core.Services
             return await mapping(cycle);
 
         }
-        public async Task<CycleForInvestorDTO> GetCycleByIdForInvestorAsync(int Cycleid,int InvestorId)
+        public async Task<CycleDetailsForInvestorDTO> GetCycleByIdForInvestorAsync(int Cycleid,int InvestorId)
         {
-            var cycleForInvestor = new CycleForInvestorDTO();
+            var cycleForInvestor = new CycleDetailsForInvestorDTO();
             var cycle=await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(Cycleid, "CycleId",
                 c=>c.LandParcel,
                 c=>c.LandParcel.Farm,   
@@ -239,6 +267,55 @@ namespace CityRoots.Core.Services
             }
 
             cycleDto.TimeToStart = GetRemainingTimeMessage(cycleDto.StartDate,cycleDto.EndDate);
+
+            return cycleDto;
+        }
+        private async Task<CycleForInvestorDTO> mappingForInvestor(Cycle cycle, int investorId)
+        {
+            var cycleDto = _mapper.Map<CycleForInvestorDTO>(cycle);
+
+            // Check if the cycle is open for investment
+            var openCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(oc => oc.CycleId == cycle.CycleId);
+            if (openCycle == null)
+            {
+                cycleDto.IsOpenForInvestment = false;
+            }
+            else
+            {
+                cycleDto.IsOpenForInvestment = true;
+                var openCycleDto = _mapper.Map<OpenInvestmentCycleDTO>(openCycle);
+                cycleDto.OpenInvestmentCycleDTO = openCycleDto;
+            }
+
+          
+            
+                var investmentRequest = await _unitOfWork.InvestmentRequest.FindAllWithIncludes<InvestmentRequest>(
+                    ir => ir.InvestorId == investorId && ir.CycleId == cycle.CycleId && ir.RequestStatus == InvestmentStatues.مقبول.ToString());
+
+                if (investmentRequest != null)
+                {
+                    cycleDto.InvestmentOfInvestor = investmentRequest.Sum(i=>i.RequestedAmount);
+                        // Determine the cycle's status (نشطه or منتهيه)
+                        var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                        var now = TimeZoneInfo.ConvertTime(DateTime.Now, egyptTimeZone);
+
+                        if (cycle.EndDate <= now)
+                        {
+                            cycleDto.Statue = "منتهيه"; // Cycle has ended
+                        }
+                        else if (cycle.StartDate <= now)
+                        {
+                            cycleDto.Statue = "نشطه"; // Cycle is active
+                        }
+                        else
+                        {
+                            cycleDto.Statue = "قيد الانتظار"; // Cycle has not started yet
+                        }
+                 }
+               
+
+            // Calculate the remaining time message
+            cycleDto.TimeToStart = GetRemainingTimeMessage(cycleDto.StartDate, cycleDto.EndDate);
 
             return cycleDto;
         }

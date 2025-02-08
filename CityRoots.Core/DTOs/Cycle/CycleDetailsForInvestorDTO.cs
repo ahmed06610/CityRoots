@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.DTOs.Cycle
 {
-    public class CycleForInvestorDTO
+    public class CycleDetailsForInvestorDTO
     {
         public string CycleName { get; set; }
         public FarmerInfoDTO Farmer { get; set; }
