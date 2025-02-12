@@ -146,13 +146,13 @@ namespace CityRoots.Core.Services
 
                     ////////////////////////////////////////
                    
-                    // Save Image after successful creation to be sure it is really valid record
+                   /* // Save Image after successful creation to be sure it is really valid record
                     if (model.ImageFile != null)
                     {
                         user.ImageProfileUrl = _imageService.SaveImage(model.ImageFile, ImagesFolder);
                         await _userManager.UpdateAsync(user); // Save the image URL to DB
                     }
-
+*/
 
                     var role = "";
 

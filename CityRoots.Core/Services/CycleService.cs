@@ -46,6 +46,7 @@ namespace CityRoots.Core.Services
         {
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(null,
                 c => c.LandParcel,
+                c => c.Crop,
                 c => c.LandParcel.Farm,
                 c => c.LandParcel.Farm.Farmer,
                 c => c.InvestmentRequests)).ToList();
@@ -89,7 +90,7 @@ namespace CityRoots.Core.Services
             {
                 var f= cycle.LandParcel.Farm.Farmer.ApplicationUser.Id;
                 var x = (await _unitOfWork.Rate.FindAllWithIncludes<Rate>(r => r.FarmerId == f));
-                var rate = x is not null? (int)x.Average(r => r.Rating) : 0;
+                var rate = x.Count() != 0 ? (int)x.Average(r => r.Rating) : 0;
                 var cycleDto = _mapper.Map<CycleForBrowsing>(cycle);
                 cycleDto.Rate =rate;
                 cycleDto.TimeToStart = GetRemainingTimeMessage(cycleDto.StartDate, cycleDto.EndDate);

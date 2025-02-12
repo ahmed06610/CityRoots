@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using CityRoots.Core.Const;
 
 namespace CityRoots.Core.Models
 {
@@ -9,7 +10,7 @@ namespace CityRoots.Core.Models
     {
         public PurchaseRequest()
         {
-            RequestStatus = "pending";
+            RequestStatus = PurchaseStatus.قيد_الانتظار.ToString();
             RequestDate = DateTime.Now;
         }
         [Key]
@@ -37,6 +38,6 @@ namespace CityRoots.Core.Models
 
         public DateTime RequestDate { get;  private set; } // تاريخ تقديم الطلب
 
-        public string Notes { get; set; } // ملاحظات اختيارية
+        public string? Notes { get; set; } // ملاحظات اختيارية
     }
 }

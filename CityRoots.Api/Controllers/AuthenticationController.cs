@@ -56,7 +56,7 @@ namespace CityRoots.Api.Controllers
           
             return Ok("Successfull Register.....Please Go To Login");
         }
-        [HttpGet("confirm-email")]
+        [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)

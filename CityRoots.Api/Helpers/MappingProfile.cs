@@ -18,6 +18,7 @@ using CityRoots.Core.DTOs.Purchasereque;
 using CityRoots.Core.DTOs.Rate;
 using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Models;
+using NumSharp.Extensions;
 
 namespace CityRoots.Api.Helpers
 {
@@ -58,6 +59,10 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest=>dest.cropType,opt=>opt.MapFrom(src=>src.CropType.Name));
             CreateMap<AddCropDto, Crop>().ReverseMap();
             CreateMap<UpdateCropDto, Crop>().ReverseMap();
+            CreateMap<Crop, CropDTO>()
+            .ForMember(dest => dest.CropName, opt => opt.MapFrom(src => src.Name));
+
+
             CreateMap<Harvest, HarvestDisplayDto>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Crop.Name))
                 .ForMember(dest => dest.FarmerDetails, opt => opt.MapFrom(src => src.Farmer))
@@ -66,8 +71,23 @@ namespace CityRoots.Api.Helpers
             CreateMap<UpdateHarvestDto,Harvest>().ReverseMap();
             CreateMap<Harvest, HarvestDtoForFarmer>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Crop.Name))
-                 .ForMember(dest => dest.ReuestsCount, opt => opt.MapFrom(src => src.Purchases.Count()))
-;
+                 .ForMember(dest => dest.ReuestsCount, opt => opt.MapFrom(src => src.Purchases.Count()));
+            CreateMap<Harvest, HarvestForBrowsing>()
+                .ForMember(dest => dest.AvailableQuantity, opt => opt.MapFrom(src => src.Yield))
+                .ForMember(dest => dest.PricePerUnit, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.HarvestDate, opt => opt.MapFrom(src => src.ProductionDate))
+                .ForMember(dest => dest.CropType, opt => opt.MapFrom(src => src.Crop.CropType.Name))
+                .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Cycle.LandParcel.Farm.Location));
+            CreateMap<Harvest, HarvestDetailsDTO>()
+                .ForMember(dest => dest.QuantityAvailable, opt => opt.MapFrom(src => src.Yield))
+                .ForMember(dest => dest.HarvestStatus, opt => opt.MapFrom(src => src.status))
+                .ForMember(dest => dest.HarvestDate, opt => opt.MapFrom(src => src.ProductionDate))
+                .ForMember(dest => dest.CropType, opt => opt.MapFrom(src => src.Crop.CropType.Name))
+                .ForMember(dest => dest.CropName, opt => opt.MapFrom(src => src.Crop.Name));
+
+
+
+
             CreateMap<Cycle, CycleDetails>()
                 .ForMember(dest => dest.LandImagesUrl, opt => opt.MapFrom(src => src.LandParcel.ImageUrl))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.LandParcel.Farm.Location))
@@ -83,7 +103,9 @@ namespace CityRoots.Api.Helpers
             CreateMap<CreateCycleDTO, Cycle>();
             CreateMap<UpdateCycleDTO, Cycle>();
             CreateMap<Cycle, CycleDTO>();
-            CreateMap<Cycle, CycleForFarmerDTO>();
+            CreateMap<Cycle, CycleForFarmerDTO>()
+                .ForMember(dest=>dest.CropName,opt=>opt.MapFrom(src=>src.Crop.Name))
+                .ForMember(dest=>dest.ParcelName,opt=>opt.MapFrom(src=>src.LandParcel.ParcelName));
             CreateMap<OpenInvestmentCycle, OpenInvestmentCycleDTO>();
 
             CreateMap<CreateOpenInvestmentCycleDTO, OpenInvestmentCycle>();

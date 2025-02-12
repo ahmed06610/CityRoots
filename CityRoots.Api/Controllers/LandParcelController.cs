@@ -22,6 +22,12 @@ namespace CityRoots.Api.Controllers
             var landParcels = await _landParcelService.GetAllLandParcelsAsync(FarmId);
             return Ok(landParcels);
         }
+        [HttpGet("GetAllLandsOfFarmerId")]
+        public async Task<IActionResult> GetAllLandParcelsOfFarmer(int FarmerId)
+        {
+            var landParcels = await _landParcelService.GetAllLandParcelsofFarmerAsync(FarmerId);
+            return Ok(landParcels);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetLandParcelById(int id)

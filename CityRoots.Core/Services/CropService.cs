@@ -19,6 +19,30 @@ namespace CityRoots.Core.Services
             this.mapper = mapper;
 
         }
+        public async Task<IEnumerable<CropDTO>> GetCrops(int CropTypeid)
+        {
+            try
+            {
+                var crops = await _unitOfWork.Crop.FindAllAsync(c => c.CropTypeId == CropTypeid);
+                var cropsdto = new List<CropDTO>();
+                foreach (var c in crops)
+                {
+                    var x = new CropDTO
+                    {
+                        CropId = c.CropId,
+                        CropName = c.Name
+                    };
+                    cropsdto.Add(x);
+                }
+                return cropsdto;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in GetCrops: {ex.Message}");
+                throw; // Re-throw the exception to propagate it to the controller
+            }
+        }
 
         public async Task<CropDisplayDto> Add(AddCropDto crop)
         {

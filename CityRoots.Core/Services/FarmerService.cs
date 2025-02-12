@@ -31,13 +31,15 @@ namespace CityRoots.Core.Services
             if (farmer == null)
                 return null;
             var user = await _userManager.FindByIdAsync(farmer.ApplicationUserId);
+            var ratings = (await _unitOfWork.Rate.FindAllWithIncludes<Rate>(r => r.FarmerId == farmer.ApplicationUserId));
+
             var info = new FarmerInfoDTO
             {
                 FarmerId = farmer.FarmerId,
                 Name = user.Name,
                 Email = user.Email,
                 Phone = user.PhoneNumber,
-                Rate=user.Rate,
+                Rate = ratings.Count() != 0 ? (int)ratings.Average(r => r.Rating) : 0,
                 Bio = farmer.Bio,
                 ImageUrl=user.ImageProfileUrl,
             };

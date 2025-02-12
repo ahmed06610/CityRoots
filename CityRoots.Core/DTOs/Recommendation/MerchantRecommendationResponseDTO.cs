@@ -2,7 +2,7 @@
 {
     public class MerchantRecommendationResponseDTO
     {
-        public int MerchantId { get; set; } // Matches "merchant_id" in JSON
-        public List<int> RecommendedHarvestsIds { get; set; } // Encapsulates the nested "data" object
+        public int merchant_id { get; set; } // Matches "merchant_id" in JSON
+        public List<int> recommended_harvest_ids { get; set; } // Encapsulates the nested "data" object
     }
 }

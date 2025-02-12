@@ -1,7 +1,12 @@
-﻿using CityRoots.Core.DTOs.Harvest;
+﻿using CityRoots.Core.DTOs.Cycle;
+using CityRoots.Core.DTOs.Harvest;
+using CityRoots.Core.DTOs.Recommendation;
 using CityRoots.Core.Interfaces.Services;
+using CityRoots.Core.Models;
+using CityRoots.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace CityRoots.Api.Controllers
 {
@@ -29,6 +34,22 @@ namespace CityRoots.Api.Controllers
 
 
         }
+
+        [HttpGet("BrowsinHarvestsForMerchant")]
+        public async Task<IActionResult> GetAllHarvests(int MerchantId)
+        {
+            var Harvests = await _harvestService.GetAllHarvestsForMerchantsAsync(MerchantId: MerchantId);
+            return Ok(Harvests);
+        }
+
+        [HttpGet("GetHarvestForMerchant")]
+        public async Task<IActionResult> GetHarvestForMerchant(int HarvestId, int MerchantId)
+        {
+            var Harvests = await _harvestService.GetHarvestByIdForMerchantAsync(HarvestId, MerchantId);
+            if (Harvests == null) return NotFound();
+            return Ok(Harvests);
+        }
+
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetById(int Id)
         {

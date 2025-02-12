@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CityRoots.Core.Models;
 using CityRoots.Core.Models.Recommendations;
+using CityRoots.Core.Seeding;
 
 namespace CityRoots.EF.Data
 {
@@ -200,6 +201,9 @@ namespace CityRoots.EF.Data
         .IsUnique();
             modelBuilder.Entity<Rate>().HasKey(x => new { x.UserId, x.FarmerId });
 
+            // Seed data
+            modelBuilder.Entity<AiPredict>().HasData(AiPredictSeeder.GetSeedData());
+            modelBuilder.Entity<Crop>().HasData(CropSeeder.GetSeedData());
         }
     }
     /*  private static List<CropType> SeedCropType()

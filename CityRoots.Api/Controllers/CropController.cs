@@ -15,12 +15,27 @@ namespace CityRoots.Api.Controllers
             _cropService = cropService;
 
         }
-        [HttpGet]
+        [HttpGet("GEtCropsForMarket")]
         public async Task<IActionResult> GetAll()
         {
             try
             {
                 return Ok(await _cropService.GetAll());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+        [HttpGet("CropsOfType")]
+        public async Task<IActionResult> GetAllOfTypeId(int CropTypeId)
+        {
+            try
+            {
+                var result = await _cropService.GetCrops(CropTypeId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
