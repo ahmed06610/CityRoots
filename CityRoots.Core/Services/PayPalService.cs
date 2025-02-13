@@ -9,6 +9,7 @@ using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Http;
 using CityRoots.Core.Interfaces;
 using System.Security.Claims;
+using OneOf.Types;
 
 public class PayPalService
 {
@@ -26,7 +27,7 @@ public class PayPalService
         _unitOfWork=unitOfWork;
     }
 
-    public async Task<string> CreatePaymentLink(decimal amount, string sellerEmail,int CycleId,string userId)
+    public async Task<string> CreatePaymentLink(decimal amount, string sellerEmail,string userId,int CycleId= 0, int HarvestId = 0)
     {
        
         PayPalEnvironment environment = _isLive
@@ -70,13 +71,17 @@ public class PayPalService
             var approvalUrl = result.Links.FirstOrDefault(l => l.Rel == "approve")?.Href;
 
             // Save transaction as "PENDING"
-            await SaveTransaction(result, "قيد الانتظار", CycleId, amount,userId);
+            if (HarvestId ==0) await SaveTransaction(result, "قيد الانتظار", CycleId, amount, userId);
+            else await SaveTransactionForMerchant(result, "قيد الانتظار", HarvestId, amount, userId);
+
+
             return approvalUrl;
         }
         catch (Exception ex)
         {
             // Save failed transaction
-            await SaveTransaction(new Order { Id = "N/A" }, "FAILED", CycleId, amount,userId);
+            if (HarvestId ==0) await SaveTransaction(new Order { Id = "N/A" }, "FAILED", CycleId, amount,userId);
+            else await SaveTransactionForMerchant(new Order { Id = "N/A" }, "FAILED", HarvestId, amount, userId);
             throw new Exception("PayPal Payment Link creation failed: " + ex.Message);
         }
 
@@ -90,6 +95,7 @@ public class PayPalService
         //    throw new Exception("User ID not found in token");
 
         //}
+         
         var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(
                    CycleId, "CycleId",
                    x => x.LandParcel,
@@ -107,7 +113,7 @@ public class PayPalService
             Amount = amount,
             CycleId = CycleId,
             PaymentMethod = "PayPal",
-            Type = "استثمار",
+            Type =   "استثمار",
             PaymentDate = DateTime.Now
         };
        await _unitOfWork.Payment.AddAsync( transaction );
@@ -123,6 +129,39 @@ public class PayPalService
         payment.Statue=status;
         _unitOfWork.Payment.Update(payment);
         await _unitOfWork.CompleteAsync();
+    }
+    private async Task SaveTransactionForMerchant(Order result, string status, int HarvestId, decimal amount, string userId)
+    {
+        //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //if (userId is null)
+        //{
+        //    throw new Exception("User ID not found in token");
+
+        //}
+
+        var harvest = await _unitOfWork.Harvest.FindTWithIncludes<Harvest>(
+                   HarvestId, "HarvestId",
+                   x => x.Farmer,
+                   x => x.Farmer.ApplicationUser
+                 
+               ) ?? throw new Exception($"No Harvest with ID {HarvestId}");
+        var transaction = new Payment
+        {
+
+            PaypalOrderId = result.Id,
+            Statue = "PENDING",
+            PayerId = userId,
+            PayeeId = harvest.Farmer.ApplicationUserId,
+            Amount = amount,
+            HarvestId = HarvestId,
+            PaymentMethod = "PayPal",
+            Type = "بيع وشراء",
+            PaymentDate = DateTime.Now
+        };
+        await _unitOfWork.Payment.AddAsync(transaction);
+        await _unitOfWork.CompleteAsync();
+
+
     }
 
 

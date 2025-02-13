@@ -55,5 +55,30 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GetMerchantPayments/{userId}")]
+        public async Task<IActionResult> GetPaymentsForMerchant(string userId)
+        {
+            try
+            {
+                return Ok(await _paymentService.GetMerchantPaymentReports(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetMerchantPaymentDetails/{PaymentId}")]
+        public async Task<IActionResult> GetMerchantPaymentDetails(int PaymentId)
+        {
+            try
+            {
+                return Ok(await _paymentService.GetMerchantPaymentReportDetails(PaymentId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
