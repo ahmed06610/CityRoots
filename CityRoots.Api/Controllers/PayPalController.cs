@@ -20,7 +20,7 @@ namespace CityRoots.Api.Controllers
         {
             try
             {
-                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,request.CycleId,request.userId);
+                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,request.userId, request.CycleId);
                 if (paymentUrl == null)
                 {
                     return BadRequest(new { message = "Failed to generate payment link" });
@@ -32,7 +32,24 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-         [HttpGet("success")]
+        [HttpPost("create-paymentforMerchant")]
+        public async Task<IActionResult> CreatePaymentForMerchant([FromBody] PayPalRequestforMerchant request)
+        {
+            try
+            {
+                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,request.userId,0,request.HarvestId);
+                if (paymentUrl == null)
+                {
+                    return BadRequest(new { message = "Failed to generate payment link" });
+                }
+                return Ok(new { url = paymentUrl });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("success")]
           public async Task<IActionResult> PaymentSuccess([FromQuery] string token)
         {
           await _payPalService.updateTransaction(token,"مقبول");

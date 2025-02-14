@@ -14,5 +14,8 @@ namespace CityRoots.Core.Interfaces.Services
         Task DeletePaymentsByCycleIdAsync(int cycleId);
         Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync(string userId);
         Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId);
+        Task<List<MerchantPaymentReports>> GetMerchantPaymentReports(string userId);
+        Task<MerchantPaymentReports> GetMerchantPaymentReportDetails(int paymentId);
+
     }
 }

@@ -8,6 +8,7 @@ namespace CityRoots.Core.Models
 {
     public class PurchaseRequest
     {
+    
         public PurchaseRequest()
         {
             RequestStatus = PurchaseStatus.قيد_الانتظار.ToString();
@@ -36,7 +37,7 @@ namespace CityRoots.Core.Models
 
         public string RequestStatus { get; set; } // Pending, Approved, Rejected
 
-        public DateTime RequestDate { get;  private set; } // تاريخ تقديم الطلب
+        public DateTime RequestDate { get;   set; } // تاريخ تقديم الطلب
 
         public string? Notes { get; set; } // ملاحظات اختيارية
     }

@@ -196,11 +196,34 @@ namespace CityRoots.Core.Services
             //}
             var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
                 x => x.Payee,
-                x => x.Payer,
                 x => x.Cycle);
             //if (payment.Payer.Id != userId)
             //    throw new Exception("You are not authorized to see this payment");
+            if (payment is null)
+                throw new Exception($"No payments with this Id {paymentId}");
             return _mapper.Map<InvestorPaymentReportsDto>(payment);
+        }
+
+        public async Task<List<MerchantPaymentReports>> GetMerchantPaymentReports(string userId)
+        {
+            var payments = (await _unitOfWork.Payment.FindAllWithIncludes<Payment>(x => x.PayerId == userId,
+                        x => x.Payee,
+                        x => x.Harvest,
+                       x=>x.Harvest.Crop)).ToList();
+
+            return _mapper.Map<List<MerchantPaymentReports>>(payments);
+        }
+
+        public async  Task<MerchantPaymentReports> GetMerchantPaymentReportDetails(int paymentId)
+        {
+            var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
+               x => x.Payee,
+               x => x.Harvest,
+               x=>x.Harvest.Crop);
+            if (payment is null)
+                throw new Exception($"No payments with this Id {paymentId}");
+            return _mapper.Map<MerchantPaymentReports>(payment);
+
         }
     }
 }

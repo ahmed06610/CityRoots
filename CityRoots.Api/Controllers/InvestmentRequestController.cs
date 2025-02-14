@@ -29,62 +29,62 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetAllForInvestor/{InvestorId}")]
-        public async Task<IActionResult> GetAllForInvestor(int InvestorId)
-        {
-            try
-            {
-                return Ok(await _investmentRequestService.GetAllRequestsForInvestor(InvestorId));
-            }
-            catch (Exception ex)
-            {
+        //[HttpGet("GetAllForInvestor/{InvestorId}")]
+        //public async Task<IActionResult> GetAllForInvestor(int InvestorId)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _investmentRequestService.GetAllRequestsForInvestor(InvestorId));
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                return BadRequest(ex.Message);
+        //        return BadRequest(ex.Message);
 
-            }
+        //    }
 
-        }
-        [HttpGet("GetInvestmentRequest/{id}")]
-        public async Task<IActionResult> GetInvestmentRequest(int id)
-        {
-            try
-            {
-                return Ok(await _investmentRequestService.GetSpeceficInvestmentRequest(id));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> CreateInvestmentRequest(CreateInvestmentRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            try
-            {
-                return Ok(await _investmentRequestService.CreateInvestmentRequest(request));
+        //}
+        //[HttpGet("GetInvestmentRequest/{id}")]
+        //public async Task<IActionResult> GetInvestmentRequest(int id)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _investmentRequestService.GetSpeceficInvestmentRequest(id));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> CreateInvestmentRequest(CreateInvestmentRequest request)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    try
+        //    {
+        //        return Ok(await _investmentRequestService.CreateInvestmentRequest(request));
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> Delete(int Id)
-        {
-            try
-            {
-                await _investmentRequestService.DeleteInvestmentRequest(Id);
-                return Ok("Deleted");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+        //[HttpDelete("{Id}")]
+        //public async Task<IActionResult> Delete(int Id)
+        //{
+        //    try
+        //    {
+        //        await _investmentRequestService.DeleteInvestmentRequest(Id);
+        //        return Ok("Deleted");
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
         [HttpGet("Approved/{Id}")]
         public async Task<IActionResult> ApproveTheRequest(int Id)
         {
