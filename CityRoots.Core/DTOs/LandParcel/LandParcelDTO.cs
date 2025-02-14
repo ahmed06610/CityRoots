@@ -9,6 +9,7 @@ namespace CityRoots.Core.DTOs.LandParcel
     public class LandParcelDTO
     {
         public int ParcelId { get; set; }
+        public string ParcelName { get; set; }
         public int FarmId { get; set; }
         public string FarmLocation { get; set; } // From related Farm
         public string Status { get; set; }

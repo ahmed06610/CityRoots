@@ -177,24 +177,32 @@ namespace CityRoots.Core.Services
 
             return result;
         }
-        public async Task<CycleDTO> UpdateCycleAsync(UpdateCycleDTO updateCycleDto)
+        public async Task<CycleForFarmerDTO> UpdateCycleAsync(UpdateCycleDTO updateCycleDto)
         {
-            var existingCycle = await _unitOfWork.Cycle.GetByIdAsync(updateCycleDto.CycleId);
+            var existingCycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(updateCycleDto.CycleId, "CycleId",
+               c => c.LandParcel,
+                c => c.Crop,
+                c => c.LandParcel.Farm,
+                c => c.LandParcel.Farm.Farmer,
+                c => c.InvestmentRequests
+                );
             if (existingCycle == null) return null;
 
 
             _mapper.Map(updateCycleDto, existingCycle);
             _unitOfWork.Cycle.Update(existingCycle);
+
             if (updateCycleDto.UpdateOpenInvestmentCycleDTO != null)
             {
                 updateCycleDto.UpdateOpenInvestmentCycleDTO.CycleId= existingCycle.CycleId;
                 updateCycleDto.UpdateOpenInvestmentCycleDTO.OpenInvestmentCycleId=(await _unitOfWork.OpenInvestmentCycle
                     .FindTWithExpression<OpenInvestmentCycle>(o=>o.CycleId==existingCycle.CycleId)).OpenInvestmentCycleId;
                await _openInvestmentCycleService.UpdateOpenInvestmentCycleAsync(updateCycleDto.UpdateOpenInvestmentCycleDTO);
+                existingCycle.OpenInvestmentCycle = _mapper.Map<OpenInvestmentCycle>(updateCycleDto.UpdateOpenInvestmentCycleDTO);
+
             }
             await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<CycleDTO>(existingCycle);
+            return await mapping(existingCycle);
         }
         public async Task<bool> DeleteCycleAsync(int id)
         {

@@ -102,14 +102,16 @@ namespace CityRoots.Api.Helpers
 
             CreateMap<CreateCycleDTO, Cycle>();
             CreateMap<UpdateCycleDTO, Cycle>();
-            CreateMap<Cycle, CycleDTO>();
+            CreateMap<Cycle, CycleDTO>().ForMember(dest => dest.CropName, opt => opt.MapFrom(src => src.Crop.Name))
+                .ForMember(dest => dest.ParcelName, opt => opt.MapFrom(src => src.LandParcel.ParcelName)).ReverseMap();
             CreateMap<Cycle, CycleForFarmerDTO>()
                 .ForMember(dest=>dest.CropName,opt=>opt.MapFrom(src=>src.Crop.Name))
                 .ForMember(dest=>dest.ParcelName,opt=>opt.MapFrom(src=>src.LandParcel.ParcelName));
             CreateMap<OpenInvestmentCycle, OpenInvestmentCycleDTO>();
 
             CreateMap<CreateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
-            CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>();
+            CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycle>().ReverseMap();
+            CreateMap<UpdateOpenInvestmentCycleDTO, OpenInvestmentCycleDTO>().ReverseMap();
             CreateMap<AddScheduleDto, Schedule>();
             CreateMap<UpdateScheduleDTO, Schedule>().ReverseMap();
             CreateMap<Schedule, ScheduleDisplayDTO>()

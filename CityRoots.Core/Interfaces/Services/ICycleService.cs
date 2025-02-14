@@ -19,7 +19,7 @@ namespace CityRoots.Core.Interfaces.Services
         Task<CycleDetailsForInvestorDTO> GetCycleByIdForInvestorAsync(int Cycleid, int InvestorId);
 
         Task<CycleDTO> AddCycleAsync(CreateCycleDTO cycle);
-        Task<CycleDTO> UpdateCycleAsync(UpdateCycleDTO cycle);
+        Task<CycleForFarmerDTO> UpdateCycleAsync(UpdateCycleDTO cycle);
         Task<bool> DeleteCycleAsync(int id);
 
     }

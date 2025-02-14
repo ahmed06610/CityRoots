@@ -9,7 +9,7 @@ namespace CityRoots.Core.Services
     public class AiPredictionService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiEndpoint = "http://127.0.0.1:8000/predict";
+        private readonly string _apiEndpoint = "https://esrraa-plant-disease-detection.hf.space/predict";
         private readonly IUnitOfWork _unitOfWork;
 
         public AiPredictionService(HttpClient httpClient, IUnitOfWork unitOfWork)
