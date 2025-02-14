@@ -25,7 +25,25 @@ namespace CityRoots.Core.Services
         }
         public async Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request)
         {
-            var investmentRequest=_mapper.Map<InvestmentRequest>(request);
+            var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId, "CycleId", c => c.OpenInvestmentCycle);
+            var openCycle = cycle.OpenInvestmentCycle;
+            if (openCycle.MinimumInvestment > request.RequestedAmount || openCycle.MaximumInvestment < request.RequestedAmount)
+                throw new Exception("المبلغ المطلوب غير مسموح به. يجب أن يكون بين الحد الأدنى والحد الأقصى للاستثمار.");
+            if (openCycle.CurrentTotalInvestment >= openCycle.ExpectedFinancialGoal)
+                throw new Exception("عذرًا، لقد تم الوصول إلى الحد الأقصى للاستثمار في هذه الدورة.");
+            if (openCycle.CurrentInvestorCount >= openCycle.MaxInvestorsAllowed)
+                throw new Exception("عذرًا، لقد تم الوصول إلى الحد الأقصى لعدد المستثمرين المسموح به في هذه الدورة.");
+            if (DateTime.UtcNow > cycle.StartDate)
+                throw new Exception("عذرًا، لا يمكن تنفيذ هذا الإجراء لأن الدورة قد بدأت بالفعل.");
+
+
+
+
+
+
+
+            var investmentRequest =_mapper.Map<InvestmentRequest>(request);
+
             investmentRequest.RequestDate = DateTime.Now;
             investmentRequest.RequestStatus = "قيد_الانتظار";
             await _unitOfWork.InvestmentRequest.AddAsync(investmentRequest);
@@ -85,6 +103,10 @@ namespace CityRoots.Core.Services
             if(status== InvestmentStatues.مقبول.ToString())
             {
                 var op=(await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId,"CycleId",c=>c.OpenInvestmentCycle)).OpenInvestmentCycle;
+                if (op.CurrentInvestorCount >= op.MaxInvestorsAllowed)
+                    throw new Exception("عذرًا، لقد تم الوصول إلى الحد الأقصى لعدد المستثمرين المسموح به في هذه الدورة.");
+                if (op.CurrentTotalInvestment >= op.ExpectedFinancialGoal)
+                    throw new Exception("عذرًا، لقد تم الوصول إلى الحد الأقصى للاستثمار في هذه الدورة.");
                 op.CurrentTotalInvestment += request.RequestedAmount;
                 op.CurrentInvestorCount++;
                 _unitOfWork.OpenInvestmentCycle.Update(op);
