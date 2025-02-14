@@ -24,6 +24,5 @@ namespace CityRoots.Core.DTOs.Auth
         public string Role { get; set; }
         public string? UserName { get; set; }
         public string Bio { get; set; }
-        public IFormFile ImageFile { get; set; }
     }
 }

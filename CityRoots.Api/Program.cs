@@ -18,6 +18,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Hangfire.Dashboard;
 using CityRoots.Core.CustomValidation;
+using Microsoft.OpenApi.Models;
 
 namespace CityRoots.Api
 {
@@ -26,7 +27,6 @@ namespace CityRoots.Api
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
 
             // Register Hangfire services
             builder.Services.AddHangfire(configuration =>
@@ -93,12 +93,12 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IMailingService, MailingService>();
             builder.Services.AddScoped<ICommunicationService, CommunicationService>();
-            builder.Services.AddScoped<IFarmService,FarmService>();
-            builder.Services.AddScoped<IFarmerService,FarmerService>();
-            builder.Services.AddScoped<IImageService,ImageService>();
-            builder.Services.AddScoped<ILandParcelService,LandParcelService>();
+            builder.Services.AddScoped<IFarmService, FarmService>();
+            builder.Services.AddScoped<IFarmerService, FarmerService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
+            builder.Services.AddScoped<ILandParcelService, LandParcelService>();
             builder.Services.AddScoped<ICropService, CropService>();
-            builder.Services.AddScoped<IHarvestService, HarvestService>();  
+            builder.Services.AddScoped<IHarvestService, HarvestService>();
             builder.Services.AddHttpClient<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ICycleService, CycleService>();
             builder.Services.AddScoped<IOpenInvestmentCycleService, OpenInvestmentCycleService>();
@@ -108,13 +108,11 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IPurchaseRequestService, PurchaseRequestService>();
             builder.Services.AddScoped<IHarvestNotificationService, HarvestNotificationService>();
             builder.Services.AddScoped<CycleNotificationLogService, CycleNotificationLogService>();
-            builder.Services.AddScoped< HarvestNotificationLogService>();
+            builder.Services.AddScoped<HarvestNotificationLogService>();
             builder.Services.AddScoped<ScheduleNotificationLogService>();
-            builder.Services.AddScoped<RecommendationService,RecommendationService>();
+            builder.Services.AddScoped<RecommendationService, RecommendationService>();
             builder.Services.AddScoped<IInvestmentRequestService, InvestmentRequestService>();
             builder.Services.AddScoped<IRateService, RateService>();
-
-
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -126,12 +124,43 @@ namespace CityRoots.Api
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
             builder.Services.AddControllers();
-     
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CityRoots API", Version = "v1" });
 
-            builder.Services.AddCors();
+                // Add JWT Authentication to Swagger
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "JWT Authentication",
+                    Description = "Enter JWT Bearer token **_only_**",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer", // must be lower case
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {securityScheme, new string[] { }}
+                });
+            });
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigins",
+                    builder => builder
+                        .WithOrigins("https://yourfrontenddomain.com", "http://localhost:3000") // Allow frontend URL
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+            });
             builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -157,10 +186,10 @@ namespace CityRoots.Api
             }
 
             // Configure the HTTP request pipeline.
-           
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
             app.UseHangfireDashboard("/Hangfire", new DashboardOptions
             {
                 Authorization = new[] { new AllowAllAuthorizationFilter() }
@@ -173,8 +202,9 @@ namespace CityRoots.Api
                 Cron.MinuteInterval(5)  // Cron expression: Every 5 minutes
             );
 
+            app.UseCors("AllowSpecificOrigins"); // Apply CORS policy
             app.UseHttpsRedirection();
-            app.UseAuthentication(); // Ensure authentication middleware is added
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

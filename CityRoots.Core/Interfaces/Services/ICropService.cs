@@ -10,7 +10,10 @@ namespace CityRoots.Core.Interfaces.Services
     public interface ICropService
     {
         Task<IEnumerable<CropDisplayDto>> GetAll();
-        Task<CropDisplayDto> Get(int id);
+        Task<IEnumerable<CropDTO>> GetCrops(int CropTypeid);
+        
+
+            Task<CropDisplayDto> Get(int id);
         Task<CropDisplayDto> Update(UpdateCropDto cropDisplayDto);
         Task<CropDisplayDto> Add(AddCropDto cropDisplayDto);
         Task Delete(int id);

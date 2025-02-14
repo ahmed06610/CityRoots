@@ -1,4 +1,6 @@
-﻿using CityRoots.Core.DTOs.Cycle;
+﻿using CityRoots.Core.Const;
+using CityRoots.Core.DTOs.Cycle;
+using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.Reccommendation;
 using CityRoots.Core.DTOs.Recommendation;
 using CityRoots.Core.Interfaces;
@@ -18,17 +20,19 @@ namespace CityRoots.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICycleService _cycleService;
+        private readonly IHarvestService _harvestService;
         private readonly IFarmerService _farmerService;
         private readonly HttpClient _httpClient;
 
 
         public RecommendationService(IUnitOfWork unitOfWork, ICycleService cycleService,
-            IFarmerService farmerService, HttpClient httpClient)
+            IFarmerService farmerService, HttpClient httpClient, IHarvestService harvestService)
         {
             _unitOfWork = unitOfWork;
             _cycleService = cycleService;
             _farmerService = farmerService;
             _httpClient = httpClient;
+            _harvestService = harvestService;
         }
         public async Task<List<CycleReco>> GetAvailableCyclesAsync()
         {
@@ -52,8 +56,6 @@ namespace CityRoots.Core.Services
                 FarmerId = c.LandParcel.Farm.FarmerId
             }).ToList();
         }
-
-
         public async Task<List<VisitedCyclesDTO>> GetVisitedCyclesAsync(int investorId)
         {
             var x = (await _unitOfWork.InteractionOfInvestor.FindAllWithIncludes<InteractionOfInvestor>(
@@ -107,11 +109,14 @@ namespace CityRoots.Core.Services
 
             }).ToList();
         }
-
+        /// <summary>
+        /// //////////////////////////
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<HarvestReco>> GetAvailableHarvestsAsync()
         {
             var harvests = await _unitOfWork.Harvest.FindAllWithIncludes<Harvest>(
-                 h => h.status == "Available",
+                 h => h.status == HarvestStatue.متاح.ToString(),
                   h => h.Farmer,
                   h => h.Farmer.ApplicationUser
              );
@@ -176,7 +181,10 @@ namespace CityRoots.Core.Services
             }).ToList();
 
         }
-
+        /// <summary>
+        /// ///////////
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<CycleForBrowsing>> GetInvestorRecommendationDataAsync(int investorId)
         {
             var availableCycles = await GetAvailableCyclesAsync();
@@ -200,7 +208,7 @@ namespace CityRoots.Core.Services
             var jsonContent = new StringContent(JsonSerializer.Serialize(recommendationData, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }), Encoding.UTF8, "application/json");
             Console.WriteLine(jsonContent);
             // Send the data to the external API
-            var response = await _httpClient.PostAsync("http://127.0.0.1:8000/recommend/investor", jsonContent);
+            var response = await _httpClient.PostAsync("https://esrraa-recommendation-system.hf.space/recommend/investor", jsonContent);
 
             // Ensure the request was successful
             response.EnsureSuccessStatusCode();
@@ -216,7 +224,7 @@ namespace CityRoots.Core.Services
             return cycles;
         }
 
-        public async Task<List<Harvest>> GetMerchantRecommendationDataAsync(int merchantId)
+        public async Task<List<HarvestForBrowsing>> GetMerchantRecommendationDataAsync(int merchantId)
         {
             var availableHarvests = await GetAvailableHarvestsAsync();
             var merchantHistory = await GetMerchantHistoryAsync(merchantId);
@@ -224,24 +232,24 @@ namespace CityRoots.Core.Services
             var visitedHarvests = await GetVisitedHarvestsAsync(merchantId);
 
 
-            var recommendationData = new MerchantReccomendationDataDTO
+            var recommendationData = new MerchantRecommendationDataDTO
             {
-                MerchantId = merchantId,
-                
+                Merchant_id = merchantId,
+                Data = new MerchantDataDTO
+                {
                     Harvests = availableHarvests,
                     MerchantHistory = merchantHistory,
                     FavoriteFarmers = favoriteFarmers,
                     VisitedHarvests = visitedHarvests
-                
-
+                }
             };
 
 
             // Serialize the RecommendationDataDTO to JSON
-            var jsonContent = new StringContent(JsonSerializer.Serialize(recommendationData), Encoding.UTF8, "application/json");
-
+            var jsonContent = new StringContent(JsonSerializer.Serialize(recommendationData, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }), Encoding.UTF8, "application/json");
+            Console.WriteLine(jsonContent);
             // Send the data to the external API
-            var response = await _httpClient.PostAsync("http://127.0.0.1:8000/recommend/merchant", jsonContent);
+            var response = await _httpClient.PostAsync("https://esrraa-recommendation-system.hf.space/recommend/merchant", jsonContent);
 
             // Ensure the request was successful
             response.EnsureSuccessStatusCode();
@@ -251,9 +259,9 @@ namespace CityRoots.Core.Services
 
             var apiResponse = JsonSerializer.Deserialize<MerchantRecommendationResponseDTO>(responseContent);
 
-            var harvests = await _unitOfWork.Harvest.FindAllAsync(h => apiResponse.RecommendedHarvestsIds.Contains(h.HarvestId));
-
-            return harvests.ToList();
+            // loop in the reccomended cyclesids and show them
+            var harvest = await _harvestService.GetAllHarvestsForMerchantsAsync(apiResponse);
+            return harvest;
 
         }
         // Other methods remain unchanged...

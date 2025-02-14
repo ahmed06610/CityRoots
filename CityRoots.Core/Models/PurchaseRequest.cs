@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using CityRoots.Core.Const;
 
 namespace CityRoots.Core.Models
 {
     public class PurchaseRequest
     {
     
+        public PurchaseRequest()
+        {
+            RequestStatus = PurchaseStatus.قيد_الانتظار.ToString();
+            RequestDate = DateTime.Now;
+        }
         [Key]
         public int PurchaseRequestId { get; set; }
 
@@ -33,6 +39,6 @@ namespace CityRoots.Core.Models
 
         public DateTime RequestDate { get;   set; } // تاريخ تقديم الطلب
 
-        public string Notes { get; set; } // ملاحظات اختيارية
+        public string? Notes { get; set; } // ملاحظات اختيارية
     }
 }

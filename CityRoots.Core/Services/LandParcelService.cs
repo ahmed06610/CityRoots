@@ -30,6 +30,11 @@ namespace CityRoots.Core.Services
             var landParcels = (await _unitOfWork.LandParcel.FindAllWithIncludes<LandParcel>((l=>l.FarmId==FarmId || FarmId == 0),l=>l.Farm)).ToList();
             return _mapper.Map<List<LandParcelDTO>>(landParcels);
         }
+        public async Task<List<LandParcelDTO>> GetAllLandParcelsofFarmerAsync(int FarmerId = 0)
+        {
+            var landParcels = (await _unitOfWork.LandParcel.FindAllWithIncludes<LandParcel>((l => l.Farm.FarmerId == FarmerId || FarmerId == 0), l => l.Farm)).ToList();
+            return _mapper.Map<List<LandParcelDTO>>(landParcels);
+        }
 
         public async Task<LandParcelDTO> GetLandParcelByIdAsync(int id)
         {

@@ -12,4 +12,10 @@ namespace CityRoots.Core.Const
         مرفوض ,
         قيد_الانتظار ,
     }
+    public enum PurchaseStatus
+    {
+        مقبول,
+        مرفوض,
+        قيد_الانتظار,
+    }
 }
