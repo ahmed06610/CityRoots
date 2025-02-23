@@ -86,8 +86,8 @@ namespace CityRoots.Core.Services
 
             var harvests = await _unitOfWork.Harvest.FindAllWithIncludes<Harvest>(x => (x.Crop.Name.Contains(s)||s==null)&&(x.FarmerId==farmerid||farmerid==0)
             ,x=>x.Crop
-            ,x=>x.Purchases
-            
+            ,x=>x.Purchases,
+            x=>x.Cycle
            
             );
           
@@ -101,6 +101,11 @@ namespace CityRoots.Core.Services
                 {
                     var x = await GetAllPurchasesRequestForHarvest(harvest.HarvestId);
                     har.Purchases = x.ToList();
+                }
+                if(harvest.Cycle is not null)
+                {
+                    har.IsHarvestConnectToCycle=true;
+                    har.CycleId=harvest.CycleId;
                 }
                 _harvests.Add(har);
             }

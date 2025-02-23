@@ -113,6 +113,8 @@ namespace CityRoots.Api
             builder.Services.AddScoped<RecommendationService, RecommendationService>();
             builder.Services.AddScoped<IInvestmentRequestService, InvestmentRequestService>();
             builder.Services.AddScoped<IRateService, RateService>();
+            builder.Services.AddScoped<InteractionsService, InteractionsService>();
+
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();

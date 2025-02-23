@@ -41,6 +41,26 @@ namespace CityRoots.Core.Services
             _cycleUpdateService = cycleUpdateService;
             _investmentRequestService = investmentRequestService;
         }
+        public async Task<List<OpenCycle>> GetAllOpenCyclesForFarmersAsync(int FarmerId = 0)
+        {
+            var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(c=>c.OpenInvestmentCycle!=null&&c.LandParcel.Farm.FarmerId==FarmerId,
+                c => c.LandParcel,
+                c => c.LandParcel.Farm,
+                c => c.LandParcel.Farm.Farmer,
+                c => c.OpenInvestmentCycle)).ToList();
+            var cyclesDTOs = new List<OpenCycle>();
+
+            foreach (var cycle in cycles)
+            {
+                var op = new OpenCycle
+                {
+                    Id = cycle.CycleId,
+                    NameCycle = cycle.CycleName,
+                };
+                cyclesDTOs.Add(op);
+            }
+            return cyclesDTOs;
+        }
 
         public async Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int FarmerId = 0,bool ForFarmer = true)
         {
@@ -59,6 +79,7 @@ namespace CityRoots.Core.Services
                 cyclesDTOs.Add(cycleDto);
             }
             return cyclesDTOs;
+        
         }
         public async Task<List<CycleForBrowsing>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation =null)
         {
@@ -156,6 +177,10 @@ namespace CityRoots.Core.Services
             cycleForInvestor.Farmer = farmerInfo;
             cycleForInvestor.landParcel= landParcel;
             cycleForInvestor.CycleName = cycleName;
+            var farmerid =(await _unitOfWork.Farmer.GetByIdAsync(farmerInfo.FarmerId)).ApplicationUserId;
+            var Investorid =(await _unitOfWork.Investor.GetByIdAsync(InvestorId)).ApplicationUserId;
+            var xx = (await _unitOfWork.FavoriteFarmers.FindTWithExpression<FavoriteFarmers>(ff => ff.FarmerId == farmerid && ff.userId == Investorid));
+            cycleForInvestor.IsFarmerInFav=xx is not null?true : false;
             return cycleForInvestor;
         }
         public async Task<CycleDTO> AddCycleAsync(CreateCycleDTO createCycleDto)

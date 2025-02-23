@@ -31,6 +31,11 @@ namespace CityRoots.Core.DTOs.Cycle
        
 
     }
+    public class OpenCycle 
+    {
+        public int Id { get; set; }
+        public string NameCycle { get; set; }
+    }
     public class CycleForBrowsing : CycleDTO
     {
         public int Rate { get; set; }

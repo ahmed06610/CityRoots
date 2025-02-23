@@ -15,6 +15,12 @@ namespace CityRoots.Api.Controllers
         {
             _cycleService = cycleService;
         }
+        [HttpGet("GetAllOpenCyclesOfFarmer")]
+        public async Task<IActionResult> GetAllOpenCycles(int FarmerId = 0)
+        {
+            var cycles = await _cycleService.GetAllOpenCyclesForFarmersAsync(FarmerId);
+            return Ok(cycles);
+        }
 
         [HttpGet("GetAllCycleasOfFarmerId")]
         public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool ForFarmer = true)
@@ -22,18 +28,18 @@ namespace CityRoots.Api.Controllers
             var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId, ForFarmer);
             return Ok(cycles);
         }
-        //[HttpGet("BrowsingCycleasForInvestors")]
-        //public async Task<IActionResult> GetAllCycles()
-        //{
-        //    var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
-        //    return Ok(cycles);
-        //}
-        //[HttpGet("GetAllCycleasOfInvestor")]
-        //public async Task<IActionResult> GetAllCycles(int InvestorId)
-        //{
-        //    var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId:InvestorId);
-        //    return Ok(cycles);
-        //}
+        [HttpGet("BrowsingCycleasForInvestors")]
+        public async Task<IActionResult> GetAllCycles()
+        {
+            var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
+            return Ok(cycles);
+        }
+        [HttpGet("GetAllCycleasOfInvestor")]
+        public async Task<IActionResult> GetAllCycles(int InvestorId)
+        {
+            var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId: InvestorId);
+            return Ok(cycles);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCycleById(int id)
@@ -43,13 +49,13 @@ namespace CityRoots.Api.Controllers
             return Ok(cycle);
         }
 
-        //[HttpGet("GetCycleForInvestor")]
-        //public async Task<IActionResult> GetCycleForInvestor(int cycleId,int investorId)
-        //{
-        //    var cycle = await _cycleService.GetCycleByIdForInvestorAsync(cycleId,investorId);
-        //    if (cycle == null) return NotFound();
-        //    return Ok(cycle);
-        //}
+        [HttpGet("GetCycleForInvestor")]
+        public async Task<IActionResult> GetCycleForInvestor(int cycleId, int investorId)
+        {
+            var cycle = await _cycleService.GetCycleByIdForInvestorAsync(cycleId, investorId);
+            if (cycle == null) return NotFound();
+            return Ok(cycle);
+        }
 
         [HttpPost("AddCycle")]
         public async Task<IActionResult> AddCycle([FromBody] CreateCycleDTO createCycleDto)

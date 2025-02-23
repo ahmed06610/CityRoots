@@ -23,7 +23,7 @@ namespace CityRoots.Core.Services
         {
             try
             {
-                var crops = await _unitOfWork.Crop.FindAllAsync(c => c.CropTypeId == CropTypeid);
+                var crops = await _unitOfWork.Crop.FindAllAsync(c => c.CropTypeId == CropTypeid||CropTypeid==0);
                 var cropsdto = new List<CropDTO>();
                 foreach (var c in crops)
                 {

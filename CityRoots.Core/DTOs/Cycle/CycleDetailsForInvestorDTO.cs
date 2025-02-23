@@ -18,6 +18,7 @@ namespace CityRoots.Core.DTOs.Cycle
         public bool IsInvestorSub {  get; set; }
         public int?  InvestmentRequestId {  get; set; }
         public bool RequestReview {  get; set; }
+        public bool IsFarmerInFav {  get; set; }
         public List<CycleUpdateDTO>? cycleUpdates { get; set; }
 
     }

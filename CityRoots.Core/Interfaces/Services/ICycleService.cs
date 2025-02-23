@@ -11,6 +11,8 @@ namespace CityRoots.Core.Interfaces.Services
 {
     public interface ICycleService
     {
+        Task<List<OpenCycle>> GetAllOpenCyclesForFarmersAsync(int FarmerId = 0);
+
         Task<List<CycleForFarmerDTO>> GetAllCyclesForFarmersAsync(int CycleerId,bool ForFarmer);
         Task<List<CycleForBrowsing>> GetAllCyclesForInvestorsAsync(InvestorRecommendationResponseDTO Recommendation = null);
         Task<List<CycleForInvestorDTO>> GetAllPrivateCyclesForInvestor(int InvestorId);

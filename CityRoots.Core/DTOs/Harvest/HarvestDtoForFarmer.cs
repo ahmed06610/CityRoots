@@ -17,6 +17,9 @@ namespace CityRoots.Core.DTOs.Harvest
         public DateTime ProductionDate { get; set; }
         public string Status {  get; set; }
         public int ReuestsCount {  get; set; }
+        public bool IsHarvestConnectToCycle {  get; set; }
+        public bool IsAlLowedToShowUpdatesToMerchant {  get; set; }
+        public int? CycleId {  get; set; }
         public List<AllPurchasesRequestForHarvest> Purchases {  get; set; }
 
     }

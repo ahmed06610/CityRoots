@@ -104,7 +104,7 @@ namespace CityRoots.Api.Controllers
         {
             try
             {
-                await _purchaseRequestService.UpdateRequest(Id, InvestmentStatues.مرفوض.ToString());
+                await _purchaseRequestService.UpdateRequest(Id, PurchaseRequestStatus.مرفوض.ToString());
                 return Ok("Declined");
             }
             catch (Exception ex)
