@@ -8,7 +8,6 @@ using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
-using Tensorflow.Keras.Layers;
 
 namespace CityRoots.Core.Services
 {
@@ -161,6 +160,7 @@ namespace CityRoots.Core.Services
 
         public async Task<HarvestDetailsForMerchantDTO> GetHarvestByIdForMerchantAsync(int harvestId, int merchantId)
         {
+            var appuserofmerchant = (await _unitOfWork.Merchant.GetByIdAsync(merchantId)).ApplicationUserId;
             var harvestForMerchant = new HarvestDetailsForMerchantDTO();
 
             // Fetch harvest details along with farmer and land parcel details
@@ -172,6 +172,7 @@ namespace CityRoots.Core.Services
                 h => h.Crop.CropType,
                 h => h.Cycle
             );
+            var appuserofFarmer = (await _unitOfWork.Farmer.GetByIdAsync(harvest.FarmerId)).ApplicationUserId;
 
             var farmerInfo = await _farmerService.GetFarmerInfo(harvest.FarmerId);
             var harvestDetails = _mapper.Map<HarvestDetailsDTO>(harvest);
@@ -190,7 +191,11 @@ namespace CityRoots.Core.Services
                     harvestForMerchant.IsMerchantBuyer = true;
                 }
             }
-
+           var x= await _unitOfWork.FavoriteFarmers.FindTWithExpression<FavoriteFarmers>( ff => (ff.userId ==appuserofmerchant) && (ff.FarmerId == appuserofFarmer));
+            if (x is not null)
+                farmerInfo.IsFarmerInFav = true;
+            else
+                farmerInfo.IsFarmerInFav = false;
             // Check if the request is under review
             harvestForMerchant.RequestReview = (purchaseRequest is not null && purchaseRequest.RequestStatus == PurchaseStatus.قيد_الانتظار.ToString());
 

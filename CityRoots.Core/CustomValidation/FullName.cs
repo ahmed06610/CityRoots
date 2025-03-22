@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CityRoots.Core.CustomValidation
 {
@@ -15,7 +10,7 @@ namespace CityRoots.Core.CustomValidation
             {
                 return new ValidationResult("null value");
             }
-            string name = value.ToString();
+            string name = value.ToString(); //"Ahmed alaraby" -> {Ahmed,Alaraby}
             string[] arr = name.Split(' ');
             if (arr.Length >= 3)
                 return ValidationResult.Success;

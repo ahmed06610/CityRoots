@@ -41,7 +41,7 @@ namespace CityRoots.EF.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsIll")
+                    b.Property<bool?>("IsIll")
                         .HasColumnType("bit");
 
                     b.Property<string>("Recommendation")

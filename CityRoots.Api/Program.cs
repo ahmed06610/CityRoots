@@ -6,19 +6,19 @@ using CityRoots.EF;
 using CityRoots.EF.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Mvc.Routing;
-using CityRoots.Api.Helpers;
 using CityRoots.Core.Interfaces.Services;
 using Hangfire;
 using Hangfire.SqlServer;
 using Hangfire.Dashboard;
 using CityRoots.Core.CustomValidation;
 using Microsoft.OpenApi.Models;
+using CityRoots.Core.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace CityRoots.Api
 {
@@ -42,11 +42,9 @@ namespace CityRoots.Api
                                  DisableGlobalLocks = true
                              }));
 
-            // Add the Hangfire server
             builder.Services.AddHangfireServer();
 
-            // Add services to the container.
-            // Configure the password constraints
+            // Configure Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.User.AllowedUserNameCharacters = null;
@@ -63,9 +61,8 @@ namespace CityRoots.Api
             .AddDefaultTokenProviders();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
             // JWT Authentication
             builder.Services.AddAuthentication(options =>
@@ -87,8 +84,26 @@ namespace CityRoots.Api
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     ValidAudience = builder.Configuration["JWT:Audience"]
                 };
+
+                // Enable SignalR to use JWT Authentication
+                o.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/ChatHub"))) // Ensure it's for SignalR
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
+            // Register Services
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IMailingService, MailingService>();
@@ -114,7 +129,7 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IInvestmentRequestService, InvestmentRequestService>();
             builder.Services.AddScoped<IRateService, RateService>();
             builder.Services.AddScoped<InteractionsService, InteractionsService>();
-
+            builder.Services.AddScoped<IChatService, ChatService>();
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -149,11 +164,21 @@ namespace CityRoots.Api
                 };
                 c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {securityScheme, new string[] { }}
-                });
+    {
+        {securityScheme, new string[] { }}
+    });
             });
 
+            // SignalR Configuration
+            builder.Services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+                options.MaximumReceiveMessageSize = 64 * 1024; // 64 KB
+            });
+
+            builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>(); // Custom provider for SignalR
+
+            // CORS for SignalR
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigins",
@@ -163,20 +188,31 @@ namespace CityRoots.Api
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
-            builder.Services.AddAutoMapper(typeof(Program));
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-            // Register IActionContextAccessor and IUrlHelper
-            builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            builder.Services.AddTransient<IUrlHelper>(x =>
-            {
-                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
-                var factory = x.GetRequiredService<IUrlHelperFactory>();
-                return factory.GetUrlHelper(actionContext);
-            });
+            builder.Services.AddAutoMapper(typeof(Program));
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Logs", "log-.txt");
+
+            Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Logs", "log-.txt"),
+                  rollingInterval: RollingInterval.Day,
+                  outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}") // Include time in log entries
+    .CreateLogger();
+
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog();
 
             var app = builder.Build();
-
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
             // Seed roles
             using (var scope = app.Services.CreateScope())
             {
@@ -184,11 +220,9 @@ namespace CityRoots.Api
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var Context = services.GetRequiredService<ApplicationDbContext>();
                 await SeedRolesAsync(roleManager);
-                //await SendAllPredictData(Context);
             }
 
-            // Configure the HTTP request pipeline.
-
+            // Middleware Configuration
             app.UseSwagger();
             app.UseSwaggerUI();
 
@@ -197,28 +231,26 @@ namespace CityRoots.Api
                 Authorization = new[] { new AllowAllAuthorizationFilter() }
             });
 
-            // Schedule the job to run every 5 minutes
             RecurringJob.AddOrUpdate<NotificationBackGroundService>(
-                "ProcessCycleNotifications",
-                Jop => Jop.ProcessNotificationsAsync(),
-                Cron.MinuteInterval(5)  // Cron expression: Every 5 minutes
-            );
-
-            app.UseCors("AllowSpecificOrigins"); // Apply CORS policy
-            app.UseHttpsRedirection();
+                  "ProcessCycleNotifications",
+                  Jop => Jop.ProcessNotificationsAsync(),
+                  "*/5 * * * *"
+              );
+            app.UseStaticFiles();
+            app.UseCors("AllowSpecificOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapControllers();
+            // Register SignalR Hubs
+            app.MapHub<ChatHub>("/ChatHub");
 
+            app.MapControllers();
             app.Run();
         }
 
-        // Method to seed roles
         private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
             var roles = new[] { "Investor", "Farmer", "Merchant" };
-
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
@@ -227,12 +259,11 @@ namespace CityRoots.Api
                 }
             }
         }
+
         public class AllowAllAuthorizationFilter : IDashboardAuthorizationFilter
         {
-            public bool Authorize(DashboardContext context)
-            {
-                return true; // Allow all access. Replace with your logic for restricted access.
-            }
+            public bool Authorize(DashboardContext context) => true;
         }
     }
 }
+

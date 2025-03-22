@@ -13,6 +13,6 @@ namespace CityRoots.Core.Models
         public string EnglishName { get; set; }
         public string? Diagnosis { get; set; }
         public string? Recommendation { get; set; }
-        public bool IsIll {  get; set; }
+        public bool? IsIll {  get; set; }
     }
 }

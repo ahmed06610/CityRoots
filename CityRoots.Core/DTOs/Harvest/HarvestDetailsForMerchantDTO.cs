@@ -26,6 +26,8 @@ namespace CityRoots.Core.DTOs.Harvest
         public decimal Price { get; set; }
         public double QuantityAvailable { get; set; }
         public string HarvestStatus { get; set; }
+        public string ImageUrl { get; set; }
+
         public DateTime HarvestDate { get; set; }
     }
 

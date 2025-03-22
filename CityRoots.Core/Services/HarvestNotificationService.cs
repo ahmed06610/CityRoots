@@ -3,12 +3,6 @@ using CityRoots.Core.DTOs.Notification;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tensorflow;
 
 namespace CityRoots.Core.Services
 {

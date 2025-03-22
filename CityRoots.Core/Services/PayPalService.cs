@@ -1,15 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
-using PayPalHttp;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Http;
 using CityRoots.Core.Interfaces;
-using System.Security.Claims;
-using OneOf.Types;
 
 public class PayPalService
 {
