@@ -140,12 +140,15 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FarmerUser.Name))
                 .ForMember(dest => dest.phoneNumber, opt => opt.MapFrom(src => src.FarmerUser.PhoneNumber))
                 .ForMember(dest => dest.bio, opt => opt.MapFrom(src => src.FarmerUser.Farmer.Bio))
-                .ForMember(dest=>dest.FarmerId,opt=>opt.MapFrom(src=>src.FarmerId));
+                .ForMember(dest=>dest.FarmerId,opt=>opt.MapFrom(src=>src.FarmerId))
+                .ForMember(dest=>dest.ImageProfileUrl,opt=>opt.MapFrom(src=>src.FarmerUser.ImageProfileUrl));
             CreateMap<Payment, InvestorPaymentReportsDto>()
                 .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
                 .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
                 .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue))
-                .ForMember(dest=>dest.PayeeEmail,opt=>opt.MapFrom(src=>src.Payee.Email));
+                .ForMember(dest=>dest.PayeeEmail,opt=>opt.MapFrom(src=>src.Payee.Email))
+                .ForMember(dest => dest.receiver, opt => opt.MapFrom(src => "مزارع"));
+            ;
             CreateMap<InvestmentRequest, InvestmentrequestDisplay>()
                 .ForMember(dest => dest.cycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
                 .ForMember(dest => dest.farmerName, opt => opt.MapFrom(src => src.Cycle.LandParcel.Farm.Farmer.ApplicationUser.Name));
@@ -159,7 +162,9 @@ namespace CityRoots.Api.Helpers
               .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
               .ForMember(dest => dest.HarvestName, opt => opt.MapFrom(src => src.Harvest.Crop.Name))
               .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.Statue))
-              .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email));
+              .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email))
+              .ForMember(dest => dest.receiver, opt => opt.MapFrom(src => "مزارع"));
+            ;
 
 
 

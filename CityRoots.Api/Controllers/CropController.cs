@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.Crop;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace CityRoots.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CropController : ControllerBase
     {
         private readonly ICropService _cropService;

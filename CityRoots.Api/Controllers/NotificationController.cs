@@ -2,6 +2,7 @@
 using CityRoots.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -19,13 +20,17 @@ namespace CityRoots.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationDTO notificationDto)
         {
+            var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId is null) return Unauthorized();
             await _notificationService.CreateNotificationAsync(notificationDto);
             return Ok("Notification created successfully.");
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetNotifications(string userId, [FromQuery] bool onlyUnread = false)
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications( [FromQuery] bool onlyUnread = false)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return Unauthorized();
             var notifications = await _notificationService.GetNotificationsAsync(userId, onlyUnread);
             return Ok(notifications);
         }

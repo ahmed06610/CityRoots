@@ -9,7 +9,7 @@ namespace CityRoots.Core.DTOs.InvestmentRequests
 {
     public class CreateInvestmentRequest
     {
-        public int InvestorId{  get; set; }    
+        //public int InvestorId{  get; set; }    
         public int CycleId {  get; set; }
         [Required]
         public string RequestedProfitType { get; set; }

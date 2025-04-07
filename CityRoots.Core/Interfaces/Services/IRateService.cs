@@ -9,7 +9,7 @@ namespace CityRoots.Core.Interfaces.Services
 {
     public interface IRateService
     {
-        Task MakeTheRating(RateRequest rate);
-        Task DeleteTheRating(DeleteRate rate); 
+        Task MakeTheRating(RateRequest rate, string userId);
+        Task DeleteTheRating(DeleteRate rate, string userId); 
     }
 }

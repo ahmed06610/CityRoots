@@ -1,5 +1,7 @@
-﻿using CityRoots.Core.DTOs.Cycle;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,32 +18,52 @@ namespace CityRoots.Api.Controllers
             _cycleService = cycleService;
         }
         [HttpGet("GetAllOpenCyclesOfFarmer")]
-        public async Task<IActionResult> GetAllOpenCycles(int FarmerId = 0)
+        [Authorize("Farmer")]
+        public async Task<IActionResult> GetAllOpenCycles()
         {
-            var cycles = await _cycleService.GetAllOpenCyclesForFarmersAsync(FarmerId);
+            var FarmerId = User.GetLoggedInId();
+            if (FarmerId is null)
+                return Unauthorized();
+
+
+                var cycles = await _cycleService.GetAllOpenCyclesForFarmersAsync(FarmerId.Value);
             return Ok(cycles);
         }
 
         [HttpGet("GetAllCycleasOfFarmerId")]
-        public async Task<IActionResult> GetAllCycles(int FarmerId = 0,bool ForFarmer = true)
+        [Authorize("Farmer")]
+
+        public async Task<IActionResult> GetAllCycles(bool ForFarmer = true)
         {
-            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId, ForFarmer);
+            var FarmerId = User.GetLoggedInId();
+            if (FarmerId is null)
+                return Unauthorized();
+            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId.Value, ForFarmer);
             return Ok(cycles);
         }
         [HttpGet("BrowsingCycleasForInvestors")]
+        [Authorize("Investor")]
+
         public async Task<IActionResult> GetAllCycles()
         {
             var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
             return Ok(cycles);
         }
         [HttpGet("GetAllCycleasOfInvestor")]
-        public async Task<IActionResult> GetAllCycles(int InvestorId)
+        [Authorize("Investor")]
+
+        public async Task<IActionResult> GetAllCyclesOfInvestor()
         {
-            var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId: InvestorId);
+            var InvestorId = User.GetLoggedInId();
+            if (InvestorId is null)
+                return Unauthorized();
+
+            var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId: InvestorId.Value);
             return Ok(cycles);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetCycleById(int id)
         {
             var cycle = await _cycleService.GetCycleByIdAsync(id);
@@ -50,14 +72,20 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("GetCycleForInvestor")]
-        public async Task<IActionResult> GetCycleForInvestor(int cycleId, int investorId)
+        [Authorize("Investor")]
+
+        public async Task<IActionResult> GetCycleForInvestor(int cycleId)
         {
-            var cycle = await _cycleService.GetCycleByIdForInvestorAsync(cycleId, investorId);
+            var InvestorId = User.GetLoggedInId();
+            if (InvestorId is null)
+                return Unauthorized();
+            var cycle = await _cycleService.GetCycleByIdForInvestorAsync(cycleId, InvestorId.Value);
             if (cycle == null) return NotFound();
             return Ok(cycle);
         }
 
         [HttpPost("AddCycle")]
+        [Authorize("Farmer")]
         public async Task<IActionResult> AddCycle([FromBody] CreateCycleDTO createCycleDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -75,6 +103,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditCycle")]
+        [Authorize("Farmer")]
         public async Task<IActionResult> UpdateCycle([FromBody] UpdateCycleDTO updateCycleDto)
         {
 
@@ -86,6 +115,7 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("Delete/{id}")]
+        [Authorize("Farmer")]
         public async Task<IActionResult> DeleteCycle(int id)
         {
             var success = await _cycleService.DeleteCycleAsync(id);

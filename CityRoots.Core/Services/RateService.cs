@@ -21,18 +21,20 @@ namespace CityRoots.Core.Services
         
         }
 
-        public async Task DeleteTheRating(DeleteRate rate)
+        public async Task DeleteTheRating(DeleteRate rate,string userId)
         {
-            var Deletedrate=await _unitOfWork.Rate.FindTWithExpression<Rate>(x=>x.UserId==rate.UserId && x.FarmerId==rate.FarmerId);
+            var Deletedrate=await _unitOfWork.Rate.FindTWithExpression<Rate>(x=>x.UserId== userId && x.FarmerId==rate.FarmerId);
             if (rate is null)
                 throw new Exception($"You didnot rate this farmer before {rate.FarmerId}");
             await _unitOfWork.Rate.DeleteAsync(Deletedrate);
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task MakeTheRating(RateRequest rate)
+        public async Task MakeTheRating(RateRequest rate,string userId)
         {
-            await _unitOfWork.Rate.AddAsync(_mapper.Map<Rate>(rate));
+            var _rate = _mapper.Map<Rate>(rate);
+            _rate.UserId = userId;
+            await _unitOfWork.Rate.AddAsync(_rate);
             await _unitOfWork.CompleteAsync();
         }
     }

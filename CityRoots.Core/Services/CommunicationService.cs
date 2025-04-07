@@ -32,13 +32,13 @@ namespace CityRoots.Core.Services
         
         }
 
-        public async Task<FeedBackDisplay> Add(FeedBackRequest feedBack)
+        public async Task<FeedBackDisplay> Add(FeedBackRequest feedBack,string userId)
         {
-            var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;//??throw new Exception("User authentication failed. User ID not found.");
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new Exception("User authentication failed. User ID not found.");
-            }
+            //var userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;//??throw new Exception("User authentication failed. User ID not found.");
+            //if (string.IsNullOrEmpty(userId))
+            //{
+            //    throw new Exception("User authentication failed. User ID not found.");
+            //}
 
             var _FeedBack = mapper.Map<FeedBack>(feedBack);
             _FeedBack.UserId = userId;

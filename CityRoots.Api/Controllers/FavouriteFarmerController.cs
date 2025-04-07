@@ -1,8 +1,10 @@
 ﻿using CityRoots.Core.DTOs.FavouriteFarmers;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -16,10 +18,14 @@ namespace CityRoots.Api.Controllers
             _favouriteFarmersService = favouriteFarmersService;
 
         }
-        [HttpGet("Favourites/{UserId}")]
-        public async Task<IActionResult> Get(string UserId) {
+        [HttpGet("Favourites/")]
+        [Authorize(Roles ="Merchant,Investor")]
+        public async Task<IActionResult> Get() {
             try {
-                return Ok(await _favouriteFarmersService.GetAllFavourites(UserId));
+                var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if(string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+                return Ok(await _favouriteFarmersService.GetAllFavourites(userId));
 
             }
             catch (Exception ex) {
@@ -27,10 +33,16 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Merchant,Investor")]
+
         public async Task<IActionResult> AddFarmerToFavourite(FavouriteFarmerRequestDTO request)
         {
             try {
-                await _favouriteFarmersService.AddToFavourites(request.FarmerId,request.UserId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+               
+                await _favouriteFarmersService.AddToFavourites(request.FarmerId,userId);
                 return Ok("Added");
             }
             catch (Exception ex) {
@@ -38,11 +50,16 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpDelete]
+        [Authorize(Roles = "Merchant,Investor")]
+
         public async Task<IActionResult> DeleteFarmerFromFavourite(FavouriteFarmerRequestDTO request)
         {
             try
             {
-                await _favouriteFarmersService.RemoveFromFavourites(request.FarmerId,request.UserId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+                await _favouriteFarmersService.RemoveFromFavourites(request.FarmerId,userId);
                 return Ok("Deleted");
             }
             catch (Exception ex)

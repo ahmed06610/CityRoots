@@ -10,7 +10,6 @@ namespace CityRoots.Core.DTOs.Purchaserequest
     public class CreatePurchaseRrquest
     {
         public int HarvestId { get; set; }
-        public int MerchantId { get; set; }
         [Required]
         [Range(0.01, double.MaxValue)]
 

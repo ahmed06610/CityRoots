@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.OpenInvestmentCycle;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Create([FromBody] CreateOpenInvestmentCycleDTO dto)
         {
             if (dto == null) return BadRequest("Invalid data.");
@@ -33,6 +36,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditOpenCycle")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Update([FromBody] UpdateOpenInvestmentCycleDTO dto)
         {
             if (dto == null) return BadRequest("Invalid data.");
@@ -49,6 +54,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Delete(int id)
         {
             try

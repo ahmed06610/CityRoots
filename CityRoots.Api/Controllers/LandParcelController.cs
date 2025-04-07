@@ -1,5 +1,7 @@
-﻿using CityRoots.Core.DTOs.LandParcel;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.DTOs.LandParcel;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,19 +19,28 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("GetAllLandsOfFarmId")]
+        [Authorize]
+
         public async Task<IActionResult> GetAllLandParcels(int FarmId)
         {
             var landParcels = await _landParcelService.GetAllLandParcelsAsync(FarmId);
             return Ok(landParcels);
         }
         [HttpGet("GetAllLandsOfFarmerId")]
-        public async Task<IActionResult> GetAllLandParcelsOfFarmer(int FarmerId)
+        [Authorize(Roles = "Farmer")]
+
+        public async Task<IActionResult> GetAllLandParcelsOfFarmer()
         {
-            var landParcels = await _landParcelService.GetAllLandParcelsofFarmerAsync(FarmerId);
+            var FarmerId = User.GetLoggedInId();
+
+            if (FarmerId is null) return Unauthorized();
+            var landParcels = await _landParcelService.GetAllLandParcelsofFarmerAsync(FarmerId.Value);
             return Ok(landParcels);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
+
         public async Task<IActionResult> GetLandParcelById(int id)
         {
             var landParcel = await _landParcelService.GetLandParcelByIdAsync(id);
@@ -38,6 +49,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> AddLandParcel([FromForm] CreateLandParcelDTO createLandParcelDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -47,6 +60,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditLand")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> UpdateLandParcel([FromForm] UpdateLandParcelDTO updateLandParcelDto)
         {
 
@@ -56,6 +71,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> DeleteLandParcel(int id)
         {
             var success = await _landParcelService.DeleteLandParcelAsync(id);

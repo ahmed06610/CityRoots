@@ -22,8 +22,15 @@ namespace CityRoots.Core.Services
         }
         public async Task<ScheduleDisplayDTO> Add(AddScheduleDto schedule)
         {
+            if(schedule is null) throw new ArgumentNullException(nameof(schedule), "Schedule data is required");
+            if (schedule.StartDate > schedule.EndDate) throw new Exception("لا يمكن ان يكون موعد بدايه المهمه اكبر من موعد نهايه المهمه");
+
             var addedschedule = mapper.Map<Schedule>(schedule);
+            addedschedule.Status = DateTime.Now < addedschedule.StartDate ? "لم تبدأ" :
+                                   DateTime.Now > addedschedule.EndDate ? "اكتملت" :
+                                                                      "في تقدم";
             await _unitOfWork.Schedule.AddAsync(addedschedule);
+            
             await _unitOfWork.CompleteAsync();
             return mapper.Map<ScheduleDisplayDTO>(addedschedule);
 
@@ -69,7 +76,13 @@ namespace CityRoots.Core.Services
             var Existingschdeule = await _unitOfWork.Schedule.GetByIdAsync(schedule.ScheduleId);
             if (Existingschdeule is null)
                 throw new Exception($"No Schedules with Id {schedule.ScheduleId}");
+            if (schedule.StartDate > schedule.EndDate) throw new Exception("لا يمكن ان يكون موعد بدايه المهمه اكبر من موعد نهايه المهمه");
+
             mapper.Map(schedule, Existingschdeule);
+            Existingschdeule.Status = DateTime.Now < Existingschdeule.StartDate ? "لم تبدأ" :
+                           DateTime.Now > Existingschdeule.EndDate ? "اكتملت" :
+                                                                              "في تقدم";
+
             _unitOfWork.Schedule.Update(Existingschdeule);
             await _unitOfWork.CompleteAsync();
             return mapper.Map<ScheduleDisplayDTO>(Existingschdeule);

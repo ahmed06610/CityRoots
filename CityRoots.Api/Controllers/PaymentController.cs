@@ -1,7 +1,9 @@
 ﻿using CityRoots.Core.DTOs.Payment;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -10,13 +12,17 @@ namespace CityRoots.Api.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
+       // private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PaymentsController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
+         //   _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> GetPaymentsForFarmer([FromQuery] PaymentFilterDTO filter)
         {
             var payments = await _paymentService.GetPaymentsAsync(filter);
@@ -24,6 +30,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetPaymentDetails(int id)
         {
             var payment = await _paymentService.GetPaymentDetailsAsync(id);
@@ -31,11 +38,15 @@ namespace CityRoots.Api.Controllers
 
             return Ok(payment);
         }
-        [HttpGet("GetInvestorPayments/{userId}")]
-        public async Task<IActionResult> GetPaymentsForInvestor(string userId)
+        [HttpGet("GetInvestorPayments")]
+        [Authorize(Roles = "Investor")]
+
+        public async Task<IActionResult> GetPaymentsForInvestor()
         {
             try
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
                 return Ok(await _paymentService.GetInvestorPaymentReportsAsync(userId));
             }
             catch (Exception ex)
@@ -44,6 +55,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("GetInvesstorPaymentDetails/{PaymentId}")]
+        [Authorize(Roles = "Investor")]
+
         public async Task<IActionResult> GetInvesstorPaymentDetails(int PaymentId)
         {
             try
@@ -55,11 +68,16 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetMerchantPayments/{userId}")]
-        public async Task<IActionResult> GetPaymentsForMerchant(string userId)
+        [HttpGet("GetMerchantPayments")]
+        [Authorize(Roles = "Merchant")]
+
+        public async Task<IActionResult> GetPaymentsForMerchant()
         {
             try
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+
                 return Ok(await _paymentService.GetMerchantPaymentReports(userId));
             }
             catch (Exception ex)
@@ -68,6 +86,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("GetMerchantPaymentDetails/{PaymentId}")]
+        [Authorize(Roles = "Merchant")]
+
         public async Task<IActionResult> GetMerchantPaymentDetails(int PaymentId)
         {
             try
