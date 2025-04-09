@@ -1,4 +1,5 @@
-﻿using CityRoots.Core.DTOs.Chat;
+﻿using CityRoots.Core.Const;
+using CityRoots.Core.DTOs.Chat;
 using CityRoots.Core.Hubs;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Models;
@@ -24,15 +25,15 @@ namespace CityRoots.Core.Services
                 SenderId = senderId,
                 ReceiverId = receiverId,
                 MessageContent = message,
-                Timestamp = DateTime.UtcNow,
-                IsRead = false
+                Timestamp = TimeHelper.NowInEgypt,
+                IsRead = true
             };
 
             await _unitOfWork.Chat.AddAsync(chat);
             await _unitOfWork.CompleteAsync();
 
             // Send real-time update correctly
-            await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, message, DateTime.UtcNow);
+            await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, message, TimeHelper.NowInEgypt);
 
 
         }
