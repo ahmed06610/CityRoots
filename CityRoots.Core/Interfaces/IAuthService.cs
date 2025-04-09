@@ -12,6 +12,12 @@ namespace CityRoots.Core.Interfaces
         Task<AuthDTO> RegisterAsync(RegisterDTO model);
         Task<AuthDTO> LoginAsync(LoginDTO model);
         Task<AuthDTO> CheakResetPassword(CheckResetCodeDTO model);
+        Task<AuthDTO> ChangePasswordAsync(string userId, ChangePasswordDTO model);
+        Task<ProfileInfoDTO> GetProfileInfoAsync(string userId, string role);
+        Task<bool> EditProfileAsync(string userId, string role, EditProfileDTO model);
+
+
+
 
     }
 }

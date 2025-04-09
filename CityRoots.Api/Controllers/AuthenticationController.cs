@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -186,7 +187,7 @@ namespace CityRoots.Api.Controllers
         }
         [Authorize]
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDTO model)
+        public async Task<IActionResult> ChangePassword(ResetPassowrdDTO model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -210,6 +211,70 @@ namespace CityRoots.Api.Controllers
 
             return Ok("تم تغير كلمة السر بنجاح.");
         }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var result = await _authService.ChangePasswordAsync(userId, model);
+            if (!result.IsAuthenticated)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Message);
+        }
+
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> GetProfileInfo()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userId == null || role == null)
+                return Unauthorized();
+
+            var profileInfo = await _authService.GetProfileInfoAsync(userId, role);
+            if (profileInfo == null)
+                return NotFound("User profile not found.");
+
+            return Ok(profileInfo);
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> EditProfile([FromForm] EditProfileDTO model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userId == null || role == null)
+                return Unauthorized();
+
+            var success = await _authService.EditProfileAsync(userId, role, model);
+            if (!success)
+                return BadRequest("Failed to update profile.");
+
+            return Ok("Profile updated successfully.");
+        }
+
+
+
 
     }
 }

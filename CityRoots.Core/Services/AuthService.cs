@@ -190,6 +190,112 @@ namespace CityRoots.Core.Services
             return await CreateAuthModelAsync(user);
 
         }
+        public async Task<AuthDTO> ChangePasswordAsync(string userId, ChangePasswordDTO model)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new AuthDTO { Message = "User not found." };
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return new AuthDTO { Message = errors };
+            }
+
+            return new AuthDTO { Message = "Password changed successfully.", IsAuthenticated = true };
+        }
+        public async Task<ProfileInfoDTO> GetProfileInfoAsync(string userId, string role)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return null;
+
+            string bio = null;
+            int? rate = null;
+
+            if (role == Roles.Farmer.ToString())
+            {
+                var farmer = await _unitOfWork.Farmer.GetByAppUserIdAsync(userId);
+                bio = farmer?.Bio;
+                rate = farmer?.ApplicationUser?.Rate;
+            }
+            else if (role == Roles.Investor.ToString())
+            {
+                var investor = await _unitOfWork.Investor.GetByAppUserIdAsync(userId);
+                bio = investor?.Bio;
+            }
+            else if (role == Roles.Merchant.ToString())
+            {
+                var merchant = await _unitOfWork.Merchant.GetByAppUserIdAsync(userId);
+                bio = merchant?.BusinessDetails;
+            }
+
+            return new ProfileInfoDTO
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                Bio = bio,
+                Rate = rate,
+                ImageProfileUrl = user.ImageProfileUrl
+            };
+        }
+        public async Task<bool> EditProfileAsync(string userId, string role, EditProfileDTO model)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.UserName = model.UserName;
+            user.PhoneNumber = model.Phone;
+
+            // Handle profile image
+            if (model.Image != null)
+            {
+                // Delete the old image if it exists
+                if (!string.IsNullOrEmpty(user.ImageProfileUrl))
+                {
+                    _imageService.DeleteImage(user.ImageProfileUrl);
+                }
+
+                // Save the new image
+                user.ImageProfileUrl = _imageService.SaveImage(model.Image, "uploads/profile");
+            }
+
+            if (role == Roles.Farmer.ToString())
+            {
+                var farmer = await _unitOfWork.Farmer.GetByAppUserIdAsync(userId);
+                if (farmer != null)
+                {
+                    farmer.Bio = model.Bio;
+                    _unitOfWork.Farmer.Update(farmer);
+                }
+            }
+            else if (role == Roles.Investor.ToString())
+            {
+                var investor = await _unitOfWork.Investor.GetByAppUserIdAsync(userId);
+                if (investor != null)
+                {
+                    investor.Bio = model.Bio;
+                    _unitOfWork.Investor.Update(investor);
+                }
+            }
+            else if (role == Roles.Merchant.ToString())
+            {
+                var merchant = await _unitOfWork.Merchant.GetByAppUserIdAsync(userId);
+                if (merchant != null)
+                {
+                    merchant.BusinessDetails = model.Bio;
+                    _unitOfWork.Merchant.Update(merchant);
+                }
+            }
+
+            await _userManager.UpdateAsync(user);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
 
         public async Task<AuthDTO> CheakResetPassword(CheckResetCodeDTO model)
         {
