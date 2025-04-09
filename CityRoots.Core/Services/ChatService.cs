@@ -62,6 +62,7 @@ namespace CityRoots.Core.Services
                 {
                     UserId = g.Key.Id,
                     UserName = g.Key.UserName,
+                    UserImageUrl = g.Key.ImageProfileUrl,
                     LastMessage = g.OrderByDescending(c => c.Timestamp).FirstOrDefault()?.MessageContent,
                     UnreadMessages = g.Count(m => !m.IsRead && m.ReceiverId == userId),
                     DateTimeOfLastMessage = g.OrderByDescending(c => c.Timestamp).FirstOrDefault().Timestamp,
