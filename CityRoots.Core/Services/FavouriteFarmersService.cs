@@ -48,7 +48,14 @@ namespace CityRoots.Core.Services
                 x=>x.userId==userId,
                 x=>x.FarmerUser,
                 x=>x.FarmerUser.Farmer)).ToList();
-            return _mapper.Map<List<FavouriteFarmerDTO>>(farmers);
+            var _farmersDto= _mapper.Map<List<FavouriteFarmerDTO>>(farmers);
+            foreach (var farmer in _farmersDto)
+            {
+                var rate = await _unitOfWork.Rate.FindTWithExpression<Rate>(x => x.FarmerId == farmer.FarmerId && x.UserId == farmer.userId);
+                farmer.Rate = rate?.Rating ?? 0;
+
+            }
+            return _farmersDto;
         }
 
       
@@ -60,12 +67,12 @@ namespace CityRoots.Core.Services
             //    throw new Exception("User ID not found in token");
 
             //}
-            var favoriteFarmer = new FavoriteFarmers
-            {
-                FarmerId = FarmerId,
-                userId = userId
-            };
-            await _unitOfWork.FavoriteFarmers.DeleteAsync(favoriteFarmer);
+            var favoritefarmer = await _unitOfWork.FavoriteFarmers.FindTWithExpression<FavoriteFarmers>(x => x.FarmerId == FarmerId && x.userId == userId);
+            if (favoritefarmer is null)
+                throw new Exception($"No farmer with this {FarmerId} in Your Favouritelist");
+                
+           
+            await _unitOfWork.FavoriteFarmers.DeleteAsync(favoritefarmer);
             await _unitOfWork.CompleteAsync();
         }
     }

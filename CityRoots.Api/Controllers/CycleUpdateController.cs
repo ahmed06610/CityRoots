@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.CycleUpdate;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("cycle/{cycleId}")]
+        [Authorize(Roles ="Farmer,Investor")]
         public async Task<IActionResult> GetAllByCycleId(int cycleId)
         {
             var updates = await _cycleUpdateService.GetAllUpdatesByCycleIdAsync(cycleId);
@@ -24,6 +26,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> Create([FromForm] CreateCycleUpdateDTO dto)
         {
             if (dto == null) return BadRequest("Invalid data.");
@@ -33,6 +37,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> Update([FromForm] UpdateCycleUpdateDTO dto)
         {
             if (dto == null) return BadRequest("Invalid data.");
@@ -43,6 +49,7 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize("Farmer")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _cycleUpdateService.DeleteCycleUpdateAsync(id);

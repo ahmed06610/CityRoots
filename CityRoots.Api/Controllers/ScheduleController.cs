@@ -1,6 +1,7 @@
 ﻿using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,8 @@ namespace CityRoots.Api.Controllers
             _scheduleService = scheduleService;
         }
         [HttpGet("GetAllTasks/{CycleId}")]
+        [Authorize]
+
         public async Task<IActionResult> GetAll(int CycleId)
         {
             try
@@ -30,6 +33,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("GetTask/{Id}")]
+        [Authorize]
+
         public async Task<IActionResult> Get(int Id)
         {
             try
@@ -43,6 +48,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost("AddTask")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Add([FromBody]AddScheduleDto addScheduleDto)
         {
             if (!ModelState.IsValid)
@@ -60,6 +67,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPut("UpdateTask")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Update(UpdateScheduleDTO updateScheduleDTO)
         {
             if (!ModelState.IsValid)
@@ -74,6 +83,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Delete(int Id)
         {
             try {
@@ -85,7 +96,9 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("MakeTaskCompeleted/{Id}")]
+        [HttpGet("MarkTaskAsCompelete/{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> CompeleteTask(int Id)
 
         {

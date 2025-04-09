@@ -1,13 +1,16 @@
 ﻿using CityRoots.Core.DTOs.FeedBack;
 using CityRoots.Core.Helpers;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ComminucationController : ControllerBase
     {
         private readonly ICommunicationService communicationService;
@@ -71,7 +74,10 @@ namespace CityRoots.Api.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                var addedFeedBack = await communicationService.Add(feedback);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized("User is not authenticated.");
+                var addedFeedBack = await communicationService.Add(feedback,userId);
                 return Ok(addedFeedBack);
             }
             catch (Exception ex)

@@ -14,5 +14,7 @@ namespace CityRoots.Core.DTOs.FavouriteFarmers
         public string Email {  get; set; }
         public string bio {  get; set; }
         public string phoneNumber {  get; set; }
+        public string? ImageProfileUrl {  get; set; }
+        public int Rate {  get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using CityRoots.Core.Const;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Purchaserequest;
 using CityRoots.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +18,8 @@ namespace CityRoots.Api.Controllers
             _purchaseRequestService = purchaseRequestService;
         }
         [HttpGet("GetAllRequestsForHarvest/{harvestId}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> GetAllRequestForCycle(int harvestId)
         {
 
@@ -29,11 +33,15 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("GetAllRequestsForMerchant/{MerchantId}")]
-        public async Task<IActionResult> GetAllForInvestor(int MerchantId)
+        [Authorize(Roles = "Merchant")]
+
+        public async Task<IActionResult> GetAllForInvestor()
         {
+            var merchantId=User.GetLoggedInId();
+            if(merchantId is null) return Unauthorized();
             try
             {
-                return Ok(await _purchaseRequestService.GetAllRequestsForMerchant(MerchantId));
+                return Ok(await _purchaseRequestService.GetAllRequestsForMerchant(merchantId.Value));
             }
             catch (Exception ex)
             {
@@ -44,6 +52,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("GetPurchaseRequest/{id}")]
+        [Authorize]
+
         public async Task<IActionResult> GetPurchaseRequest(int id)
         {
             try
@@ -56,13 +66,17 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Merchant")]
+
         public async Task<IActionResult> CreatePurchaseRrquest(CreatePurchaseRrquest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            var merchantId = User.GetLoggedInId();
+            if (merchantId is null) return Unauthorized();
             try
             {
-                return Ok(await _purchaseRequestService.CreatePurchaseRequest(request));
+                return Ok(await _purchaseRequestService.CreatePurchaseRequest(request,merchantId.Value));
 
             }
             catch (Exception ex)
@@ -71,6 +85,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Merchant")]
+
         public async Task<IActionResult> Delete(int Id)
         {
             try
@@ -85,6 +101,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("Approved/{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> ApproveTheRequest(int Id)
         {
             try
@@ -100,6 +118,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("Declined/{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> DeclineTheRequest(int Id)
         {
             try

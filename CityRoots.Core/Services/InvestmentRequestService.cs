@@ -23,7 +23,7 @@ namespace CityRoots.Core.Services
             _mapper = mapper;
             _openInvestmentCycle = openInvestmentCycle;
         }
-        public async Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request)
+        public async Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request,int investorId)
         {
             var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId, "CycleId", c => c.OpenInvestmentCycle);
             var openCycle = cycle.OpenInvestmentCycle;
@@ -43,6 +43,7 @@ namespace CityRoots.Core.Services
 
 
             var investmentRequest =_mapper.Map<InvestmentRequest>(request);
+            investmentRequest.InvestorId = investorId;
 
             investmentRequest.RequestDate = DateTime.Now;
             investmentRequest.RequestStatus = "قيد_الانتظار";

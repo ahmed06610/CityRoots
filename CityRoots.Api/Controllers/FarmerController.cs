@@ -21,9 +21,11 @@ namespace CityRoots.Api.Controllers
             _farmerService = farmerService;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllAsync()
             => Ok(await _unitOfWork.Farmer.GetAllAsync());
         [HttpGet("GetFarmerInformation")]
+        [Authorize]
         public async Task<IActionResult> GetAsync(int id)
         {
           var info =await _farmerService.GetFarmerInfo(id);
@@ -33,6 +35,8 @@ namespace CityRoots.Api.Controllers
             return Ok(info);
         }
         [HttpPut]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> UpdateAsync(UpdateFarmerDTO model)
         {
             

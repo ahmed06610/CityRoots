@@ -15,7 +15,7 @@ namespace CityRoots.Core.Interfaces.Services
         Task<InvestmentrequestDisplay> GetSpeceficInvestmentRequest(int Id);
 
 
-        Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request);
+        Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request,int investorId);
         Task<InvestmentRequest> UpdateInvestmentRequest(int Id,string status);
         Task DeleteInvestmentRequest(int id);
     }

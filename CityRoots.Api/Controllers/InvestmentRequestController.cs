@@ -1,6 +1,9 @@
-﻿using CityRoots.Core.Const;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.InvestmentRequests;
 using CityRoots.Core.Interfaces.Services;
+using CityRoots.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -30,11 +33,17 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("GetAllForInvestor/{InvestorId}")]
-        public async Task<IActionResult> GetAllForInvestor(int InvestorId)
+        [Authorize(Roles = "Investor")]
+
+        public async Task<IActionResult> GetAllForInvestor()
         {
+            var investorId=User.GetLoggedInId();
+            
+            if(investorId is null) return Unauthorized();
             try
             {
-                return Ok(await _investmentRequestService.GetAllRequestsForInvestor(InvestorId));
+
+                return Ok(await _investmentRequestService.GetAllRequestsForInvestor(investorId.Value));
             }
             catch (Exception ex)
             {
@@ -45,6 +54,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("GetInvestmentRequest/{id}")]
+        [Authorize(Roles = "Investor,Farmer")]
+
         public async Task<IActionResult> GetInvestmentRequest(int id)
         {
             try
@@ -57,13 +68,19 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Investor")]
+
         public async Task<IActionResult> CreateInvestmentRequest(CreateInvestmentRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            var investorId = User.GetLoggedInId();
+
+            if (investorId is null) return Unauthorized();
+
             try
             {
-                await _investmentRequestService.CreateInvestmentRequest(request);
+                await _investmentRequestService.CreateInvestmentRequest(request,investorId.Value);
                 return Ok();
 
             }
@@ -73,6 +90,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Investor")]
+
         public async Task<IActionResult> Delete(int Id)
         {
             try
@@ -87,6 +106,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("Approved/{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> ApproveTheRequest(int Id)
         {
             try
@@ -101,6 +122,7 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("Declined/{Id}")]
+        [Authorize(Roles="Farmer")]
         public async Task<IActionResult> DeclineTheRequest(int Id)
         {
             try

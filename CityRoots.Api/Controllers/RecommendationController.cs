@@ -1,6 +1,8 @@
-﻿using CityRoots.Core.Services;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -16,18 +18,26 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("ReccommendationForInvestor")]
-       public async Task<IActionResult> GetReccommendationForInvestor(int InvestorId)
+       public async Task<IActionResult> GetReccommendationForInvestor()
         {
-          var res= await reccommendation.GetInvestorRecommendationDataAsync(InvestorId);
+            var investorId = User.GetLoggedInId();
+            if(investorId is null)
+                return Unauthorized();
+
+            
+          var res= await reccommendation.GetInvestorRecommendationDataAsync(investorId.Value);
 
             if (res == null)
                 return NotFound();
             return Ok(res);
         }
         [HttpGet("ReccommendationForMerchant")]
-        public async Task<IActionResult> GetReccommendationForMerchant(int MerchantId)
+        public async Task<IActionResult> GetReccommendationForMerchant()
         {
-            var res = await reccommendation.GetMerchantRecommendationDataAsync(MerchantId);
+            var merchantId = User.GetLoggedInId();
+            if (merchantId is null)
+                return Unauthorized();
+            var res = await reccommendation.GetMerchantRecommendationDataAsync(merchantId.Value);
 
             if (res == null)
                 return NotFound();

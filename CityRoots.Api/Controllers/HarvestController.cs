@@ -1,9 +1,11 @@
-﻿using CityRoots.Core.DTOs.Cycle;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.Recommendation;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using CityRoots.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
@@ -21,11 +23,15 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpPost("GetAllHarvestsForFarmer")]
-        public async Task<IActionResult> GetAll([FromBody] string Name = null, int farmerid = 0)
+        [Authorize(Roles ="Farmer")]
+        public async Task<IActionResult> GetAll([FromBody] string Name = null)
         {
+            var farmerId = User.GetLoggedInId();
+            if(farmerId is null)
+                 return Unauthorized();
             try
             {
-                return Ok(await _harvestService.GetAll(Name, farmerid = 0));
+                return Ok(await _harvestService.GetAll(Name, farmerId.Value));
             }
             catch (Exception ex)
             {
@@ -36,21 +42,32 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("BrowsinHarvestsForMerchant")]
-        public async Task<IActionResult> GetAllHarvests(int MerchantId)
+        [Authorize(Roles = "Merchant")]
+
+        public async Task<IActionResult> GetAllHarvests()
         {
-            var Harvests = await _harvestService.GetAllHarvestsForMerchantsAsync(MerchantId: MerchantId);
+            var merchantId= User.GetLoggedInId();
+            if(merchantId is null)
+                return Unauthorized();
+            var Harvests = await _harvestService.GetAllHarvestsForMerchantsAsync(MerchantId: merchantId.Value);
             return Ok(Harvests);
         }
 
         [HttpGet("GetHarvestForMerchant")]
-        public async Task<IActionResult> GetHarvestForMerchant(int HarvestId, int MerchantId)
+        [Authorize(Roles = "Merchant")]
+
+        public async Task<IActionResult> GetHarvestForMerchant(int HarvestId)
         {
-            var Harvests = await _harvestService.GetHarvestByIdForMerchantAsync(HarvestId, MerchantId);
+            var merchantId = User.GetLoggedInId();
+            if (merchantId is null)
+                return Unauthorized();
+            var Harvests = await _harvestService.GetHarvestByIdForMerchantAsync(HarvestId, merchantId.Value);
             if (Harvests == null) return NotFound();
             return Ok(Harvests);
         }
 
         [HttpGet("{Id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int Id)
         {
             try
@@ -64,14 +81,19 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] AddHarvestDto harvest, int farmerid = 1)
+        [Authorize(Roles = "Farmer")]
+
+        public async Task<IActionResult> Add([FromForm] AddHarvestDto harvest)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             try
             {
+                var farmerId = User.GetLoggedInId();
+                if (farmerId is null)
+                    return Unauthorized();
 
-                return Ok(await _harvestService.Add(harvest, farmerid));
+                return Ok(await _harvestService.Add(harvest, farmerId.Value));
 
             }
             catch (Exception ex)
@@ -80,6 +102,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPut]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Update([FromForm] UpdateHarvestDto harvest)
         {
             if (!ModelState.IsValid)
@@ -98,6 +122,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Farmer")]
+
         public async Task<IActionResult> Delete(int Id)
         {
             try
@@ -113,6 +139,7 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpGet("GetTheRequestsofHarvest/{harvestId}")]
+        [Authorize]
         public async Task<IActionResult> GetAllRequests(int harvestId)
         {
             try

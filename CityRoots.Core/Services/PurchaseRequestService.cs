@@ -23,7 +23,7 @@ namespace CityRoots.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<PurchaseRequest> CreatePurchaseRequest(CreatePurchaseRrquest Request)
+        public async Task<PurchaseRequest> CreatePurchaseRequest(CreatePurchaseRrquest Request,int merchantId)
         {
             var harvest = await _unitOfWork.Harvest.GetByIdAsync(Request.HarvestId);
             if (harvest is null)
@@ -39,6 +39,7 @@ namespace CityRoots.Core.Services
             var purchaseRequest = _mapper.Map<PurchaseRequest>(Request);
             purchaseRequest.RequestStatus = "قيد_الانتظار";
             purchaseRequest.RequestDate = DateTime.Now;
+            purchaseRequest.MerchantId = merchantId;
             purchaseRequest.RequestedPrice=(decimal)Request.RequestedAmount*harvest.Price;
             await _unitOfWork.Purchase.AddAsync(purchaseRequest);
             await _unitOfWork.CompleteAsync();

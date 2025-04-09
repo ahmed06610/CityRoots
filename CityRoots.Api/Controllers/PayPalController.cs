@@ -1,6 +1,7 @@
 ﻿using CityRoots.Core.DTOs.PayPal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -20,7 +21,9 @@ namespace CityRoots.Api.Controllers
         {
             try
             {
-                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,request.userId, request.CycleId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,userId, request.CycleId);
                 if (paymentUrl == null)
                 {
                     return BadRequest(new { message = "Failed to generate payment link" });
@@ -37,7 +40,9 @@ namespace CityRoots.Api.Controllers
         {
             try
             {
-                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,request.userId,0,request.HarvestId);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var paymentUrl = await _payPalService.CreatePaymentLink(request.Amount, request.SellerEmail,userId,0,request.HarvestId);
                 if (paymentUrl == null)
                 {
                     return BadRequest(new { message = "Failed to generate payment link" });

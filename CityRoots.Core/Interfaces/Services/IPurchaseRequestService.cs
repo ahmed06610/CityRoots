@@ -13,7 +13,7 @@ namespace CityRoots.Core.Interfaces.Services
         Task<List<PurchaseRequestDsiplay>> GetAllRequestsForHarvest(int HarvestId);
         Task<List<PurchaseRequestDsiplay>> GetAllRequestsForMerchant(int MerchantId);
         Task<PurchaseRequest> GetSpecificRequest(int RequestId);
-        Task<PurchaseRequest> CreatePurchaseRequest(CreatePurchaseRrquest purchaseRrquest);
+        Task<PurchaseRequest> CreatePurchaseRequest(CreatePurchaseRrquest purchaseRrquest,int merchantId);
         Task Delete(int RequestId);
         Task UpdateRequest(int requestId, string status);  
     }

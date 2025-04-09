@@ -1,6 +1,8 @@
-﻿using CityRoots.Core.DTOs.Farm;
+﻿using CityRoots.Api.Helpers;
+using CityRoots.Core.DTOs.Farm;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +20,18 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpGet("GetAllFarmasOfFarmerId")]
-        public async Task<IActionResult> GetAllFarms(int FarmerId=0)
+        [Authorize]
+        public async Task<IActionResult> GetAllFarms()
         {
-            var farms = await _farmService.GetAllFarmsAsync(FarmerId);
+            var FarmerId = User.GetLoggedInId();
+            if (FarmerId is null)
+                return Unauthorized();
+            var farms = await _farmService.GetAllFarmsAsync(FarmerId.Value);
             return Ok(farms);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetFarmById(int id)
         {
             var farm = await _farmService.GetFarmByIdAsync(id);
@@ -33,6 +40,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost("AddFarm")]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> AddFarm([FromBody] CreateFarmDTO createFarmDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -42,6 +51,8 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditFarm")]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> UpdateFarm([FromBody] UpdateFarmDTO updateFarmDto)
         {
 
@@ -53,6 +64,8 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("Delete/{id}")]
+        [Authorize("Farmer")]
+
         public async Task<IActionResult> DeleteFarm(int id)
         {
             var success = await _farmService.DeleteFarmAsync(id);
