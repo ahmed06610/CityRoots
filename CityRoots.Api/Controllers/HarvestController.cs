@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CityRoots.Api.Controllers
 {
@@ -31,7 +32,10 @@ namespace CityRoots.Api.Controllers
                  return Unauthorized();
             try
             {
-                return Ok(await _harvestService.GetAll(Name, farmerId.Value));
+                var harvest = await _harvestService.GetAll(Name, farmerId.Value);
+                if (harvest == null || harvest.Count() <= 0)
+                    return NotFound();
+                return Ok(harvest);
             }
             catch (Exception ex)
             {
@@ -50,6 +54,8 @@ namespace CityRoots.Api.Controllers
             if(merchantId is null)
                 return Unauthorized();
             var Harvests = await _harvestService.GetAllHarvestsForMerchantsAsync(MerchantId: merchantId.Value);
+            if (Harvests == null || Harvests.Count() <= 0)
+                return NotFound();
             return Ok(Harvests);
         }
 

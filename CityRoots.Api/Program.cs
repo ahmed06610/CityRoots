@@ -179,15 +179,17 @@ namespace CityRoots.Api
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>(); // Custom provider for SignalR
 
             // CORS for SignalR
+            // Allow CORS for frontend
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigins",
-                    builder => builder
-                        .WithOrigins("https://yourfrontenddomain.com", "http://localhost:3000") // Allow frontend URL
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
             });
+
 
             builder.Services.AddAutoMapper(typeof(Program));
             var logPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Logs", "log-.txt");
@@ -237,7 +239,7 @@ namespace CityRoots.Api
                   "*/5 * * * *"
               );
             app.UseStaticFiles();
-            app.UseCors("AllowSpecificOrigins");
+            app.UseCors("AllowFrontend"); // <-- ده مهم تحطه قبل UseAuthorization
             app.UseAuthentication();
             app.UseAuthorization();
 

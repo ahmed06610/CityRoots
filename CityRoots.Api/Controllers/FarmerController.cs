@@ -35,7 +35,7 @@ namespace CityRoots.Api.Controllers
             return Ok(info);
         }
         [HttpPut]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> UpdateAsync(UpdateFarmerDTO model)
         {

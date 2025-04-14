@@ -22,11 +22,14 @@ namespace CityRoots.Api.Controllers
         public async Task<IActionResult> GetAllByCycleId(int cycleId)
         {
             var updates = await _cycleUpdateService.GetAllUpdatesByCycleIdAsync(cycleId);
+            if (updates == null || updates.Count() <= 0)
+                return NotFound();
+
             return Ok(updates);
         }
 
         [HttpPost]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> Create([FromForm] CreateCycleUpdateDTO dto)
         {
@@ -37,7 +40,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> Update([FromForm] UpdateCycleUpdateDTO dto)
         {
@@ -49,7 +52,7 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _cycleUpdateService.DeleteCycleUpdateAsync(id);

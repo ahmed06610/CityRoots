@@ -121,7 +121,8 @@ namespace CityRoots.Api.Controllers
                 Email = user.Email,
                 Name = user.Name,
                 LoogedId = LoogedId,
-                Role = role
+                Role = role,
+                ImageUrl = user.ImageProfileUrl,
             });
         }
 

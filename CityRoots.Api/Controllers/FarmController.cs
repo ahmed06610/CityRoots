@@ -5,6 +5,7 @@ using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CityRoots.Api.Controllers
 {
@@ -27,6 +28,8 @@ namespace CityRoots.Api.Controllers
             if (FarmerId is null)
                 return Unauthorized();
             var farms = await _farmService.GetAllFarmsAsync(FarmerId.Value);
+            if (farms == null || farms.Count() <= 0)
+                return NotFound();
             return Ok(farms);
         }
 
@@ -40,7 +43,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost("AddFarm")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]//Farmer
 
         public async Task<IActionResult> AddFarm([FromBody] CreateFarmDTO createFarmDto)
         {
@@ -51,7 +54,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditFarm")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> UpdateFarm([FromBody] UpdateFarmDTO updateFarmDto)
         {
@@ -64,7 +67,7 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("Delete/{id}")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> DeleteFarm(int id)
         {

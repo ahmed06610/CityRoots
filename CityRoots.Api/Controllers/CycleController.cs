@@ -1,6 +1,7 @@
 ﻿using CityRoots.Api.Helpers;
 using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.Interfaces.Services;
+using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace CityRoots.Api.Controllers
             _cycleService = cycleService;
         }
         [HttpGet("GetAllOpenCyclesOfFarmer")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> GetAllOpenCycles()
         {
             var FarmerId = User.GetLoggedInId();
@@ -27,11 +28,13 @@ namespace CityRoots.Api.Controllers
 
 
                 var cycles = await _cycleService.GetAllOpenCyclesForFarmersAsync(FarmerId.Value);
+            if (cycles == null||cycles.Count<=0)
+                return NotFound();
             return Ok(cycles);
         }
 
         [HttpGet("GetAllCycleasOfFarmerId")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
 
         public async Task<IActionResult> GetAllCycles(bool ForFarmer = true)
         {
@@ -39,18 +42,22 @@ namespace CityRoots.Api.Controllers
             if (FarmerId is null)
                 return Unauthorized();
             var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId.Value, ForFarmer);
+            if (cycles == null || cycles.Count <= 0)
+                return NotFound();
             return Ok(cycles);
         }
         [HttpGet("BrowsingCycleasForInvestors")]
-        [Authorize("Investor")]
+        [Authorize(Roles = "Investor")]
 
         public async Task<IActionResult> GetAllCycles()
         {
             var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
+            if (cycles == null || cycles.Count <= 0)
+                return NotFound();
             return Ok(cycles);
         }
         [HttpGet("GetAllCycleasOfInvestor")]
-        [Authorize("Investor")]
+        [Authorize(Roles = "Investor")]
 
         public async Task<IActionResult> GetAllCyclesOfInvestor()
         {
@@ -59,6 +66,8 @@ namespace CityRoots.Api.Controllers
                 return Unauthorized();
 
             var cycles = await _cycleService.GetAllPrivateCyclesForInvestor(InvestorId: InvestorId.Value);
+            if (cycles == null || cycles.Count <= 0)
+                return NotFound();
             return Ok(cycles);
         }
 
@@ -67,12 +76,13 @@ namespace CityRoots.Api.Controllers
         public async Task<IActionResult> GetCycleById(int id)
         {
             var cycle = await _cycleService.GetCycleByIdAsync(id);
-            if (cycle == null) return NotFound();
+            if (cycle == null )
+                return NotFound();
             return Ok(cycle);
         }
 
         [HttpGet("GetCycleForInvestor")]
-        [Authorize("Investor")]
+        [Authorize(Roles = "Investor")]
 
         public async Task<IActionResult> GetCycleForInvestor(int cycleId)
         {
@@ -85,7 +95,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPost("AddCycle")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> AddCycle([FromBody] CreateCycleDTO createCycleDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -103,7 +113,7 @@ namespace CityRoots.Api.Controllers
         }
 
         [HttpPut("EditCycle")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> UpdateCycle([FromBody] UpdateCycleDTO updateCycleDto)
         {
 
@@ -115,7 +125,7 @@ namespace CityRoots.Api.Controllers
 
 
         [HttpDelete("Delete/{id}")]
-        [Authorize("Farmer")]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> DeleteCycle(int id)
         {
             var success = await _cycleService.DeleteCycleAsync(id);
