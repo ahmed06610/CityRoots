@@ -21,11 +21,7 @@ namespace CityRoots.Core.Models
         [Required]
         public string ParcelName { get; set; }
 
-        [Required]
-        public double Price { get; set; }
-
-        [Required]
-        public string Status { get; set; } // Available, Occupied, etc.
+      
         public string ImageUrl {  get; set; } 
 
         // Navigation Properties

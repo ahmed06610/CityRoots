@@ -27,7 +27,7 @@ namespace CityRoots.Core.Services
 
         public async Task<List<LandParcelDTO>> GetAllLandParcelsAsync(int FarmId=0)
         {
-            var landParcels = (await _unitOfWork.LandParcel.FindAllWithIncludes<LandParcel>((l=>l.FarmId==FarmId || FarmId == 0),l=>l.Farm)).ToList();
+            var landParcels = (await _unitOfWork.LandParcel.FindAllWithIncludes<LandParcel>((l=>l.FarmId==FarmId || FarmId == 0),l=>l.Farm,l=>l.Cycles)).ToList();
             return _mapper.Map<List<LandParcelDTO>>(landParcels);
         }
         public async Task<List<LandParcelDTO>> GetAllLandParcelsofFarmerAsync(int FarmerId = 0)
@@ -55,7 +55,6 @@ namespace CityRoots.Core.Services
             {
                 landParcel.ImageUrl = _imageService.SaveImage(createLandParcelDto.Image, ImagesFolder);
             }
-
             var createdLandParcel = await _unitOfWork.LandParcel.AddAsync(landParcel);
             await _unitOfWork.CompleteAsync();
 

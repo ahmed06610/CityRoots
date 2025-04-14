@@ -95,21 +95,21 @@ namespace CityRoots.Api.Controllers
 
             if (!user.EmailConfirmed)
                 return BadRequest("Email not confirmed");
-            var LoogedId = 0;
+            var LoggedId = 0;
             var role = "";
            if(result.Roles.First()==Roles.Farmer.ToString())
             {
-                LoogedId=(await _unitOfWork.Farmer.GetByAppUserIdAsync(user.Id)).FarmerId;
+                LoggedId = (await _unitOfWork.Farmer.GetByAppUserIdAsync(user.Id)).FarmerId;
                 role = Roles.Farmer.ToString();
             }
            else if (result.Roles.First() == Roles.Investor.ToString())
             {
-                LoogedId = (await _unitOfWork.Investor.GetByAppUserIdAsync(user.Id)).InvestorId;
+                LoggedId = (await _unitOfWork.Investor.GetByAppUserIdAsync(user.Id)).InvestorId;
                 role = Roles.Investor.ToString();
             }
             else if (result.Roles.First() == Roles.Merchant.ToString())
             {
-                LoogedId = (await _unitOfWork.Merchant.GetByAppUserIdAsync(user.Id)).MerchantId;
+                LoggedId = (await _unitOfWork.Merchant.GetByAppUserIdAsync(user.Id)).MerchantId;
                 role = Roles.Merchant.ToString();
             }
 
@@ -120,7 +120,7 @@ namespace CityRoots.Api.Controllers
                 UserId = user.Id,
                 Email = user.Email,
                 Name = user.Name,
-                LoogedId = LoogedId,
+                LoggedId = LoggedId,
                 Role = role,
                 ImageUrl = user.ImageProfileUrl,
             });

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Auth;
 using CityRoots.Core.DTOs.Crop;
 
@@ -52,9 +53,13 @@ namespace CityRoots.Api.Helpers
             CreateMap<LandParcel, LandParcelDTO>()
      .ForMember(dest => dest.FarmLocation, opt => opt.MapFrom(src => src.Farm.Location))
      .ForMember(dest => dest.Status, opt => opt.MapFrom(src =>
-         src.Cycles != null && src.Cycles.Any(cycle => cycle.StartDate <= DateTime.Now && cycle.EndDate >= DateTime.Now)
-             ? "Occupied"
-             : "Available"));
+         src.Cycles != null && src.Cycles.Any(cycle => cycle.StartDate <= TimeHelper.NowInEgypt && cycle.EndDate >= TimeHelper.NowInEgypt)
+             ? "مربوطه بدوره زراعيه"
+             : "متاحه"))
+     .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src =>
+         src.Cycles != null && src.Cycles.Any(cycle => cycle.StartDate <= TimeHelper.NowInEgypt && cycle.EndDate >= TimeHelper.NowInEgypt)
+             ? src.Cycles.FirstOrDefault(cycle => cycle.StartDate <= TimeHelper.NowInEgypt && cycle.EndDate >= TimeHelper.NowInEgypt).CycleName
+             : null));
             CreateMap<Crop, CropDisplayDto>()
                 .ForMember(dest=>dest.cropType,opt=>opt.MapFrom(src=>src.CropType.Name));
             CreateMap<AddCropDto, Crop>().ReverseMap();

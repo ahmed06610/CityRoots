@@ -13,6 +13,7 @@ namespace CityRoots.Core.DTOs.LandParcel
         public int FarmId { get; set; }
         public string FarmLocation { get; set; } // From related Farm
         public string Status { get; set; }
+        public string? CycleName { get; set; } // From related Cycle
         public string ImageUrl { get; set; }
     }
 
