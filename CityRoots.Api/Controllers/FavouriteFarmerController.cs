@@ -1,6 +1,7 @@
 ﻿using CityRoots.Core.DTOs.FavouriteFarmers;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,13 @@ namespace CityRoots.Api.Controllers
     public class FavouriteFarmerController : ControllerBase
     {
         private readonly IFavouriteFarmersService _favouriteFarmersService;
-        public FavouriteFarmerController(IFavouriteFarmersService favouriteFarmersService)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IFavoriteFarmerNotificationService _favoriteFarmerNotificationService;
+        public FavouriteFarmerController(IFavouriteFarmersService favouriteFarmersService,IBackgroundJobClient backgroundJobClient,IFavoriteFarmerNotificationService favoriteFarmerNotificationService)
         {
             _favouriteFarmersService = favouriteFarmersService;
+            _backgroundJobClient = backgroundJobClient;
+            _favoriteFarmerNotificationService = favoriteFarmerNotificationService;
 
         }
         [HttpGet("Favourites/")]
@@ -37,12 +42,17 @@ namespace CityRoots.Api.Controllers
 
         public async Task<IActionResult> AddFarmerToFavourite(FavouriteFarmerRequestDTO request)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
+
             try {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized();
-               
+                
                 await _favouriteFarmersService.AddToFavourites(request.FarmerId,userId);
+                _backgroundJobClient.Enqueue(() =>
+                _favoriteFarmerNotificationService.NotifyOnFavoriteList(userName, request.FarmerId));
+
                 return Ok("Added");
             }
             catch (Exception ex) {

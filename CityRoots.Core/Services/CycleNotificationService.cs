@@ -1,8 +1,10 @@
 ﻿using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Notification;
+using CityRoots.Core.Hubs;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Microsoft.AspNetCore.SignalR;
 using TimeZoneConverter;
 
 namespace CityRoots.Core.Services
@@ -13,17 +15,20 @@ namespace CityRoots.Core.Services
         private readonly ICycleService _cycleService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly CycleNotificationLogService _cycleNotificationLogService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public CycleNotificationService(
             INotificationService notificationService,
             ICycleService cycleService,
             IUnitOfWork unitOfWork,
-            CycleNotificationLogService cycleNotificationLogService)
+            CycleNotificationLogService cycleNotificationLogService,
+            IHubContext<NotificationHub> hubContext)
         {
             _notificationService = notificationService;
             _cycleService = cycleService;
             _unitOfWork = unitOfWork;
             _cycleNotificationLogService = cycleNotificationLogService;
+            _hubContext = hubContext;
         }
 
         public async Task HandleCycleNotificationAsync(Cycle cycle)
@@ -32,24 +37,15 @@ namespace CityRoots.Core.Services
             var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
 
             var farmerId = cycle.LandParcel.Farm.Farmer.ApplicationUser.Id;
+           
+            var investorsId = cycle.InvestmentRequests.
+                Where(x => x.RequestStatus == InvestmentStatues.مقبول.ToString())
+                .Select(x=>x.InvestorId)
+                .Distinct()
+                .ToList();
+            
 
-            // Notify pending investment requests
-            if (cycle.InvestmentRequests.Any(i => i.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString()))
-            {
-                foreach (var investment in cycle.InvestmentRequests.Where(i => i.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString()))
-                {
-                    var investorName = (await _unitOfWork.Investor.FindTWithIncludes<Investor>(
-                        investment.InvestorId,
-                        "InvestorId",
-                        i => i.ApplicationUser)).ApplicationUser.UserName;
-
-                    if (!await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.InvestmentRequest,investment.InvestmentRequestId))
-                    {
-                        await NotifyInvestmentRequestAsync(cycle.CycleId, farmerId, investorName, investment.RequestedAmount);
-                        await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.InvestmentRequest,investment.InvestmentRequestId);
-                    }
-                }
-            }
+           
 
             // Notify when investment goal is met before the cycle start date
             if (cycle.OpenInvestmentCycle != null &&
@@ -76,7 +72,14 @@ namespace CityRoots.Core.Services
                 !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.CycleStarted))
             {
                 await NotifyCycleStartedAsync(cycle.CycleId, farmerId);
-                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.CycleStarted);
+                var investors = await _unitOfWork.Investor.GetInvestorsByIdsAsync(investorsId);
+                foreach (var investor in investors)
+                {
+
+                    await NotifyCycleStartedAsync(cycle.CycleId, investor.ApplicationUserId);
+                
+                    
+                }
             }
 
             // Notify if the cycle end is approaching
@@ -86,10 +89,52 @@ namespace CityRoots.Core.Services
                 await NotifyCycleEndApproachingAsync(cycle.CycleId, farmerId, cycle.EndDate);
                 await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.CycleEndApproaching);
             }
+
+            //Notify if the cycle ended
+            if (now.Date >= cycle.EndDate.Date &&
+               !await _cycleNotificationLogService.HasNotificationBeenSentAsync(cycle.CycleId, CycleNotificationType.cycleEnded))
+            {
+                await NotifyCycleEndedAsync(cycle.CycleId, farmerId);
+                await _cycleNotificationLogService.LogNotificationAsync(cycle.CycleId, CycleNotificationType.cycleEnded);
+                var investors = await _unitOfWork.Investor.GetInvestorsByIdsAsync(investorsId);
+                foreach (var investor in investors)
+                {
+
+                    await NotifyCycleEndedAsync(cycle.CycleId, investor.ApplicationUserId);
+
+
+                }
+            }
+
         }
 
-        public async Task NotifyInvestmentRequestAsync(int cycleId, string userId, string investorName, decimal amount)
+        //public async Task NotifyInvestmentRequestAsync(int cycleId, int investorId, decimal amount)
+        //{
+        //    var investor = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investorId, "InvestorId", x => x.ApplicationUser);
+        //    var investorName = investor.ApplicationUser.Name;
+        //    var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(cycleId, "CycleId",
+        //        x => x.LandParcel,
+        //        x => x.LandParcel.Farm,
+        //        x => x.LandParcel.Farm.Farmer,
+        //        x => x.LandParcel.Farm.Farmer.ApplicationUser);
+        //    var userId = cycle.LandParcel.Farm.Farmer.ApplicationUserId;
+        //    var content = $"استثمار جديد من {investorName} بمبلغ {amount} في الدورة {cycle.CycleName} (رقم {cycleId}).";
+        //    var notification = new CreateNotificationDTO
+        //    {
+        //        UserId = userId,
+        //        Content = content,
+        //        Type = "Cycle",
+        //        AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
+        //    };
+
+        //    await _notificationService.CreateNotificationAsync(notification);
+        //    await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
+        //}
+        public async Task NotifyInvestmentRequestAsync(int cycleId, string userId, int investorId, decimal amount)
         {
+            var investor = await _unitOfWork.Investor.FindTWithIncludes<Investor>(investorId, "InvestorId", x => x.ApplicationUser);
+            var investorName = investor.ApplicationUser.Name;
             var cycle = await _cycleService.GetCycleByIdAsync(cycleId);
             var content = $"استثمار جديد من {investorName} بمبلغ {amount} في الدورة {cycle.CycleName} (رقم {cycleId}).";
             var notification = new CreateNotificationDTO
@@ -101,6 +146,8 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
         }
 
         public async Task NotifyInvestmentGoalMetAsync(int cycleId, string userId)
@@ -116,6 +163,8 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
         }
 
         public async Task NotifyInsufficientInvestmentAsync(int cycleId, string userId, DateTime startDate)
@@ -132,6 +181,8 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
         }
 
         public async Task NotifyCycleStartedAsync(int cycleId, string userId)
@@ -147,6 +198,8 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
         }
 
         public async Task NotifyCycleEndApproachingAsync(int cycleId, string userId, DateTime endDate)
@@ -163,6 +216,110 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
         }
+
+        public async Task NotifyInvestorOfInvestmentResponseAsync(int cycleId, string FarmerName, int investorId, string status)
+        {
+            var cycle=await _cycleService.GetCycleByIdAsync(cycleId);
+            var investor=await _unitOfWork.Investor.GetByIdAsync(investorId);
+            var content = status == InvestmentStatues.مقبول.ToString() ?
+                $"لقد تم قبول طلبك من قبل {FarmerName} بشأن الاستثمار في دوره {cycle.CycleName} رقم {cycleId}" :
+                $"لقد تم رفض طلبك من قبل {FarmerName} بشأن الاستثمار في دوره {cycle.CycleName} رقم {cycleId}";
+           
+            var userId = investor.ApplicationUserId;
+            var notification = new CreateNotificationDTO
+            {
+                Type = "InvestmentRequest",
+                Content = content,
+                UserId = userId,
+                AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
+
+
+
+            };
+            await _notificationService.CreateNotificationAsync(notification);
+
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
+
+        }
+        public async Task NotifyCycleEndedAsync(int cycleId, string userId)
+        {
+            var cycle = await _cycleService.GetCycleByIdAsync(cycleId);
+            var content = $"الدورة {cycle.CycleName} (رقم {cycleId}) قد انتهت.";
+            var notification = new CreateNotificationDTO
+            {
+                UserId = userId,
+                Content = content,
+                Type = "Cycle",
+                AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
+            };
+
+            await _notificationService.CreateNotificationAsync(notification);
+            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+
+        }
+
+        public async Task NotifyInvestorOnCyclesUpdates(int cycleId, string farmerName)
+        {
+
+            var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(cycleId, "CycleId", x => x.InvestmentRequests);
+
+            var investorsId = cycle.InvestmentRequests.
+                           Where(x => x.RequestStatus == InvestmentStatues.مقبول.ToString())
+                           .Select(x => x.InvestorId)
+                           .Distinct()
+                           .ToList();
+            var investors = await _unitOfWork.Investor.GetInvestorsByIdsAsync(investorsId);
+            var content = $"قام {farmerName} بإضافة تحديث بخصوص الدورة {cycle.CycleName} (رقم {cycleId}).";
+
+            foreach (var investor in investors)
+            {
+                var notification = new CreateNotificationDTO
+                {
+                    Type = "CycleUpdate",
+                    UserId = investor.ApplicationUserId,
+                    AdditionalData = $"{{ \"CycleId\": {cycleId} }}",
+                    Content = content
+
+                };
+                await _notificationService.CreateNotificationAsync(notification);
+                await _hubContext.Clients.User(investor.ApplicationUserId).SendAsync("ReceiveNotification", notification);
+
+            }
+
+        }
+
+        public async Task NotifyInvestorOnUpdateOncycle(int cycleId,string userName)
+        {
+            var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(cycleId, "CycleId", x => x.InvestmentRequests);
+
+            var investorsId = cycle.InvestmentRequests.
+                           Where(x => x.RequestStatus == InvestmentStatues.مقبول.ToString())
+                           .Select(x => x.InvestorId)
+                           .Distinct()
+                           .ToList();
+            var investors = await _unitOfWork.Investor.GetInvestorsByIdsAsync(investorsId);
+            var content = $"تم تعديل في الدوره رقم {cycleId} من قبل {userName}.";
+            foreach (var investor in investors)
+            {
+                var notification = new CreateNotificationDTO
+                {
+                    Type = "CycleUpdate",
+                    UserId = investor.ApplicationUserId,
+                    AdditionalData = $"{{ \"CycleId\": {cycleId} }}",
+                    Content = content
+
+                };
+                await _notificationService.CreateNotificationAsync(notification);
+                await _hubContext.Clients.User(investor.ApplicationUserId).SendAsync("ReceiveNotification", notification);
+
+            }
+
+
+        }
+        
     }
 }

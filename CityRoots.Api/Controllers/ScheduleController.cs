@@ -1,4 +1,5 @@
-﻿using CityRoots.Core.DTOs.Schedule;
+﻿using CityRoots.Core.Const;
+using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -103,7 +104,7 @@ namespace CityRoots.Api.Controllers
 
         {
             try { 
-            await _scheduleService.CompelteTask(Id);
+            await _scheduleService.UpdateTheStatus(Id,ScheduleStatus.اكتملت.ToString());
                 return Ok("Compeleted");
             }
             catch (Exception ex) {

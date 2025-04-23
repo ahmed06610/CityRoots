@@ -93,14 +93,13 @@ namespace CityRoots.Core.Services
             var _harvests = new List<HarvestDtoForFarmer>();
 
             foreach (var harvest in harvests)
-            { await CheckStatus(harvest);
+            { 
                 var har = _mapper.Map<HarvestDtoForFarmer>(harvest);
 
-                if (harvest.status == HarvestStatue.تحت_الطلب.ToString())
-                {
+               
                     var x = await GetAllPurchasesRequestForHarvest(harvest.HarvestId);
                     har.Purchases = x.ToList();
-                }
+                
                 if(harvest.Cycle is not null)
                 {
                     har.IsHarvestConnectToCycle=true;

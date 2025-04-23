@@ -25,7 +25,11 @@ namespace CityRoots.Core.Services
         }
         public async Task<InvestmentRequest> CreateInvestmentRequest(CreateInvestmentRequest request,int investorId)
         {
-            var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId, "CycleId", c => c.OpenInvestmentCycle);
+            var cycle = await _unitOfWork.Cycle.FindTWithIncludes<Cycle>(request.CycleId, "CycleId", c => c.OpenInvestmentCycle
+            ,
+            c=>c.LandParcel,
+            c=>c.LandParcel.Farm,
+            c=>c.LandParcel.Farm.Farmer);
             var openCycle = cycle.OpenInvestmentCycle;
             if (openCycle.MinimumInvestment > request.RequestedAmount || openCycle.MaximumInvestment < request.RequestedAmount)
                 throw new Exception("المبلغ المطلوب غير مسموح به. يجب أن يكون بين الحد الأدنى والحد الأقصى للاستثمار.");

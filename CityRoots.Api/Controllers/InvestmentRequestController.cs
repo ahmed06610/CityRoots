@@ -3,10 +3,12 @@ using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.InvestmentRequests;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CityRoots.Api.Controllers
 {
@@ -15,9 +17,14 @@ namespace CityRoots.Api.Controllers
     public class InvestmentRequestController : ControllerBase
     {
         private readonly IInvestmentRequestService _investmentRequestService;
-        public InvestmentRequestController(IInvestmentRequestService investmentRequestService)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly ICycleNotificationService _cycleNotificationService;
+
+        public InvestmentRequestController(IInvestmentRequestService investmentRequestService,IBackgroundJobClient backgroundJobClient, ICycleNotificationService cycleNotificationService)
         {
             _investmentRequestService = investmentRequestService;
+            _backgroundJobClient = backgroundJobClient;
+            _cycleNotificationService = cycleNotificationService;
         }
         [HttpGet("GetAllRequestForCycle/{cycleId}")]
         public async Task<IActionResult> GetAllRequestForCycle(int cycleId)
@@ -80,8 +87,11 @@ namespace CityRoots.Api.Controllers
 
             try
             {
-                await _investmentRequestService.CreateInvestmentRequest(request,investorId.Value);
-                return Ok();
+               var _request= await _investmentRequestService.CreateInvestmentRequest(request,investorId.Value);
+                var farmerId = _request.Cycle.LandParcel.Farm.Farmer.ApplicationUserId;
+                _backgroundJobClient.Enqueue( ()=>
+      _cycleNotificationService.NotifyInvestmentRequestAsync(request.CycleId,farmerId,investorId.Value, request.RequestedAmount));
+                return Ok(request);
 
             }
             catch (Exception ex)
@@ -110,10 +120,16 @@ namespace CityRoots.Api.Controllers
 
         public async Task<IActionResult> ApproveTheRequest(int Id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return Unauthorized();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
             try
             {
-               
-                return Ok(await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مقبول.ToString()));
+                var request = await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مقبول.ToString());
+                _backgroundJobClient.Enqueue(() =>
+                _cycleNotificationService.NotifyInvestorOfInvestmentResponseAsync(request.CycleId, userName, request.InvestorId, InvestmentStatues.مقبول.ToString()));
+                
+                return Ok(request);
             }
             catch (Exception ex)
             {
@@ -125,9 +141,14 @@ namespace CityRoots.Api.Controllers
         [Authorize(Roles="Farmer")]
         public async Task<IActionResult> DeclineTheRequest(int Id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null) return Unauthorized();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
             try
             {
-                await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مرفوض.ToString());
+               var request= await _investmentRequestService.UpdateInvestmentRequest(Id, InvestmentStatues.مرفوض.ToString());
+                _backgroundJobClient.Enqueue(() =>
+               _cycleNotificationService.NotifyInvestorOfInvestmentResponseAsync(request.CycleId, userName, request.InvestorId, InvestmentStatues.مرفوض.ToString()));
                 return Ok();
             }
             catch (Exception ex)

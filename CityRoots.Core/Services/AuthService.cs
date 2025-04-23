@@ -357,7 +357,8 @@ namespace CityRoots.Core.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),     // Username
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),      // Email
-                new Claim("LoggedId",userIdLogged.ToString())              // Id Of the LoggedIn User
+                new Claim("LoggedId",userIdLogged.ToString()),        // Id Of the LoggedIn User
+                 new Claim("NameOfuser",user.Name) //Name of User                                                
             }
             .Union(userClaims)       // Include additional claims from user
             .Union(roleClaims);      // Include role claims
