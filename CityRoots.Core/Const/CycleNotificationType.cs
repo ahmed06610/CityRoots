@@ -12,6 +12,7 @@ namespace CityRoots.Core.Const
         InvestmentGoalMet,       // Investment goal met notification
         InsufficientInvestment,  // Insufficient investment notification
         CycleStarted,            // Cycle start notification
-        CycleEndApproaching      // Cycle end approaching notification
+        CycleEndApproaching,     // Cycle end approaching notification
+        cycleEnded
     }
 }

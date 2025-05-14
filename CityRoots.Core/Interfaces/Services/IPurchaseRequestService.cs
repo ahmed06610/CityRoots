@@ -1,4 +1,5 @@
-﻿using CityRoots.Core.DTOs.Purchaserequest;
+﻿using CityRoots.Core.DTOs.Harvest;
+using CityRoots.Core.DTOs.Purchaserequest;
 using CityRoots.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,6 @@ namespace CityRoots.Core.Interfaces.Services
         Task<PurchaseRequest> GetSpecificRequest(int RequestId);
         Task<PurchaseRequest> CreatePurchaseRequest(CreatePurchaseRrquest purchaseRrquest,int merchantId);
         Task Delete(int RequestId);
-        Task UpdateRequest(int requestId, string status);  
+        Task<HarvestNotificationDto> UpdateRequest(int requestId, string status);  
     }
 }

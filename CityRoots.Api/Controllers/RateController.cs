@@ -1,5 +1,7 @@
 ﻿using CityRoots.Core.DTOs.Rate;
+using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +14,13 @@ namespace CityRoots.Api.Controllers
     public class RateController : ControllerBase
     {
         private readonly IRateService _rateService;
-        public RateController(IRateService rateService)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IRateNotificationService _rateNotificationService;
+        public RateController(IRateService rateService,IBackgroundJobClient backgroundJobClient,IRateNotificationService rateNotificationService)
         {
             _rateService = rateService;
+            _backgroundJobClient = backgroundJobClient;
+            _rateNotificationService = rateNotificationService;
         }
         [HttpPost]
         [Authorize(Roles = "Merchant,Investor")]
@@ -25,11 +31,14 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ModelState);
             var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(userId is null) return Unauthorized();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
+            
 
             try
             {
 
                 await _rateService.MakeTheRating(rateRequest,userId);
+                _backgroundJobClient.Enqueue(() => _rateNotificationService.NotifyOnRating(userName, rateRequest.FarmerId, rateRequest.Rating));
                 return Ok("Added");
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Schedule;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeZoneConverter;
 
 namespace CityRoots.Core.Services
 {
@@ -15,20 +17,26 @@ namespace CityRoots.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper mapper;
+        private static readonly TimeZoneInfo egyptZone = TZConvert.GetTimeZoneInfo("Africa/Cairo");
         public ScheduleService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             this.mapper = mapper;
+
         }
         public async Task<ScheduleDisplayDTO> Add(AddScheduleDto schedule)
         {
             if(schedule is null) throw new ArgumentNullException(nameof(schedule), "Schedule data is required");
             if (schedule.StartDate > schedule.EndDate) throw new Exception("لا يمكن ان يكون موعد بدايه المهمه اكبر من موعد نهايه المهمه");
 
+          var  now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
+
             var addedschedule = mapper.Map<Schedule>(schedule);
-            addedschedule.Status = DateTime.Now < addedschedule.StartDate ? "لم تبدأ" :
-                                   DateTime.Now > addedschedule.EndDate ? "اكتملت" :
-                                                                      "في تقدم";
+            addedschedule.StartDate = TimeZoneInfo.ConvertTimeFromUtc(addedschedule.StartDate, egyptZone);
+            addedschedule.EndDate = TimeZoneInfo.ConvertTimeFromUtc(addedschedule.EndDate, egyptZone);
+            addedschedule.Status = now < addedschedule.StartDate ?ScheduleStatus.لم_تبدأ.ToString() :
+                                   now > addedschedule.EndDate ? ScheduleStatus.اكتملت.ToString() :
+                                                                      ScheduleStatus.في_تقدم.ToString();
             await _unitOfWork.Schedule.AddAsync(addedschedule);
             
             await _unitOfWork.CompleteAsync();
@@ -36,12 +44,12 @@ namespace CityRoots.Core.Services
 
         }
 
-        public async Task CompelteTask(int Id)
+        public async Task UpdateTheStatus(int Id,string Status)
         {
             var schdeule = await _unitOfWork.Schedule.GetByIdAsync(Id);
             if (schdeule is null)
                 throw new Exception($"No Schedules with Id {Id}");
-            schdeule.Status = "اكتملت";
+            schdeule.Status =Status;
             _unitOfWork.Schedule.Update(schdeule);
             await _unitOfWork.CompleteAsync();
         }
@@ -77,11 +85,28 @@ namespace CityRoots.Core.Services
             if (Existingschdeule is null)
                 throw new Exception($"No Schedules with Id {schedule.ScheduleId}");
             if (schedule.StartDate > schedule.EndDate) throw new Exception("لا يمكن ان يكون موعد بدايه المهمه اكبر من موعد نهايه المهمه");
+            var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
+
+
+            schedule.StartDate = TimeZoneInfo.ConvertTimeFromUtc(schedule.StartDate, egyptZone);
+            schedule.EndDate = TimeZoneInfo.ConvertTimeFromUtc(schedule.EndDate, egyptZone);
+
+            if (Existingschdeule.Status == ScheduleStatus.في_تقدم.ToString() || Existingschdeule.Status == ScheduleStatus.اكتملت.ToString())
+            {
+                if (Existingschdeule.StartDate != schedule.StartDate)
+                    throw new Exception("لا يمكن تعديل تاريخ البداية بعد بدء المهمة.");
+
+                if (Existingschdeule.Status == ScheduleStatus.اكتملت.ToString() &&
+                    Existingschdeule.EndDate != schedule.EndDate)
+                    throw new Exception("لا يمكن تعديل تاريخ النهاية بعد اكتمال المهمة.");
+            }
+
 
             mapper.Map(schedule, Existingschdeule);
-            Existingschdeule.Status = DateTime.Now < Existingschdeule.StartDate ? "لم تبدأ" :
-                           DateTime.Now > Existingschdeule.EndDate ? "اكتملت" :
-                                                                              "في تقدم";
+
+            Existingschdeule.Status = now < Existingschdeule.StartDate ? ScheduleStatus.لم_تبدأ.ToString() :
+                                   now > Existingschdeule.EndDate ? ScheduleStatus.اكتملت.ToString() :
+                                                                      ScheduleStatus.في_تقدم.ToString();
 
             _unitOfWork.Schedule.Update(Existingschdeule);
             await _unitOfWork.CompleteAsync();

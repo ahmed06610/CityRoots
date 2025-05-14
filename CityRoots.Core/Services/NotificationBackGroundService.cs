@@ -45,8 +45,8 @@ namespace CityRoots.Core.Services
                
 
                 );
-            foreach (var harvest in HarvestNotify)
-                await _harvestNotificationService.ControlHarvestNotification(harvest.HarvestId);
+            //foreach (var harvest in HarvestNotify)
+            //    await _harvestNotificationService.ControlHarvestNotification(harvest.HarvestId);
             ///////////////////Schedules
             var TaskwNotify = await _unitOfWork.Schedule.FindAllWithIncludes<Schedule>(null,
                 c => c.Cycle,

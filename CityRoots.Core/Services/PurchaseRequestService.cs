@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CityRoots.Core.Const;
+using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.Purchaserequest;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
@@ -40,7 +41,7 @@ namespace CityRoots.Core.Services
             purchaseRequest.RequestStatus = "قيد_الانتظار";
             purchaseRequest.RequestDate = DateTime.Now;
             purchaseRequest.MerchantId = merchantId;
-            purchaseRequest.RequestedPrice=(decimal)Request.RequestedAmount*harvest.Price;
+           // purchaseRequest.RequestedPrice=(decimal)Request.RequestedAmount*harvest.Price;
             await _unitOfWork.Purchase.AddAsync(purchaseRequest);
             await _unitOfWork.CompleteAsync();
             purchaseRequest.Harvest = null;
@@ -89,13 +90,24 @@ namespace CityRoots.Core.Services
             return _mapper.Map<PurchaseRequest>(request);
         }
 
-        public async Task UpdateRequest(int requestId, string status)
+        public async Task<HarvestNotificationDto> UpdateRequest(int requestId, string status)
         {
-            var request = await _unitOfWork.Purchase.GetByIdAsync(requestId);
+            var request = await _unitOfWork.Purchase.FindTWithIncludes<PurchaseRequest>(requestId, "PurchaseRequestId",
+                x=>x.Merchant,
+                x=>x.Harvest,
+                x=>x.Harvest.Crop);
+            
+            
+            
             if (request is null) throw new Exception($"No requests with this Id {requestId}");
+            var _harvest = new HarvestNotificationDto();
+            
             if (status == PurchaseRequestStatus.مقبول.ToString())
             {
-                var harvest = await _unitOfWork.Harvest.GetByIdAsync(request.HarvestId);
+                var harvest = await _unitOfWork.Harvest.FindTWithIncludes<Harvest>(request.HarvestId, "HarvestId",
+                     x=>x.Farmer,
+                     x=>x.Crop
+                     );
 
                 if (harvest.Yield<request.RequestedAmount)
                     throw new Exception("لا يمكنك قبول طلب الشراء، لأن الكمية المطلوبة أكبر من الكمية المتاحة.");
@@ -108,12 +120,17 @@ namespace CityRoots.Core.Services
 
                 }
                 _unitOfWork.Harvest.Update(harvest);
-
-
+                _harvest.status=harvest.status;
+                _harvest.userId=harvest.Farmer.ApplicationUserId;
+               
             }
             request.RequestStatus = status;
             _unitOfWork.Purchase.Update(request);
             await _unitOfWork.CompleteAsync();
+            _harvest.cropName=request.Harvest.Crop.Name;
+            _harvest.merchantId = request.Merchant.ApplicationUserId;
+            _harvest.HarvestId = request.HarvestId;
+            return _harvest;
         }
     }
 }
