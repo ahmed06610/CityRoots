@@ -146,12 +146,7 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest => dest.bio, opt => opt.MapFrom(src => src.FarmerUser.Farmer.Bio))
                 .ForMember(dest=>dest.FarmerId,opt=>opt.MapFrom(src=>src.FarmerId))
                 .ForMember(dest=>dest.ImageProfileUrl,opt=>opt.MapFrom(src=>src.FarmerUser.ImageProfileUrl));
-            CreateMap<Payment, InvestorPaymentReportsDto>()
-                .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
-                .ForMember(dest => dest.CycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
-                .ForMember(dest=>dest.status,opt=>opt.MapFrom(src=>src.Statue))
-                .ForMember(dest=>dest.PayeeEmail,opt=>opt.MapFrom(src=>src.Payee.Email))
-                .ForMember(dest => dest.receiver, opt => opt.MapFrom(src => "مزارع"));
+           
             ;
             CreateMap<InvestmentRequest, InvestmentrequestDisplay>()
                 .ForMember(dest => dest.cycleName, opt => opt.MapFrom(src => src.Cycle.CycleName))
@@ -162,14 +157,36 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest => dest.HarvestName, opt => opt.MapFrom(src => src.Harvest.Crop.Name))
                 .ForMember(dest => dest.FarmerName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name));
             CreateMap<CreatePurchaseRrquest, PurchaseRequest>();
-            CreateMap<Payment, MerchantPaymentReports>()
-              .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
-              .ForMember(dest => dest.HarvestName, opt => opt.MapFrom(src => src.Harvest.Crop.Name))
-              .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.Statue))
-              .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email))
-              .ForMember(dest => dest.receiver, opt => opt.MapFrom(src => "مزارع"));
-            ;
 
+            // Merchant Mappings
+            CreateMap<Payment, MerchantPaymentDetailDto>()
+                .ForMember(dest => dest.PayerName, opt => opt.MapFrom(src => src.Payer.Name))
+                .ForMember(dest => dest.PayerEmail, opt => opt.MapFrom(src => src.Payer.Email))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Statue))
+                .ForMember(dest => dest.AssociatedHarvest, opt => opt.MapFrom(src => new HarvestDto
+                {
+                    HarvestId = src.Harvest.HarvestId,
+                    CropName = src.Harvest.Crop.Name
+                }));
+
+            CreateMap<Payment, PaymentMerchantSummaryDto>()
+                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.PaymentDate.Year))
+                .ForMember(dest => dest.PurchasesPerMonth, opt => opt.Ignore()); // Will be populated manually
+
+            // Investor Mappings
+            CreateMap<Payment, InvestorPaymentDetailDto>()
+                .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
+                .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Statue))
+                .ForMember(dest => dest.AssociatedCycle, opt => opt.MapFrom(src => new CycleDto
+                {
+                    CycleId = src.Cycle.CycleId,
+                    CycleName = src.Cycle.CycleName
+                }));
+
+            CreateMap<Payment, PaymentInvestorSummaryDto>()
+                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.PaymentDate.Year))
+                .ForMember(dest => dest.InvestmentsPerMonth, opt => opt.Ignore()); // Will be populated manually
 
 
 

@@ -27,15 +27,16 @@ namespace CityRoots.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter)
+        public async Task<PaymentResultsDTO> GetPaymentsAsync(PaymentFilterDTO filter)
         {
-            var query =await _unitOfWork.Payment.FindAllWithIncludes<Payment>(p=>(p.PayerId==filter.Id||p.PayeeId==filter.Id),
+            var query = await _unitOfWork.Payment.FindAllWithIncludes<Payment>(
+                p => p.PayerId == filter.Id || p.PayeeId == filter.Id,
                 p => p.Payer,
                 p => p.Payee,
-                 p => p.Cycle,
+                p => p.Cycle,
                 p => p.Harvest,
                 p => p.Harvest.Crop
-                );
+            );
 
             // Apply filters
             if (!string.IsNullOrEmpty(filter.Type))
@@ -50,25 +51,27 @@ namespace CityRoots.Core.Services
             if (filter.EndDate.HasValue)
                 query = query.Where(p => p.PaymentDate <= filter.EndDate.Value);
 
-            /* var payments =  query.Select(p => new PaymentDTO
-                                        {
-                                            PaymentId = p.PaymentId,
-                                            PaymentDate = p.PaymentDate,
-                                            Amount = p.Amount,
-                                            Type = p.Type,
-                                            Payer = p.Payer.Name,
-                                            Payee = p.Payee.Name,
-                                            PaymentMethod = p.PaymentMethod,
-                                            Status = p.Statue
-                                        }).ToList();*/
             var payments = new List<PaymentDetailsDTO>();
+            var summaryDict = new Dictionary<int, (List<decimal> Investments, List<decimal> Purchases)>();
 
             foreach (var payment in query)
             {
-                if (payment == null) return null;
+                if (payment == null) continue;
 
                 AssociatedCycleDTO assoc = null;
                 AssociatedHarvestDTO assoh = null;
+
+                var year = payment.PaymentDate.Year;
+                var month = payment.PaymentDate.Month - 1; // 0-based index
+
+                // Initialize summary data for the year if not exists
+                if (!summaryDict.ContainsKey(year))
+                {
+                    summaryDict[year] = (
+                        Investments: new List<decimal>(new decimal[12]),
+                        Purchases: new List<decimal>(new decimal[12])
+                    );
+                }
 
                 if (payment.Type == PaymentType.Investment.ToString())
                 {
@@ -77,6 +80,9 @@ namespace CityRoots.Core.Services
                         CycleId = payment.Cycle.CycleId,
                         CycleName = payment.Cycle.CycleName,
                     };
+
+                    // Add to investments
+                    summaryDict[year].Investments[month] += payment.Amount;
                 }
                 else
                 {
@@ -85,8 +91,12 @@ namespace CityRoots.Core.Services
                         HarvestId = payment.Harvest.HarvestId,
                         HarvestName = payment.Harvest.Crop.Name,
                     };
+
+                    // Add to purchases
+                    summaryDict[year].Purchases[month] += payment.Amount;
                 }
-                var pay= new PaymentDetailsDTO
+
+                payments.Add(new PaymentDetailsDTO
                 {
                     PaymentId = payment.PaymentId,
                     PaymentDate = payment.PaymentDate,
@@ -100,13 +110,26 @@ namespace CityRoots.Core.Services
                     Status = payment.Statue,
                     AssociatedCycle = assoc,
                     AssociatedHarvest = assoh
-                };
-                payments.Add(pay);
+                });
             }
 
-            return payments;
-        }
+            // Convert the summary dictionary to PaymentSummaryDTO list
+            var paymentsSummary = summaryDict
+                .OrderBy(x => x.Key)
+                .Select(x => new PaymentSummaryDTO
+                {
+                    Year = x.Key,
+                    InvestmentsPerMonth = x.Value.Investments,
+                    PurchasesPerMonth = x.Value.Purchases
+                })
+                .ToList();
 
+            return new PaymentResultsDTO
+            {
+                Payments = payments,
+                PaymentsSummary = paymentsSummary
+            };
+        }
         public async Task<PaymentDetailsDTO> GetPaymentDetailsAsync(int paymentId)
         {
             var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
@@ -171,59 +194,115 @@ namespace CityRoots.Core.Services
                 await _unitOfWork.CommitAsync();  // Save changes to the database
             }
         }
-     //For Investors
-        public async Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync(string userId)
+        //For Investors
+        public async Task<InvestorPaymentReportsResponseDto> GetInvestorPaymentReportsAsync(string userId)
         {
-            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (userId is null)
-            //{
-            //    throw new Exception("User ID not found in token");
-
-            //}
-            var payments = (await _unitOfWork.Payment.FindAllWithIncludes<Payment>(x=>x.PayerId==userId,
-                x=>x.Payee,
-                x=>x.Cycle)).ToList();
-            return _mapper.Map<List<InvestorPaymentReportsDto>>(payments);  
-        }
-
-        public async Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId)
-        {
-            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (userId is null)
-            //{
-            //    throw new Exception("User ID not found in token");
-
-            //}
-            var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
+            // Get all investment payments for the investor
+            var payments = await _unitOfWork.Payment.FindAllWithIncludes<Payment>(
+                x => x.PayerId == userId||x.PayeeId==userId && x.Type == PaymentType.Investment.ToString(),
                 x => x.Payee,
-                x => x.Cycle);
-            //if (payment.Payer.Id != userId)
-            //    throw new Exception("You are not authorized to see this payment");
-            if (payment is null)
-                throw new Exception($"No payments with this Id {paymentId}");
-            return _mapper.Map<InvestorPaymentReportsDto>(payment);
+                x => x.Cycle
+            );
+
+            if (!payments.Any())
+            {
+                return new InvestorPaymentReportsResponseDto
+                {
+                    Payments = new List<InvestorPaymentDetailDto>(),
+                    PaymentsSummary = new List<PaymentInvestorSummaryDto>()
+                };
+            }
+
+            // Group payments by year and month to calculate InvestmentsPerMonth
+            var paymentsByYear = payments
+                .GroupBy(p => p.PaymentDate.Year)
+                .OrderBy(g => g.Key);
+
+            var paymentSummary = new List<PaymentInvestorSummaryDto>();
+
+            foreach (var yearGroup in paymentsByYear)
+            {
+                var year = yearGroup.Key;
+                var investmentsPerMonth = new decimal[12];
+
+                // Fill monthly data
+                foreach (var payment in yearGroup)
+                {
+                    var month = payment.PaymentDate.Month - 1; // 0-based index
+                    investmentsPerMonth[month] += payment.Amount;
+                }
+
+                paymentSummary.Add(new PaymentInvestorSummaryDto
+                {
+                    Year = year,
+                    InvestmentsPerMonth = investmentsPerMonth.ToList(),
+                });
+            }
+
+            // Map the payment details
+            var paymentDetails = _mapper.Map<List<InvestorPaymentDetailDto>>(payments);
+
+            return new InvestorPaymentReportsResponseDto
+            {
+                Payments = paymentDetails,
+                PaymentsSummary = paymentSummary
+            };
         }
 
-        public async Task<List<MerchantPaymentReports>> GetMerchantPaymentReports(string userId)
+
+        public async Task<MerchantPaymentReportsDto> GetMerchantPaymentReports(string userId)
         {
-            var payments = (await _unitOfWork.Payment.FindAllWithIncludes<Payment>(x => x.PayerId == userId,
-                        x => x.Payee,
-                        x => x.Harvest,
-                       x=>x.Harvest.Crop)).ToList();
+            // Get all merchant payments (purchases)
+            var payments = await _unitOfWork.Payment.FindAllWithIncludes<Payment>(
+                x => x.PayerId == userId || x.PayeeId == userId && x.Type == PaymentType.Purchase.ToString(),
+                x => x.Payer,  // The buyer in this case
+                x => x.Harvest,
+                x => x.Harvest.Crop
+            );
 
-            return _mapper.Map<List<MerchantPaymentReports>>(payments);
-        }
+            if (!payments.Any())
+            {
+                return new MerchantPaymentReportsDto
+                {
+                    Payments = new List<MerchantPaymentDetailDto>(),
+                    PaymentsSummary = new List<PaymentMerchantSummaryDto>()
+                };
+            }
 
-        public async  Task<MerchantPaymentReports> GetMerchantPaymentReportDetails(int paymentId)
-        {
-            var payment = await _unitOfWork.Payment.FindTWithIncludes<Payment>(paymentId, "PaymentId",
-               x => x.Payee,
-               x => x.Harvest,
-               x=>x.Harvest.Crop);
-            if (payment is null)
-                throw new Exception($"No payments with this Id {paymentId}");
-            return _mapper.Map<MerchantPaymentReports>(payment);
+            // Group payments by year and month to calculate PurchasesPerMonth
+            var paymentsByYear = payments
+                .GroupBy(p => p.PaymentDate.Year)
+                .OrderBy(g => g.Key);
 
+            var paymentSummary = new List<PaymentMerchantSummaryDto>();
+
+            foreach (var yearGroup in paymentsByYear)
+            {
+                var year = yearGroup.Key;
+                var purchasesPerMonth = new decimal[12];
+
+                // Fill monthly data
+                foreach (var payment in yearGroup)
+                {
+                    var month = payment.PaymentDate.Month - 1; // 0-based index
+                    purchasesPerMonth[month] += payment.Amount;
+                }
+
+                paymentSummary.Add(new PaymentMerchantSummaryDto
+                {
+                    Year = year,
+                    PurchasesPerMonth = purchasesPerMonth.ToList()
+                });
+            }
+
+            // Map the payment details
+            var paymentDetails = _mapper.Map<List<MerchantPaymentDetailDto>>(payments);
+
+            return new MerchantPaymentReportsDto
+            {
+                Payments = paymentDetails,
+                PaymentsSummary = paymentSummary
+            };
         }
     }
 }

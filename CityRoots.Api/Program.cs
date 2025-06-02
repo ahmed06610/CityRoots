@@ -186,7 +186,9 @@ namespace CityRoots.Api
                 {
                     policy.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // <--- THIS IS THE FIX
+
                 });
             });
 
@@ -221,7 +223,7 @@ namespace CityRoots.Api
                 var services = scope.ServiceProvider;
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var Context = services.GetRequiredService<ApplicationDbContext>();
-                await SeedRolesAsync(roleManager);
+               // await SeedRolesAsync(roleManager);
             }
 
             // Middleware Configuration

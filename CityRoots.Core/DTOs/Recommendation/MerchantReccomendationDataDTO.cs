@@ -28,7 +28,7 @@ namespace CityRoots.Core.DTOs.Recommendation
 
     public class VisitedHarvestsDTO
     {
-        public int HarvestId { get; set; } // Matches "harvestId" in JSON
+        public int CycleId { get; set; } // Matches "harvestId" in JSON
     }
 
     public class HarvestReco

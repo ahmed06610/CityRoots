@@ -54,20 +54,7 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetInvesstorPaymentDetails/{PaymentId}")]
-        [Authorize(Roles = "Investor")]
-
-        public async Task<IActionResult> GetInvesstorPaymentDetails(int PaymentId)
-        {
-            try
-            {
-                return Ok(await _paymentService.GetInvestorPaymentReportDetails(PaymentId));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+      
         [HttpGet("GetMerchantPayments")]
         [Authorize(Roles = "Merchant")]
 
@@ -85,20 +72,7 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetMerchantPaymentDetails/{PaymentId}")]
-        [Authorize(Roles = "Merchant")]
-
-        public async Task<IActionResult> GetMerchantPaymentDetails(int PaymentId)
-        {
-            try
-            {
-                return Ok(await _paymentService.GetMerchantPaymentReportDetails(PaymentId));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+       
 
     }
 }

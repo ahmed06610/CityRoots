@@ -36,12 +36,12 @@ namespace CityRoots.Api.Controllers
         [HttpGet("GetAllCycleasOfFarmerId")]
         [Authorize(Roles = "Farmer")]
 
-        public async Task<IActionResult> GetAllCycles(bool ForFarmer = true)
+        public async Task<IActionResult> GetAllCyclesForFarmer()
         {
             var FarmerId = User.GetLoggedInId();
             if (FarmerId is null)
                 return Unauthorized();
-            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId.Value, ForFarmer);
+            var cycles = await _cycleService.GetAllCyclesForFarmersAsync(FarmerId.Value, true);
             if (cycles == null || cycles.Count <= 0)
                 return NotFound();
             return Ok(cycles);
@@ -49,7 +49,7 @@ namespace CityRoots.Api.Controllers
         [HttpGet("BrowsingCycleasForInvestors")]
         [Authorize(Roles = "Investor")]
 
-        public async Task<IActionResult> GetAllCycles()
+        public async Task<IActionResult> GetAllCyclesForInvestor()
         {
             var cycles = await _cycleService.GetAllCyclesForInvestorsAsync();
             if (cycles == null || cycles.Count <= 0)

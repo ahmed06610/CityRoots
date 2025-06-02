@@ -17,8 +17,7 @@ namespace CityRoots.Core.DTOs.Harvest
         [Required]
         public decimal Price{get; set;}
        
-        [Required]
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         [Required]
         public DateTime ProductionDate { get; set; }
         [Required]

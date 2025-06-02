@@ -10,6 +10,7 @@ namespace CityRoots.Core.Const
     {
 
         متاح,
-      منتهي
+      منتهي,
+      تحت_الطلب
     }
 }

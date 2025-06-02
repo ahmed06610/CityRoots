@@ -6,19 +6,34 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.DTOs.Payment
 {
-    public class MerchantPaymentReports
+    public class MerchantPaymentReportsDto
     {
-        public int paymentId { get; set; }
-        public DateTime Date { get; set; }
-        public decimal amount { get; set; }
-        public string Type { get; set; }
-        public string HarvestName { get; set; }
-        public string PayeeName { get; set; }
-        public string PayeeEmail { get; set; }
-        public string PaymentMethod { get; set; }
-        public string status { get; set; }
-        public string receiver { get; set; }
+        public List<MerchantPaymentDetailDto> Payments { get; set; }
+        public List<PaymentMerchantSummaryDto> PaymentsSummary { get; set; }
+    }
 
-        public string PayPalOrderId { get; set; }
+    public class MerchantPaymentDetailDto
+    {
+        public int PaymentId { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public decimal Amount { get; set; }
+        public string Type { get; set; }
+        public string PayerName { get; set; }  // Buyer name
+        public string PayerEmail { get; set; } // Buyer email
+        public string PaymentMethod { get; set; }
+        public string Status { get; set; }
+        public HarvestDto AssociatedHarvest { get; set; }
+    }
+
+    public class HarvestDto
+    {
+        public int HarvestId { get; set; }
+        public string CropName { get; set; }
+    }
+
+    public class PaymentMerchantSummaryDto
+    {
+        public int Year { get; set; }
+        public List<decimal> PurchasesPerMonth { get; set; } = new List<decimal>();
     }
 }

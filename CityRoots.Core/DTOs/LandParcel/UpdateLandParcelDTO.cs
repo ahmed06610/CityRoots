@@ -15,9 +15,9 @@ namespace CityRoots.Core.DTOs.LandParcel
         [Required]
         public int FarmId { get; set; }
 
-        public string ParcelName { get; set; }
+        public string? ParcelName { get; set; }
 
-        public IFormFile Image { get; set; } // Accept image file for updates
+        public IFormFile? Image { get; set; } // Accept image file for updates
     }
 
 }

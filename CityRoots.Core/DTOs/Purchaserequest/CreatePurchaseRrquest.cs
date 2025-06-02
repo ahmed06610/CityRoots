@@ -14,7 +14,7 @@ namespace CityRoots.Core.DTOs.Purchaserequest
         [Range(0.01, double.MaxValue)]
 
         public double RequestedAmount { get; set; }
+        public decimal RequestedPrice { get; set; }
     
-        public string Notes { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace CityRoots.Core.Services
             {
                 throw new Exception($"No harvests Wit this Id {Request.HarvestId}");
             }
-            if (harvest.status != HarvestStatus.متاح.ToString())
+            if (harvest.status == HarvestStatus.منتهي.ToString())
                 throw new Exception("لاتسطيع ارسال طلب شراء للمحصول لانه بالفعل انتهي");
             //if (harvest.Price < purchaseRrquest.RequestedPrice)
             //    throw new Exception("لا يمكنك إرسال طلب الشراء، لأن السعر المحدد للمحصول غير صالح أو أقل من السعر المطلوب.");
@@ -40,7 +40,8 @@ namespace CityRoots.Core.Services
             purchaseRequest.RequestStatus = "قيد_الانتظار";
             purchaseRequest.RequestDate = DateTime.Now;
             purchaseRequest.MerchantId = merchantId;
-            purchaseRequest.RequestedPrice=(decimal)Request.RequestedAmount*harvest.Price;
+            purchaseRequest.RequestedPrice=(decimal)Request.RequestedPrice;
+            purchaseRequest.RequestedAmount=Request.RequestedAmount;
             await _unitOfWork.Purchase.AddAsync(purchaseRequest);
             await _unitOfWork.CompleteAsync();
             purchaseRequest.Harvest = null;

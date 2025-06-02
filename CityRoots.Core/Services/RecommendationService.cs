@@ -75,14 +75,14 @@ namespace CityRoots.Core.Services
         public async Task<List<FavoriteFarmersDTO>> GetFavoriteFarmersAsync(int investorId)
         {
             var id = (await _unitOfWork.Investor.GetByIdAsync(investorId)).ApplicationUserId;
-            var farmers = await _unitOfWork.FavoriteFarmers.FindAllAsync(f => f.userId == id);
+            var farmers = await _unitOfWork.FavoriteFarmers.FindAllWithIncludes<FavoriteFarmers>(f => f.userId == id,fv=>fv.FarmerUser);
             var favoritefarmers = new List<FavoriteFarmersDTO>();
             foreach (var item in farmers)
             {
-                var info = await _farmerService.GetFarmerInfo((await _unitOfWork.Farmer.GetByAppUserIdAsync(item.FarmerId)).FarmerId);
+                var info = (await _unitOfWork.Farmer.GetByAppUserIdAsync(item.FarmerId)).FarmerId;
                 var x = new FavoriteFarmersDTO
                 {
-                    FarmerId = info.FarmerId,
+                    FarmerId = info,
                 };
                 favoritefarmers.Add(x);
             }
@@ -139,7 +139,7 @@ namespace CityRoots.Core.Services
             {
                 var v = new VisitedHarvestsDTO
                 {
-                    HarvestId = visit.HarvestId,
+                    CycleId = visit.HarvestId,
                 };
                 visited.Add(v);
             }
@@ -243,7 +243,6 @@ namespace CityRoots.Core.Services
                     VisitedHarvests = visitedHarvests
                 }
             };
-
 
             // Serialize the RecommendationDataDTO to JSON
             var jsonContent = new StringContent(JsonSerializer.Serialize(recommendationData, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }), Encoding.UTF8, "application/json");

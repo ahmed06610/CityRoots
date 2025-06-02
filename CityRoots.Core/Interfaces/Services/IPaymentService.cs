@@ -9,13 +9,10 @@ namespace CityRoots.Core.Interfaces.Services
 {
     public interface IPaymentService
     {
-        Task<List<PaymentDetailsDTO>> GetPaymentsAsync(PaymentFilterDTO filter);
+        Task<PaymentResultsDTO> GetPaymentsAsync(PaymentFilterDTO filter);
         Task<PaymentDetailsDTO> GetPaymentDetailsAsync(int paymentId);
         Task DeletePaymentsByCycleIdAsync(int cycleId);
-        Task<List<InvestorPaymentReportsDto>> GetInvestorPaymentReportsAsync(string userId);
-        Task<InvestorPaymentReportsDto> GetInvestorPaymentReportDetails(int paymentId);
-        Task<List<MerchantPaymentReports>> GetMerchantPaymentReports(string userId);
-        Task<MerchantPaymentReports> GetMerchantPaymentReportDetails(int paymentId);
-
+        Task<InvestorPaymentReportsResponseDto> GetInvestorPaymentReportsAsync(string userId);
+        Task<MerchantPaymentReportsDto> GetMerchantPaymentReports(string userId);
     }
 }

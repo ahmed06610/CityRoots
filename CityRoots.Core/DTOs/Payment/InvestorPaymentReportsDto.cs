@@ -6,19 +6,34 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.DTOs.Payment
 {
-    public class InvestorPaymentReportsDto
+    public class InvestorPaymentReportsResponseDto
     {
-        public int paymentId {  get; set; }
-        public DateTime Date {  get; set; }
-        public decimal amount {  get; set; }
-        public string Type { get; set; }
-        public string CycleName {  get; set; }
-        public string PayeeName {  get; set; }
-        public string PayeeEmail {  get; set; }
-        public string PaymentMethod{  get; set; }
-        public string status {  get; set; }
-        public string receiver { get; set; }
-        public string PayPalOrderId { get; set; }
+        public List<InvestorPaymentDetailDto> Payments { get; set; }
+        public List<PaymentInvestorSummaryDto> PaymentsSummary { get; set; }
+    }
 
+    public class InvestorPaymentDetailDto
+    {
+        public int PaymentId { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public decimal Amount { get; set; }
+        public string Type { get; set; }
+        public string PayeeName { get; set; }
+        public string PayeeEmail { get; set; }
+        public string PaymentMethod { get; set; }
+        public string Status { get; set; }
+        public CycleDto AssociatedCycle { get; set; }
+    }
+
+    public class CycleDto
+    {
+        public int CycleId { get; set; }
+        public string CycleName { get; set; }
+    }
+
+    public class PaymentInvestorSummaryDto
+    {
+        public int Year { get; set; }
+        public List<decimal> InvestmentsPerMonth { get; set; } = new List<decimal>();
     }
 }

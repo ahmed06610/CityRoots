@@ -42,6 +42,7 @@ namespace CityRoots.Core.Services
                 Rate = ratings.Count() != 0 ? (int)ratings.Average(r => r.Rating) : 0,
                 Bio = farmer.Bio,
                 ImageUrl=user.ImageProfileUrl,
+                UserId=user.Id
             };
             return info;
         }

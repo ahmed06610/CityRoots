@@ -26,4 +26,19 @@
         public int HarvestId { get; set; }
         public string HarvestName { get; set; }
     }
+
+    public class PaymentSummaryDTO
+    {
+        public int Year { get; set; }
+        public List<decimal> InvestmentsPerMonth { get; set; } = new List<decimal>(new decimal[12]); // initialize with 12 months
+        public List<decimal> PurchasesPerMonth { get; set; } = new List<decimal>(new decimal[12]);
+
+    }
+
+    public class PaymentResultsDTO
+    {
+        public List<PaymentDetailsDTO> Payments { get; set; }
+        public List<PaymentSummaryDTO> PaymentsSummary { get; set; }
+    }
+
 }
