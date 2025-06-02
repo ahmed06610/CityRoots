@@ -15,6 +15,7 @@ namespace CityRoots.Core.DTOs.Purchaserequest
 
         public double RequestedAmount { get; set; }
         public decimal RequestedPrice { get; set; }
+
     
     }
 }

@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace CityRoots.Core.Const
 {
-    enum NotificationsTypes
+    public enum ScheduleStatus
     {
-        CycleNotification,
-        SchudleNotification,
-        HarvestNotification,
-        RateNotification
+        لم_تبدأ,
+        في_تقدم,
+        اكتملت
 
     }
 }

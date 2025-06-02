@@ -2,6 +2,8 @@
 using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Purchaserequest;
 using CityRoots.Core.Interfaces.Services;
+using CityRoots.Core.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +15,13 @@ namespace CityRoots.Api.Controllers
     public class PurchaseRequestController : ControllerBase
     {
         private readonly IPurchaseRequestService _purchaseRequestService;
-        public PurchaseRequestController(IPurchaseRequestService purchaseRequestService)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IHarvestNotificationService _harvestNotificationService;
+        public PurchaseRequestController(IPurchaseRequestService purchaseRequestService,IBackgroundJobClient backgroundJobClient, IHarvestNotificationService harvestNotificationService)
         {
             _purchaseRequestService = purchaseRequestService;
+            _backgroundJobClient = backgroundJobClient;
+            _harvestNotificationService = harvestNotificationService;
         }
         [HttpGet("GetAllRequestsForHarvest/{harvestId}")]
         [Authorize(Roles = "Farmer")]
@@ -68,7 +74,7 @@ namespace CityRoots.Api.Controllers
         [HttpPost]
         [Authorize(Roles = "Merchant")]
 
-        public async Task<IActionResult> CreatePurchaseRrquest(CreatePurchaseRrquest request)
+        public async Task<IActionResult> CreatePurchaseRequest(CreatePurchaseRrquest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -76,7 +82,10 @@ namespace CityRoots.Api.Controllers
             if (merchantId is null) return Unauthorized();
             try
             {
-                return Ok(await _purchaseRequestService.CreatePurchaseRequest(request,merchantId.Value));
+                var _request = await _purchaseRequestService.CreatePurchaseRequest(request, merchantId.Value);
+                _backgroundJobClient.Enqueue(()=>
+                _harvestNotificationService.notifyOnPurchaseRequest(_request.HarvestId,merchantId.Value,_request));
+                return Ok(_request);
 
             }
             catch (Exception ex)
@@ -105,9 +114,19 @@ namespace CityRoots.Api.Controllers
 
         public async Task<IActionResult> ApproveTheRequest(int Id)
         {
+            var userName = User?.FindFirst("NameOfuser")?.Value;
+            if (userName is null) return Unauthorized();
+
             try
             {
-                await _purchaseRequestService.UpdateRequest(Id, PurchaseRequestStatus.مقبول.ToString());
+               var harvest= await _purchaseRequestService.UpdateRequest(Id, PurchaseRequestStatus.مقبول.ToString());
+
+
+                _backgroundJobClient.Enqueue(() =>
+                _harvestNotificationService.NotifyMerchantOfpurchaseResponseAsync(userName, harvest, PurchaseRequestStatus.مقبول.ToString()));
+                if(harvest.status==HarvestStatus.منتهي.ToString())
+                    _backgroundJobClient.Enqueue(() =>
+                _harvestNotificationService.NotifyFinishedYield(harvest));
 
                 return Ok("Approved");
             }
@@ -122,9 +141,13 @@ namespace CityRoots.Api.Controllers
 
         public async Task<IActionResult> DeclineTheRequest(int Id)
         {
+            var userName = User?.FindFirst("NameOfuser")?.Value;
+            if (userName is null) return Unauthorized();
             try
             {
-                await _purchaseRequestService.UpdateRequest(Id, PurchaseRequestStatus.مرفوض.ToString());
+               var harvest= await _purchaseRequestService.UpdateRequest(Id, PurchaseRequestStatus.مرفوض.ToString());
+                _backgroundJobClient.Enqueue(() =>
+               _harvestNotificationService.NotifyMerchantOfpurchaseResponseAsync(userName, harvest, PurchaseRequestStatus.مرفوض.ToString()));
                 return Ok("Declined");
             }
             catch (Exception ex)

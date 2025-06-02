@@ -1,5 +1,7 @@
 ﻿using CityRoots.Core.DTOs.Chat;
+using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +15,14 @@ namespace CityRoots.Api.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
+        private readonly IChatNotificationService _chatNotificationService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public ChatController(IChatService chatService)
+        public ChatController(IChatService chatService,IChatNotificationService chatNotificationService,IBackgroundJobClient backgroundJobClient)
         {
             _chatService = chatService;
+            _backgroundJobClient = backgroundJobClient;
+            _chatNotificationService=chatNotificationService;
         }
 
         [HttpPost("send")]
@@ -25,8 +31,11 @@ namespace CityRoots.Api.Controllers
             var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (senderId == null)
                 return Unauthorized();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
 
             await _chatService.SendMessageAsync(senderId, model.ReceiverId, model.Message);
+            _backgroundJobClient.Enqueue(() =>
+            _chatNotificationService.NotifyTheUserAboutNewMessage(model.ReceiverId,userName));
             return Ok(new { Message = "Message sent successfully." });
         }
 

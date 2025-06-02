@@ -14,6 +14,6 @@ namespace CityRoots.Core.Interfaces.Services
         Task<ScheduleDisplayDTO> Add(AddScheduleDto schedule);
         Task<ScheduleDisplayDTO> update(UpdateScheduleDTO schedule);
         Task Delete(int Id);
-        Task CompelteTask(int Id);
+        Task UpdateTheStatus(int Id,string status);
     }
 }

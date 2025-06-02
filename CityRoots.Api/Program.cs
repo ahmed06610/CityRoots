@@ -19,6 +19,7 @@ using CityRoots.Core.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Text.Json.Serialization;
 
 namespace CityRoots.Api
 {
@@ -59,6 +60,10 @@ namespace CityRoots.Api
             .AddUserValidator<CustomUserValidator<ApplicationUser>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+            //builder.Services.AddControllers().AddJsonOptions(options =>
+            // {
+            //     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            // });
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -137,6 +142,9 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
             builder.Services.AddScoped<IFavouriteFarmersService, FavouriteFarmersService>();
             builder.Services.AddScoped<PayPalService>();
+            builder.Services.AddScoped<IRateNotificationService, RateNotificationService>();
+            builder.Services.AddScoped<IFavoriteFarmerNotificationService,FavoriteFarmerNotificationService>();
+            builder.Services.AddScoped<IChatNotificationService, ChatNotificationService>();
 
             builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
             builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
@@ -247,6 +255,7 @@ namespace CityRoots.Api
 
             // Register SignalR Hubs
             app.MapHub<ChatHub>("/ChatHub");
+            app.MapHub<NotificationHub>("/NotificationHub");
 
             app.MapControllers();
             app.Run();

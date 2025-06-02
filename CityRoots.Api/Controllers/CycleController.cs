@@ -2,6 +2,7 @@
 using CityRoots.Core.DTOs.Cycle;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,13 @@ namespace CityRoots.Api.Controllers
     public class CycleController : ControllerBase
     {
         private readonly ICycleService _cycleService;
-
-        public CycleController(ICycleService cycleService)
+        private readonly ICycleNotificationService _cycleNotificationService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        public CycleController(ICycleService cycleService, IBackgroundJobClient backgroundJobClient, ICycleNotificationService cycleNotificationService)
         {
             _cycleService = cycleService;
+            _backgroundJobClient = backgroundJobClient;
+            _cycleNotificationService = cycleNotificationService;
         }
         [HttpGet("GetAllOpenCyclesOfFarmer")]
         [Authorize(Roles = "Farmer")]
@@ -119,6 +123,10 @@ namespace CityRoots.Api.Controllers
 
             var updatedCycle = await _cycleService.UpdateCycleAsync(updateCycleDto);
             if (updatedCycle == null) return NotFound();
+            var userName = User?.FindFirst("NameOfuser")?.Value;
+            if (userName is null) return Unauthorized();
+            _backgroundJobClient.Enqueue(() =>
+            _cycleNotificationService.NotifyInvestorOnUpdateOncycle(updateCycleDto.CycleId,userName));
 
             return Ok(updatedCycle);
         }
