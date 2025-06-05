@@ -9,7 +9,7 @@ namespace CityRoots.Core.Models
 {
     public interface IChatService
     {
-        Task SendMessageAsync(string senderId, string receiverId, string message);
+        Task SendMessageAsync(string senderId, string receiverId, string messageContent); // Renamed 'message' to 'messageContent'
         Task<List<Chat>> GetChatMessagesAsync(string senderId, string receiverId);
         Task<List<ChatUserDTO>> GetChatUsersAsync(string userId);
         Task MarkMessagesAsReadAsync(string senderId, string receiverId);

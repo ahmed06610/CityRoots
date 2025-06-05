@@ -14,6 +14,7 @@ namespace CityRoots.EF
         public ICropRepository Crop { get; private set; }
         public ICycleRepository Cycle { get; private set; }
         public IChatRepository Chat { get; private set; }
+        public IUserConnectionRepository UserConnection { get; private set; }
         public ICycleUpdateRepository CycleUpdate { get; private set; }
         public IFarmerRepository Farmer { get; private set; }
         public IFarmRepository Farm { get; private set; }
@@ -43,6 +44,7 @@ namespace CityRoots.EF
             Crop = new CropRepository(context);
             Cycle = new CycleRepository(context);
             Chat = new ChatRepository(context);
+            UserConnection = new UserConnectionRepository(context);
             CycleUpdate = new CycleUpdateRepository(context);
             Farmer = new FarmerRepository(context);
             Farm = new FarmRepository(context);

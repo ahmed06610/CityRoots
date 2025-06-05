@@ -4,12 +4,12 @@ using CityRoots.EF.Data;
 
 namespace CityRoots.EF.Repositories
 {
-    public class ChatRepository : BaseRepository<Chat>, IChatRepository
+    public class UserConnectionRepository : BaseRepository<UserConnection>, IUserConnectionRepository
     {
         private readonly ApplicationDbContext _context;
-        public ChatRepository(ApplicationDbContext context) : base(context)
+        public UserConnectionRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
         }
-    } 
+    }
 }

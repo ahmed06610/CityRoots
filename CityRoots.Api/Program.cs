@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Text.Json.Serialization;
+using CityRoots.EF.Repositories;
 
 namespace CityRoots.Api
 {
@@ -135,6 +136,7 @@ namespace CityRoots.Api
             builder.Services.AddScoped<IRateService, RateService>();
             builder.Services.AddScoped<InteractionsService, InteractionsService>();
             builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<IUserConnectionRepository, UserConnectionRepository>();
 
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();

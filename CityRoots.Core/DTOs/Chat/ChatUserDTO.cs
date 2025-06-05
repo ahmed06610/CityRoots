@@ -14,6 +14,6 @@ namespace CityRoots.Core.DTOs.Chat
         public string LastMessage { get; set; }
         public int UnreadMessages { get; set; }
         public bool IsOnline { get; set; }
-        public DateTime DateTimeOfLastMessage { get; set; }
+        public DateTime? DateTimeOfLastMessage { get; set; }
     }
 }

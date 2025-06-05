@@ -41,11 +41,19 @@ namespace CityRoots.EF.Data
         public DbSet<InteractionOfMerchant> interactionOfMerchants { get; set; }
         public DbSet<FavoriteFarmers> favoriteFarmers { get; set; }
         public DbSet<Rate> Rates { get; set; }
+        public DbSet<UserConnection> UserConnections { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserConnection>()
+           .HasIndex(uc => uc.ConnectionId)
+           .IsUnique();
+
+            modelBuilder.Entity<UserConnection>()
+                .HasIndex(uc => uc.UserId);
 
             // Configure entity relationships and constraints
 

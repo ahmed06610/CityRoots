@@ -12,6 +12,7 @@ namespace CityRoots.Core.Interfaces
     public interface IUnitOfWork
     {
         IChatRepository Chat { get; }
+        IUserConnectionRepository UserConnection { get; }
         ICropRepository Crop { get; }
         ICycleRepository Cycle { get; }
         ICycleUpdateRepository CycleUpdate { get; }
