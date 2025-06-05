@@ -38,7 +38,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(farmerId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == farmerId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            //    await _hubContext.Clients.User(farmerId).SendAsync("ReceiveNotification", notification);
         }
 
     }

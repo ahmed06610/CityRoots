@@ -146,7 +146,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+          //  await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
 
         }
 
@@ -163,7 +173,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            // await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
 
         }
 
@@ -181,7 +201,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            //await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
 
         }
 
@@ -198,7 +228,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+           // await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
 
         }
 
@@ -216,7 +256,17 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+           // await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
 
         }
 
@@ -240,8 +290,17 @@ namespace CityRoots.Core.Services
 
             };
             await _notificationService.CreateNotificationAsync(notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
 
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+
 
 
         }
@@ -258,8 +317,16 @@ namespace CityRoots.Core.Services
             };
 
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userId);
 
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
         }
 
         public async Task NotifyInvestorOnCyclesUpdates(int cycleId, string farmerName)
@@ -286,7 +353,16 @@ namespace CityRoots.Core.Services
 
                 };
                 await _notificationService.CreateNotificationAsync(notification);
-                await _hubContext.Clients.User(investor.ApplicationUserId).SendAsync("ReceiveNotification", notification);
+                var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == investor.ApplicationUserId);
+
+                if (connections.Any())
+                {
+                    foreach (var conn in connections)
+                    {
+                        await _hubContext.Clients.Client(conn.ConnectionId)
+                            .SendAsync("ReceiveNotification", notification);
+                    }
+                }
 
             }
 
@@ -313,13 +389,25 @@ namespace CityRoots.Core.Services
                     Content = content
 
                 };
-                await _notificationService.CreateNotificationAsync(notification);
-                await _hubContext.Clients.User(investor.ApplicationUserId).SendAsync("ReceiveNotification", notification);
+                await _notificationService.CreateNotificationAsync(notification); 
+                var connections = await _unitOfWork.UserConnection.FindAllAsync(x=>x.UserId== investor.ApplicationUserId);
+
+                if (connections.Any())
+                {
+                    foreach (var conn in connections)
+                    {
+                        await _hubContext.Clients.Client(conn.ConnectionId)
+                            .SendAsync("ReceiveNotification", notification);
+                    }
+                }
+
+
 
             }
 
 
         }
         
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.Notification;
 using CityRoots.Core.Hubs;
+using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -14,11 +15,12 @@ namespace CityRoots.Core.Services
     {
         private readonly INotificationService _notificationService;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public FavoriteFarmerNotificationService(IHubContext<NotificationHub> hubContext,INotificationService notificationService)
+        private readonly IUnitOfWork _unitOfwork;
+        public FavoriteFarmerNotificationService(IHubContext<NotificationHub> hubContext,INotificationService notificationService,IUnitOfWork unitOfWork)
         {
             _hubContext = hubContext;
             _notificationService = notificationService;
-
+            _unitOfwork=unitOfWork;
             
         }
 
@@ -32,7 +34,17 @@ namespace CityRoots.Core.Services
                 Type = "FavoriteFarmer"
             };
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(farmerId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfwork.UserConnection.FindAllAsync(x => x.UserId == farmerId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+           // await _hubContext.Clients.User(farmerId).SendAsync("ReceiveNotification", notification);
 
         }
     }

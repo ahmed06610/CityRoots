@@ -93,7 +93,17 @@ namespace CityRoots.Core.Services
             };
             await _scheduleService.UpdateTheStatus(scheduleId, ScheduleStatus.اكتملت.ToString());
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userid);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+          //  await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
 
 
         }
@@ -115,7 +125,17 @@ namespace CityRoots.Core.Services
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userid);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+           // await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
 
 
 
@@ -137,7 +157,17 @@ namespace CityRoots.Core.Services
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userid);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            //  await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
 
 
         }
@@ -161,7 +191,17 @@ namespace CityRoots.Core.Services
             await _scheduleService.UpdateTheStatus(scheduleId, ScheduleStatus.في_تقدم.ToString());
             
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == userid);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            //await _hubContext.Clients.User(userid).SendAsync("ReceiveNotification", notification);
 
 
 
