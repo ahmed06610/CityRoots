@@ -1,44 +1,52 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CityRoots.Core.Interfaces;
+using CityRoots.Core.Models;
+using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace CityRoots.Core.Hubs
 {
-    public class NotificationHub:Hub
+    public class NotificationHub : Hub
     {
-        private static readonly ConcurrentDictionary<string, HashSet<string>> OnlineUsers =
-            new ConcurrentDictionary<string, HashSet<string>>();
-        public override Task OnConnectedAsync()
+        private readonly IUnitOfWork _unitOfWork;
+
+        public NotificationHub(IUnitOfWork unitOfWork)
         {
-            var userId = Context.User?.FindFirst("sub")?.Value;
-            if (!string.IsNullOrEmpty(userId))
-            {
-                OnlineUsers.AddOrUpdate(userId,
-                    new HashSet<string> { Context.ConnectionId },
-                    (key, oldValue) => { oldValue.Add(Context.ConnectionId); return oldValue; });
-            }
-            return base.OnConnectedAsync();
-            
+            _unitOfWork = unitOfWork;
         }
-        public override Task OnDisconnectedAsync(Exception exception)
+
+        public override async Task OnConnectedAsync()
         {
-            var userId = Context.User?.FindFirst("sub")?.Value;
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (!string.IsNullOrEmpty(userId))
             {
-                if (OnlineUsers.TryGetValue(userId,out var connections))
+                var connection = new UserConnection
                 {
-                    connections.Remove(Context.ConnectionId);
-                    if (connections.Count == 0)
-                        OnlineUsers.TryRemove(userId, out _);
-                }
+                    UserId = userId,
+                    ConnectionId = Context.ConnectionId,
+                    ConnectedAt = DateTime.UtcNow,
+                    UserAgent = "unknown"
+                };
+
+               await _unitOfWork.UserConnection.AddAsync(connection);
+                await _unitOfWork.CompleteAsync();
             }
 
-            return base.OnDisconnectedAsync(exception);
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var connectionId = Context.ConnectionId;
+            var connection = await _unitOfWork.UserConnection.FindTWithExpression<UserConnection>(x=>x.ConnectionId==connectionId);
+
+            if (connection != null)
+            {
+                await _unitOfWork.UserConnection.DeleteAsync(connection);
+                await _unitOfWork.CompleteAsync();
+            }
+
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }
-

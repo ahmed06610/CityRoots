@@ -1,5 +1,6 @@
 ﻿using CityRoots.Core.DTOs.Notification;
 using CityRoots.Core.Hubs;
+using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using Microsoft.AspNetCore.SignalR;
 using Org.BouncyCastle.Tls;
@@ -15,10 +16,12 @@ namespace CityRoots.Core.Services
     {
         private readonly INotificationService _notificationService;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public ChatNotificationService(IHubContext<NotificationHub> hubContext, INotificationService notificationService)
+        private readonly IUnitOfWork _unitOfWork;
+        public ChatNotificationService(IHubContext<NotificationHub> hubContext, INotificationService notificationService, IUnitOfWork unitOfWork)
         {
             _hubContext = hubContext;
             _notificationService = notificationService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task NotifyTheUserAboutNewMessage(string ReciverId, string senderName)
@@ -32,7 +35,17 @@ namespace CityRoots.Core.Services
 
             };
             await _notificationService.CreateNotificationAsync(notification);
-            await _hubContext.Clients.User(ReciverId).SendAsync("ReceiveNotification", notification);
+            var connections = await _unitOfWork.UserConnection.FindAllAsync(x => x.UserId == ReciverId);
+
+            if (connections.Any())
+            {
+                foreach (var conn in connections)
+                {
+                    await _hubContext.Clients.Client(conn.ConnectionId)
+                        .SendAsync("ReceiveNotification", notification);
+                }
+            }
+            //   await _hubContext.Clients.User(ReciverId).SendAsync("ReceiveNotification", notification);
 
         }
     }
