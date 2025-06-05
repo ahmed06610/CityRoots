@@ -73,6 +73,8 @@ namespace CityRoots.Core.DTOs.Cycle
     public class RequestsForInvestment
     {
         public string FullName { get; set; }
+        public string UserId { get; set; }
+        public string UserImageUrl { get; set; }
         public decimal InvestmentAmount { get; set; }
         public string TypeOfProfit { get; set; }
         public int InvestmentRequestId { get; set; }

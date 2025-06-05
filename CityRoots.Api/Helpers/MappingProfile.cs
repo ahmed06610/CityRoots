@@ -138,7 +138,10 @@ namespace CityRoots.Api.Helpers
 
 
             CreateMap<PurchaseRequest, AllPurchasesRequestForHarvest>()
-           .ForMember(dest => dest.merchantName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name));
+           .ForMember(dest => dest.merchantName, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Name))
+           .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.Id))
+           .ForMember(dest => dest.UserImageUrl, opt => opt.MapFrom(src => src.Merchant.ApplicationUser.ImageProfileUrl))
+           ;
             CreateMap<FavoriteFarmers, FavouriteFarmerDTO>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.FarmerUser.Email))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FarmerUser.Name))

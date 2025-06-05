@@ -281,6 +281,8 @@ namespace CityRoots.Core.Services
                             var requestForInvestment = new RequestsForInvestment
                             {
                                 FullName = invest.ApplicationUser.UserName,
+                                UserImageUrl = invest.ApplicationUser.ImageProfileUrl,
+                                UserId = invest.ApplicationUserId,
                                 InvestmentAmount = req.RequestedAmount,
                                 TypeOfProfit = req.RequestedProfitType.ToString(),
                                 InvestmentRequestId=req.InvestmentRequestId,
