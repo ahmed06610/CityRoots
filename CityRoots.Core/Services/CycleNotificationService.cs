@@ -141,7 +141,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -168,7 +168,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -196,7 +196,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -223,7 +223,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -251,7 +251,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -281,7 +281,7 @@ namespace CityRoots.Core.Services
             var userId = investor.ApplicationUserId;
             var notification = new CreateNotificationDTO
             {
-                Type = "InvestmentRequest",
+                Type = "طلب استثمار",
                 Content = content,
                 UserId = userId,
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
@@ -312,7 +312,7 @@ namespace CityRoots.Core.Services
             {
                 UserId = userId,
                 Content = content,
-                Type = "Cycle",
+                Type = "الدوره الزراعيه",
                 AdditionalData = $"{{ \"CycleId\": {cycleId} }}"
             };
 
@@ -346,7 +346,7 @@ namespace CityRoots.Core.Services
             {
                 var notification = new CreateNotificationDTO
                 {
-                    Type = "CycleUpdate",
+                    Type = "تحديث الدورة الزراعية",
                     UserId = investor.ApplicationUserId,
                     AdditionalData = $"{{ \"CycleId\": {cycleId} }}",
                     Content = content
@@ -383,7 +383,7 @@ namespace CityRoots.Core.Services
             {
                 var notification = new CreateNotificationDTO
                 {
-                    Type = "CycleUpdate",
+                    Type = "تحديث الدورة الزراعية",
                     UserId = investor.ApplicationUserId,
                     AdditionalData = $"{{ \"CycleId\": {cycleId} }}",
                     Content = content

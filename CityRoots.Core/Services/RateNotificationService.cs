@@ -33,7 +33,7 @@ namespace CityRoots.Core.Services
             var notification = new CreateNotificationDTO
             {
                 Content = content,
-                Type = "Rate",
+                Type = "التقييم",
                 UserId = farmerId
             };
 

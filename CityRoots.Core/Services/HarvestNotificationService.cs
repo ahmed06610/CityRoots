@@ -59,7 +59,7 @@ namespace CityRoots.Core.Services
             var content = $"طلب شراء من {merchantname} للمحصول {Harvest.Crop.Name} (رقم: {Harvest.HarvestId}) بكمية {request.RequestedAmount} وسعر {request.RequestedPrice} مع الملاحظات: \"{request.Notes}\" بتاريخ {formattedDate}";
             var notification = new CreateNotificationDTO
             {
-                Type = "Harvest",
+                Type = "حصاد",
                 Content = content,
                 UserId = userId,
                 AdditionalData = $"HarvestId : {HarvestId}"
@@ -79,7 +79,7 @@ namespace CityRoots.Core.Services
 
             var notification = new CreateNotificationDTO
             {
-                Type = "Harvest",
+                Type = "حصاد",
                 Content = content,
                 UserId = userId,
                 AdditionalData = $"HarvestId : {harvest.HarvestId}"
@@ -110,7 +110,7 @@ namespace CityRoots.Core.Services
             var userId = harvest.merchantId;
             var notification = new CreateNotificationDTO
             {
-                Type = "Purchaserequest",
+                Type = "طلب شراء",
                 Content = content,
                 UserId = userId,
                 AdditionalData = $"{{ \"HarvestId\": {harvest.HarvestId} }}"

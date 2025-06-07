@@ -88,7 +88,7 @@ namespace CityRoots.Core.Services
             {
                 Content = content,
                 UserId = userid,
-                Type = "Schedule",
+                Type = "المهام",
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             await _scheduleService.UpdateTheStatus(scheduleId, ScheduleStatus.اكتملت.ToString());
@@ -121,7 +121,7 @@ namespace CityRoots.Core.Services
             {
                 Content = Content,
                 UserId = userid,
-                Type = "Schedule",
+                Type = "المهام",
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             await _notificationService.CreateNotificationAsync(notification);
@@ -153,7 +153,7 @@ namespace CityRoots.Core.Services
             {
                 Content = Content,
                 UserId = userid,
-                Type = "Schedule",
+                Type = "المهام",
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             await _notificationService.CreateNotificationAsync(notification);
@@ -184,7 +184,7 @@ namespace CityRoots.Core.Services
             {
                 Content = content,
                 UserId = userid,
-                Type = "Schedule",
+                Type = "المهام",
                 AdditionalData = $"ScheduleId : {scheduleId}"
             };
             schedule.Status = ScheduleStatus.في_تقدم.ToString();
