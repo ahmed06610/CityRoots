@@ -31,7 +31,7 @@ namespace CityRoots.Core.Services
             {
                 Content = message,
                 UserId = ReciverId,
-                Type = "Chat"
+                Type = "المحادثات"
 
             };
             await _notificationService.CreateNotificationAsync(notification);

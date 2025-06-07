@@ -31,7 +31,7 @@ namespace CityRoots.Core.Services
             {
                 Content = content,
                 UserId = farmerId,
-                Type = "FavoriteFarmer"
+                Type = "مزارع مفضل"
             };
             await _notificationService.CreateNotificationAsync(notification);
             var connections = await _unitOfwork.UserConnection.FindAllAsync(x => x.UserId == farmerId);
