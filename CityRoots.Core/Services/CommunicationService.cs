@@ -59,7 +59,7 @@ namespace CityRoots.Core.Services
 
         public async Task<IEnumerable<FeedBackDisplay>> GetAll()
         {
-            var feedbacks=await unitOfWork.FeedBack.GetAllAsync();
+            var feedbacks=await unitOfWork.FeedBack.FindAllWithIncludes<FeedBack>(null,f=>f.User);
             return mapper.Map<IEnumerable<FeedBackDisplay>>(feedbacks);
         }
 
@@ -85,8 +85,19 @@ namespace CityRoots.Core.Services
         }
         public async Task SendSupportAsync(Support support)
         {
-            var userEmail = httpContextAccessor.HttpContext.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-            var userName = httpContextAccessor.HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            /* var userEmail = httpContextAccessor.HttpContext.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+             var userName = httpContextAccessor.HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;*/
+       /*     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // User ID
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),     // Username
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),      // Email
+                new Claim("LoggedId", userIdLogged.ToString()),        // Id Of the LoggedIn User
+                 new Claim("NameOfuser", user.Name) //Name of User    */   
+
+
+                var userEmail = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
+            var userName = httpContextAccessor.HttpContext.User.FindFirstValue("NameOfuser") ?? string.Empty;
             if (userEmail is null || userName is null)
                 throw new Exception("User Doesnot authenticated ");
 

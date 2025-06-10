@@ -54,8 +54,10 @@ namespace CityRoots.Api.Controllers
 
                 return BadRequest(ex);
             }
+            // make arabic message
+
           
-            return Ok("Successfull Register.....Please Go To Login");
+            return Ok("لقد تم انشاء الحساب بنجاح برجاء الذهاب لتسجيل الدخول");
         }
         [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)

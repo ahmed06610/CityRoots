@@ -51,11 +51,11 @@ namespace CityRoots.Api
             {
                 options.User.AllowedUserNameCharacters = null;
                 options.User.RequireUniqueEmail = true;
-                options.Password.RequireDigit = true;
+                options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
                 options.Password.RequiredUniqueChars = 1;
             })
             .AddUserValidator<CustomUserValidator<ApplicationUser>>()
@@ -188,17 +188,17 @@ namespace CityRoots.Api
 
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>(); // Custom provider for SignalR
 
-            // CORS for SignalR
-            // Allow CORS for frontend
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials(); // <--- THIS IS THE FIX
-
+                    policy.WithOrigins(
+                        "http://localhost:3000",
+                        "https://graduation-project-y3x4.vercel.app"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials(); // Keep this if you're using SignalR with authentication
                 });
             });
 

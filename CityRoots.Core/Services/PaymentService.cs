@@ -73,7 +73,7 @@ namespace CityRoots.Core.Services
                     );
                 }
 
-                if (payment.Type == PaymentType.Investment.ToString())
+                if (payment.Type == PaymentType.Investment.ToString()|| payment.Type == "استثمار")
                 {
                     assoc = new AssociatedCycleDTO
                     {
@@ -201,7 +201,8 @@ namespace CityRoots.Core.Services
             var payments = await _unitOfWork.Payment.FindAllWithIncludes<Payment>(
                 x => x.PayerId == userId||x.PayeeId==userId && x.Type == PaymentType.Investment.ToString(),
                 x => x.Payee,
-                x => x.Cycle
+                x => x.Cycle,
+                x => x.Payer
             );
 
             if (!payments.Any())
@@ -257,7 +258,8 @@ namespace CityRoots.Core.Services
                 x => x.PayerId == userId || x.PayeeId == userId && x.Type == PaymentType.Purchase.ToString(),
                 x => x.Payer,  // The buyer in this case
                 x => x.Harvest,
-                x => x.Harvest.Crop
+                x => x.Harvest.Crop,
+                x => x.Payee
             );
 
             if (!payments.Any())

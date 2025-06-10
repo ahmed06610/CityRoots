@@ -165,6 +165,8 @@ namespace CityRoots.Api.Helpers
             CreateMap<Payment, MerchantPaymentDetailDto>()
                 .ForMember(dest => dest.PayerName, opt => opt.MapFrom(src => src.Payer.Name))
                 .ForMember(dest => dest.PayerEmail, opt => opt.MapFrom(src => src.Payer.Email))
+                .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
+                .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Statue))
                 .ForMember(dest => dest.AssociatedHarvest, opt => opt.MapFrom(src => new HarvestDto
                 {
@@ -180,6 +182,8 @@ namespace CityRoots.Api.Helpers
             CreateMap<Payment, InvestorPaymentDetailDto>()
                 .ForMember(dest => dest.PayeeName, opt => opt.MapFrom(src => src.Payee.Name))
                 .ForMember(dest => dest.PayeeEmail, opt => opt.MapFrom(src => src.Payee.Email))
+                .ForMember(dest => dest.PayerEmail, opt => opt.MapFrom(src => src.Payer.Email))
+                .ForMember(dest => dest.PayerName, opt => opt.MapFrom(src => src.Payer.Name))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Statue))
                 .ForMember(dest => dest.AssociatedCycle, opt => opt.MapFrom(src => new CycleDto
                 {

@@ -51,8 +51,8 @@ namespace CityRoots.Core.Services
             var _farmersDto= _mapper.Map<List<FavouriteFarmerDTO>>(farmers);
             foreach (var farmer in _farmersDto)
             {
-                var rate = await _unitOfWork.Rate.FindTWithExpression<Rate>(x => x.FarmerId == farmer.FarmerId && x.UserId == farmer.userId);
-                farmer.Rate = rate?.Rating ?? 0;
+                var ratings = (await _unitOfWork.Rate.FindAllWithIncludes<Rate>(r => r.FarmerId == farmer.FarmerId));
+                farmer.Rate = ratings.Count() != 0 ? (int)ratings.Average(r => r.Rating) : 0;
 
             }
             return _farmersDto;

@@ -52,8 +52,8 @@ public class PayPalService
         },
             ApplicationContext = new ApplicationContext
             {
-                ReturnUrl = "https://localhost:7109/api/paypal/success",
-                CancelUrl = "https://localhost:7109/api/paypal/cancel"
+                ReturnUrl = "https://cityroots.runasp.net/api/paypal/success",
+                CancelUrl = "https://cityroots.runasp.net/api/paypal/cancel"
             }
         });
 
@@ -74,9 +74,9 @@ public class PayPalService
         catch (Exception ex)
         {
             // Save failed transaction
-            if (HarvestId ==0) await SaveTransaction(new Order { Id = "N/A" }, "FAILED", CycleId, amount,userId);
-            else await SaveTransactionForMerchant(new Order { Id = "N/A" }, "FAILED", HarvestId, amount, userId);
-            throw new Exception("PayPal Payment Link creation failed: " + ex.Message);
+            if (HarvestId ==0) await SaveTransaction(new Order { Id = "N/A" }, "فشلت", CycleId, amount,userId);
+            else await SaveTransactionForMerchant(new Order { Id = "N/A" }, "فشلت", HarvestId, amount, userId);
+            throw new Exception("فشل إنشاء رابط الدفع عبر PayPal: " + ex.Message);
         }
 
 
@@ -101,7 +101,7 @@ public class PayPalService
         {
 
             PaypalOrderId = result.Id,
-            Statue = "PENDING",
+            Statue = status,
             PayerId = userId,
             PayeeId = cycle.LandParcel.Farm.Farmer.ApplicationUserId,
             Amount = amount,
@@ -143,13 +143,13 @@ public class PayPalService
         {
 
             PaypalOrderId = result.Id,
-            Statue = "PENDING",
+            Statue = status,
             PayerId = userId,
             PayeeId = harvest.Farmer.ApplicationUserId,
             Amount = amount,
             HarvestId = HarvestId,
             PaymentMethod = "PayPal",
-            Type = "بيع وشراء",
+            Type = "شراء",
             PaymentDate = DateTime.Now
         };
         await _unitOfWork.Payment.AddAsync(transaction);

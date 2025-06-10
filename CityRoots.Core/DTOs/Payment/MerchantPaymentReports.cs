@@ -20,6 +20,8 @@ namespace CityRoots.Core.DTOs.Payment
         public string Type { get; set; }
         public string PayerName { get; set; }  // Buyer name
         public string PayerEmail { get; set; } // Buyer email
+        public string PayeeName { get; set; }  // Merchant name
+        public string PayeeEmail { get; set; } // Merchant email
         public string PaymentMethod { get; set; }
         public string Status { get; set; }
         public HarvestDto AssociatedHarvest { get; set; }

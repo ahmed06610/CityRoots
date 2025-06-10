@@ -10,7 +10,6 @@ namespace CityRoots.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ComminucationController : ControllerBase
     {
         private readonly ICommunicationService communicationService;
@@ -69,6 +68,8 @@ namespace CityRoots.Api.Controllers
 
         }
         [HttpPost]
+        [Authorize]
+
         public async Task<IActionResult> Add([FromBody] FeedBackRequest feedback)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -103,6 +104,8 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpPost("SendSupprt")]
+        [Authorize]
+
         public async Task<IActionResult> SendSupport(Support support)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);

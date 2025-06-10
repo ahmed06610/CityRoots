@@ -57,7 +57,7 @@ namespace CityRoots.Core.Services
         {
            
                     if (await _userManager.FindByEmailAsync(model.Email) is not null)
-                        return new AuthDTO { Message = "Email is already registered!" };
+                        return new AuthDTO { Message = "الايميل موجود بالفعل" };
 
                     var user = _mapper.Map<ApplicationUser>(model);
                    
@@ -354,7 +354,7 @@ namespace CityRoots.Core.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // User ID
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),     // Username
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName),     // Username
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),      // Email
                 new Claim("LoggedId",userIdLogged.ToString()),        // Id Of the LoggedIn User

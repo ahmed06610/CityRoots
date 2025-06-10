@@ -58,7 +58,7 @@ namespace CityRoots.Api.Controllers
           public async Task<IActionResult> PaymentSuccess([FromQuery] string token)
         {
           await _payPalService.updateTransaction(token,"مقبول");
-               return Redirect("https://localhost:7109");  // Redirect to your frontend
+               return Redirect("https://graduation-project-y3x4.vercel.app");  // Redirect to your frontend
           }
 
         [HttpGet("cancel")]
@@ -66,7 +66,7 @@ namespace CityRoots.Api.Controllers
         {
             await _payPalService.updateTransaction(token, "مرفوض");
 
-            return Redirect("https://localhost:7109");  // Redirect back to your site
+            return Redirect("https://graduation-project-y3x4.vercel.app");  // Redirect back to your site
         }
     }
 

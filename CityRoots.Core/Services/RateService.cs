@@ -33,7 +33,7 @@ namespace CityRoots.Core.Services
         public async Task MakeTheRating(RateRequest rate,string userId)
         {
             var Deletedrate = await _unitOfWork.Rate.FindTWithExpression<Rate>(x => x.UserId == userId && x.FarmerId == rate.FarmerId);
-            if (rate is not null)
+            if (Deletedrate is not null)
                await DeleteTheRating(new DeleteRate { FarmerId = rate.FarmerId }, userId);
             var _rate = _mapper.Map<Rate>(rate);
             _rate.UserId = userId;
