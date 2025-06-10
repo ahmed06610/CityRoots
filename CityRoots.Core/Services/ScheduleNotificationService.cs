@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Notification;
+using CityRoots.Core.Helpers;
 using CityRoots.Core.Hubs;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,7 +118,8 @@ namespace CityRoots.Core.Services
             {
                 throw new Exception($"No Tasks With This Id {scheduleId}");
             }
-            var Content = $"المهمه {schedule.TaskName} رقم {scheduleId} في الدوره {schedule.Cycle.CycleName} ستنتهي في {schedule.EndDate.ToString("dddd hh:mm tt")}  يمكنك تأجيل موعد الانتهاء, اي بعد يوم واحد فقط  ";
+            var formattedDate = DateHelper.FormatArabicDate(schedule.EndDate);
+            var Content = $"المهمه {schedule.TaskName} رقم {scheduleId} في الدوره {schedule.Cycle.CycleName} ستنتهي في {formattedDate}  يمكنك تأجيل موعد الانتهاء, اي بعد يوم واحد فقط  ";
             var notification = new CreateNotificationDTO
             {
                 Content = Content,
@@ -148,7 +151,8 @@ namespace CityRoots.Core.Services
             {
                 throw new Exception($"No Tasks With This Id {scheduleId}");
             }
-            var Content = $"المهمه {schedule.TaskName} رقم {scheduleId} في الدوره {schedule.Cycle.CycleName} ستبدأ في {schedule.StartDate.ToString("dddd hh:mm tt")}  يمكنك تأجيل موعد الابتداء, اي بعد يوم واحد فقط";
+            var formattedDate = DateHelper.FormatArabicDate(schedule.StartDate);
+            var Content = $"المهمه {schedule.TaskName} رقم {scheduleId} في الدوره {schedule.Cycle.CycleName} ستبدأ في {formattedDate}  يمكنك تأجيل موعد الابتداء, اي بعد يوم واحد فقط";
             var notification = new CreateNotificationDTO
             {
                 Content = Content,
