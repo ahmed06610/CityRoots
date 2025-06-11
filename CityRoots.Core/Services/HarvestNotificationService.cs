@@ -1,6 +1,7 @@
 ﻿using CityRoots.Core.Const;
 using CityRoots.Core.DTOs.Harvest;
 using CityRoots.Core.DTOs.Notification;
+using CityRoots.Core.Helpers;
 using CityRoots.Core.Hubs;
 using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
@@ -55,7 +56,7 @@ namespace CityRoots.Core.Services
             var merchantname = investor.ApplicationUser.Name;
 
 
-            var formattedDate = request.RequestDate.ToString("dddd, HH", System.Globalization.CultureInfo.InvariantCulture);
+            var formattedDate = DateHelper.FormatArabicFullDate(request.RequestDate);
             var content = $"طلب شراء من {merchantname} للمحصول {Harvest.Crop.Name} (رقم: {Harvest.HarvestId}) بكمية {request.RequestedAmount} وسعر {request.RequestedPrice} مع الملاحظات: \"{request.Notes}\" بتاريخ {formattedDate}";
             var notification = new CreateNotificationDTO
             {

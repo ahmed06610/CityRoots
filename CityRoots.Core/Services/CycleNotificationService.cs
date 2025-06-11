@@ -191,7 +191,7 @@ namespace CityRoots.Core.Services
         {
             var cycle = await _cycleService.GetCycleByIdAsync(cycleId);
             var daysLeft = (startDate - DateTime.Now).TotalDays;
-            var content = $"الدورة {cycle.CycleName} (رقم {cycleId}) ستبدأ في {daysLeft:F0} أيام ولكن لم يكتمل هدف الاستثمار. يمكنك تأجيل موعد البدء.";
+            var content = $"الدورة \"{cycle.CycleName}\" (رقم {cycleId}) ستبدأ خلال {daysLeft:F0} يومًا، ولكن لم يتم الوصول إلى هدف الاستثمار بعد. يُمكنك تأجيل موعد البدء إذا لزم الأمر.";
             var notification = new CreateNotificationDTO
             {
                 UserId = userId,
@@ -246,7 +246,7 @@ namespace CityRoots.Core.Services
         {
             var cycle = await _cycleService.GetCycleByIdAsync(cycleId);
             var daysLeft = (endDate - DateTime.Now).TotalDays;
-            var content = $"الدورة {cycle.CycleName} (رقم {cycleId}) ستنتهي في {daysLeft:F0} أيام. يمكنك تأجيل موعد الانتهاء إذا لزم الأمر.";
+            var content = $"الدورة \"{cycle.CycleName}\" (رقم {cycleId}) ستنتهي خلال {daysLeft:F0} يومًا. يمكنك تأجيل موعد الانتهاء إذا لزم الأمر.";
             var notification = new CreateNotificationDTO
             {
                 UserId = userId,

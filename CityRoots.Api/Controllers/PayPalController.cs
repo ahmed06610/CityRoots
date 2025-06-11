@@ -55,19 +55,19 @@ namespace CityRoots.Api.Controllers
             }
         }
         [HttpGet("success")]
-          public async Task<IActionResult> PaymentSuccess([FromQuery] string token)
+        public async Task<IActionResult> PaymentSuccess([FromQuery] string token)
         {
-          await _payPalService.updateTransaction(token,"مقبول");
-               return Redirect("https://graduation-project-y3x4.vercel.app");  // Redirect to your frontend
-          }
+            await _payPalService.updateTransaction(token, "مقبول");
+            return Redirect("https://graduation-project-y3x4.vercel.app/payment-success");
+        }
 
         [HttpGet("cancel")]
-        public async Task <IActionResult> PaymentCancelled([FromQuery] string token)
+        public async Task<IActionResult> PaymentCancelled([FromQuery] string token)
         {
             await _payPalService.updateTransaction(token, "مرفوض");
-
-            return Redirect("https://graduation-project-y3x4.vercel.app");  // Redirect back to your site
+            return Redirect("https://graduation-project-y3x4.vercel.app/payment-cancel");
         }
+
     }
 
 }
