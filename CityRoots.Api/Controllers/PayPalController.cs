@@ -58,14 +58,14 @@ namespace CityRoots.Api.Controllers
         public async Task<IActionResult> PaymentSuccess([FromQuery] string token)
         {
             await _payPalService.updateTransaction(token, "مقبول");
-            return Redirect("https://graduation-project-y3x4.vercel.app/payment-success");
+            return Redirect("https://graduation-project-y3x4.vercel.app/");
         }
 
         [HttpGet("cancel")]
         public async Task<IActionResult> PaymentCancelled([FromQuery] string token)
         {
             await _payPalService.updateTransaction(token, "مرفوض");
-            return Redirect("https://graduation-project-y3x4.vercel.app/payment-cancel");
+            return Redirect("https://graduation-project-y3x4.vercel.app/");
         }
 
     }

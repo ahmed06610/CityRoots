@@ -250,6 +250,11 @@ namespace CityRoots.Api
                   Jop => Jop.ProcessNotificationsAsync(),
                   "*/5 * * * *"
               );
+            RecurringJob.AddOrUpdate<PaymentBackgroundService>(
+                "process-payments-daily",
+                service => service.ProcessPaymentsAsync(),
+                     Cron.Daily
+              );
             app.UseStaticFiles();
             app.UseCors("AllowFrontend"); // <-- ده مهم تحطه قبل UseAuthorization
             app.UseAuthentication();
