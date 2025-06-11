@@ -238,7 +238,9 @@ namespace CityRoots.Core.Services
             {
                 var farmer = await _unitOfWork.Farmer.GetByAppUserIdAsync(userId);
                 bio = farmer?.Bio;
-                rate = farmer?.ApplicationUser?.Rate;
+                var ratings = (await _unitOfWork.Rate.FindAllWithIncludes<Rate>(r => r.FarmerId == farmer.ApplicationUserId));
+                rate = ratings.Count() != 0 ? (int)ratings.Average(r => r.Rating) : 0;
+
             }
             else if (role == Roles.Investor.ToString())
             {

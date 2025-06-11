@@ -105,6 +105,11 @@ namespace CityRoots.Core.Services
                     har.IsHarvestConnectToCycle=true;
                     har.CycleId=harvest.CycleId;
                 }
+                if (x.Count() > 0)
+                {
+                    har.ReuestsCount = x.Count();
+                    har.Status = HarvestStatue.تحت_الطلب.ToString();
+                }
                 _harvests.Add(har);
             }
          
@@ -256,8 +261,8 @@ namespace CityRoots.Core.Services
 
         public async Task<IEnumerable<AllPurchasesRequestForHarvest>> GetAllPurchasesRequestForHarvest(int harvestId)
         {
-            var Requests = await _unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId
-            ,x=>x.Merchant,
+            var Requests = await _unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(x => x.HarvestId == harvestId &&x.RequestStatus == PurchaseStatus.قيد_الانتظار.ToString()
+            , x=>x.Merchant,
             x=>x.Merchant.ApplicationUser
             ,x=>x.Harvest
             ,x => x.Harvest.Purchases

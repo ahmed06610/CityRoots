@@ -12,7 +12,7 @@ namespace CityRoots.Core.DTOs.CycleUpdate
         public int UpdateId { get; set; }
         public decimal GrowthRate { get; set; }
         public string QualityCheck { get; set; }
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         public string AdditionalNotes { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }

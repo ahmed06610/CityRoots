@@ -271,8 +271,11 @@ namespace CityRoots.Core.Services
                                 InvestmentAmount = req.RequestedAmount,
                             };
                             CurrentInvestors.Add(CurrentInvstment);
-                        }
-                        else if (req.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString())
+                        cycleDto.OpenInvestmentCycleDTO.CurrentInvestorCount += 1;
+                        cycleDto.OpenInvestmentCycleDTO.CurrentTotalInvestment += CurrentInvstment.InvestmentAmount;
+
+                    }
+                    else if (req.RequestStatus == InvestmentStatues.قيد_الانتظار.ToString())
                         {
                             cycleDto.NumbersOfRequestsInvestments += 1;
 
