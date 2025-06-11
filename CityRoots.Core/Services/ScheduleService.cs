@@ -28,8 +28,13 @@ namespace CityRoots.Core.Services
         {
             if(schedule is null) throw new ArgumentNullException(nameof(schedule), "Schedule data is required");
             if (schedule.StartDate > schedule.EndDate) throw new Exception("لا يمكن ان يكون موعد بدايه المهمه اكبر من موعد نهايه المهمه");
+            var cycle = await _unitOfWork.Cycle.GetByIdAsync(schedule.CycleId);
+            if (cycle is null)
+                 throw new Exception($"No Cycle with Id {schedule.CycleId}");
+            if (schedule.StartDate < cycle.StartDate || schedule.EndDate > cycle.EndDate)
+                throw new Exception($"لا يمكن ان يكون موعد بدايه او نهايه المهمه خارج فتره الدوره المحدده من {cycle.StartDate} الي {cycle.EndDate})");
 
-          var  now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
+            var  now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptZone);
 
             var addedschedule = mapper.Map<Schedule>(schedule);
             addedschedule.StartDate = TimeZoneInfo.ConvertTimeFromUtc(addedschedule.StartDate, egyptZone);
