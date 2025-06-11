@@ -56,7 +56,7 @@ namespace CityRoots.Core.Services
 
             foreach (var payment in query)
             {
-                if (payment == null) continue;
+                if (payment == null ) continue;
 
                 AssociatedCycleDTO assoc = null;
                 AssociatedHarvestDTO assoh = null;
@@ -80,9 +80,11 @@ namespace CityRoots.Core.Services
                         CycleId = payment.Cycle.CycleId,
                         CycleName = payment.Cycle.CycleName,
                     };
-
-                    // Add to investments
-                    summaryDict[year].Investments[month] += payment.Amount;
+                    if (payment.Statue == "مقبول")
+                    {
+                        // Add to investments
+                        summaryDict[year].Investments[month] += payment.Amount;
+                    }
                 }
                 else
                 {
@@ -91,9 +93,11 @@ namespace CityRoots.Core.Services
                         HarvestId = payment.Harvest.HarvestId,
                         HarvestName = payment.Harvest.Crop.Name,
                     };
-
-                    // Add to purchases
-                    summaryDict[year].Purchases[month] += payment.Amount;
+                    if (payment.Statue == "مقبول")
+                    {
+                        // Add to purchases
+                        summaryDict[year].Purchases[month] += payment.Amount;
+                    }
                 }
 
                 payments.Add(new PaymentDetailsDTO
@@ -229,6 +233,8 @@ namespace CityRoots.Core.Services
                 // Fill monthly data
                 foreach (var payment in yearGroup)
                 {
+                    if (payment == null || payment.Statue != "مقبول") continue;
+
                     var month = payment.PaymentDate.Month - 1; // 0-based index
                     investmentsPerMonth[month] += payment.Amount;
                 }
@@ -286,6 +292,8 @@ namespace CityRoots.Core.Services
                 // Fill monthly data
                 foreach (var payment in yearGroup)
                 {
+                    if (payment == null || payment.Statue != "مقبول") continue;
+
                     var month = payment.PaymentDate.Month - 1; // 0-based index
                     purchasesPerMonth[month] += payment.Amount;
                 }

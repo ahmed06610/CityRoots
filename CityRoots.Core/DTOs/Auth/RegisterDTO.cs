@@ -18,7 +18,7 @@ namespace CityRoots.Core.DTOs.Auth
         public string Email { get; set; }
         [Required, Phone]
         public string PhoneNumber { get; set; }
-        [Required, MaxLength(100)]
+        [Required,MinLength(8), MaxLength(100)]
         public string Password { get; set; }
         [Required, RoleDeticated]
         public string Role { get; set; }

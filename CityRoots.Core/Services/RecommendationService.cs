@@ -37,7 +37,7 @@ namespace CityRoots.Core.Services
         public async Task<List<CycleReco>> GetAvailableCyclesAsync()
         {
             var cycles = await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(
-                c => c.OpenInvestmentCycle != null,
+                c => c.OpenInvestmentCycle != null&& c.StartDate > TimeHelper.NowInEgypt,
                 c => c.LandParcel,
                 c => c.LandParcel.Farm,
                 c => c.LandParcel.Farm.Farmer,

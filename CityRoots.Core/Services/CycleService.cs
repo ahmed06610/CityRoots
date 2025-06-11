@@ -81,13 +81,13 @@ namespace CityRoots.Core.Services
 
             if (Recommendation != null && Recommendation.recommended_cycle_ids != null && Recommendation.recommended_cycle_ids.Any())
             {
-                criteria = c => Recommendation.recommended_cycle_ids.Contains(c.CycleId);
+                criteria = c => Recommendation.recommended_cycle_ids.Contains(c.CycleId)&& c.OpenInvestmentCycle != null && c.StartDate > TimeHelper.NowInEgypt;
             }
            
             else
             {
                 // Get All Open Cycles
-                criteria = c => c.OpenInvestmentCycle != null;
+                criteria = c => c.OpenInvestmentCycle != null&&c.StartDate>TimeHelper.NowInEgypt;
             }
             var cycles = (await _unitOfWork.Cycle.FindAllWithIncludes<Cycle>(criteria,
                 c => c.LandParcel,

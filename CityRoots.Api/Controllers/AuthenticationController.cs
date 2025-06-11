@@ -40,7 +40,7 @@ namespace CityRoots.Api.Controllers
                 return BadRequest(ModelState);
 
             if (!EmailValidatorService.IsValidEmailProvider(model.Email))
-                return BadRequest("Invalid Email");
+                return BadRequest("حساب غير صحيح");
 
             //model.UserName = model.Email;
             try
@@ -96,7 +96,7 @@ namespace CityRoots.Api.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (!user.EmailConfirmed)
-                return BadRequest("Email not confirmed");
+                return BadRequest("الحساب غير مفعل برجاء التوجه للميل الخاص بك لتفعيل الحساب");
             var LoggedId = 0;
             var role = "";
            if(result.Roles.First()==Roles.Farmer.ToString())

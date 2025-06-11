@@ -117,7 +117,7 @@ namespace CityRoots.Core.Services
 
             if (Recommendation != null && Recommendation.recommended_harvest_ids != null && Recommendation.recommended_harvest_ids.Any())
             {
-                criteria = h => Recommendation.recommended_harvest_ids.Contains(h.HarvestId);
+                criteria = h => Recommendation.recommended_harvest_ids.Contains(h.HarvestId)&& h.status == HarvestStatue.متاح.ToString() || h.status == HarvestStatue.تحت_الطلب.ToString();
                 MerchantId=Recommendation.merchant_id;
             }
             else
