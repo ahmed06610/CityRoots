@@ -188,9 +188,9 @@ namespace CityRoots.Core.Services
             var harvestDetails = _mapper.Map<HarvestDetailsDTO>(harvest);
 
             // Check if the merchant has requested to purchase this harvest
-            var purchaseRequest = await _unitOfWork.Purchase.FindTWithExpression<PurchaseRequest>(
+            var purchaseRequest = (await _unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(
                 pr => pr.MerchantId == merchantId && pr.HarvestId == harvestId
-            );
+            )).LastOrDefault();
 
             if (purchaseRequest is not null)
             {
