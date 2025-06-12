@@ -31,7 +31,7 @@ namespace CityRoots.Core.Services
             {
                 throw new Exception($"No harvests Wit this Id {Request.HarvestId}");
             }
-            if (harvest.status == HarvestStatus.منتهي.ToString())
+            if (harvest.status == HarvestStatue.نفذت_الكميه.ToString())
                 throw new Exception("لاتسطيع ارسال طلب شراء للمحصول لانه بالفعل انتهي");
             //if (harvest.Price < purchaseRrquest.RequestedPrice)
             //    throw new Exception("لا يمكنك إرسال طلب الشراء، لأن السعر المحدد للمحصول غير صالح أو أقل من السعر المطلوب.");
@@ -118,7 +118,7 @@ namespace CityRoots.Core.Services
                 harvest.Yield -= request.RequestedAmount;
                 if (harvest.Yield <= 0)
                 {
-                    harvest.status = HarvestStatus.منتهي.ToString();
+                    harvest.status = HarvestStatue.نفذت_الكميه.ToString();
 
                 }
                 _unitOfWork.Harvest.Update(harvest);
