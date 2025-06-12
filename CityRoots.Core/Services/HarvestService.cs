@@ -111,7 +111,7 @@ namespace CityRoots.Core.Services
                     har.ReuestsCount = x.Count();
                     har.Status = HarvestStatue.تحت_الطلب.ToString();
                 }
-                else
+                else if(har.Yield != 0)
                 {
                     har.ReuestsCount = 0;
                     har.Status = HarvestStatue.متاح.ToString();
@@ -188,9 +188,9 @@ namespace CityRoots.Core.Services
             var harvestDetails = _mapper.Map<HarvestDetailsDTO>(harvest);
 
             // Check if the merchant has requested to purchase this harvest
-            var purchaseRequest = (await _unitOfWork.Purchase.FindAllWithIncludes<PurchaseRequest>(
+            var purchaseRequest = await _unitOfWork.Purchase.FindTWithExpression<PurchaseRequest>(
                 pr => pr.MerchantId == merchantId && pr.HarvestId == harvestId
-            )).LastOrDefault();
+            );
 
             if (purchaseRequest is not null)
             {
@@ -257,11 +257,12 @@ namespace CityRoots.Core.Services
                 har.ReuestsCount = x.Count();
                 har.Status = HarvestStatue.تحت_الطلب.ToString();
             }
-            else
+            else if (har.Yield != 0)
             {
                 har.ReuestsCount = 0;
                 har.Status = HarvestStatue.متاح.ToString();
             }
+
             await _unitOfWork.CompleteAsync();
             return har;
 
