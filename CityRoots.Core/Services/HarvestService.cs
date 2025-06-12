@@ -36,6 +36,11 @@ namespace CityRoots.Core.Services
 
         public async Task<AddHarvestDto> Add(AddHarvestDto harvest,int farmerid=1)
         {
+
+            if(harvest.Yield <= 0)
+            {
+                throw new Exception("لا يمكنك إضافة محصول ليس له عائد.");
+            }
             var addedharvest = _mapper.Map<Harvest>(harvest);
 
             if (harvest.Image != null)
@@ -233,6 +238,12 @@ namespace CityRoots.Core.Services
                 harvest.status=HarvestStatue.متاح.ToString();
 
             _mapper.Map(updateharvest, harvest);
+            if (harvest.Yield <= 0)
+            {
+                harvest.Yield = 0;
+                harvest.status = HarvestStatus.منتهي.ToString();
+            }
+
             if (updateharvest.Image != null)
             {
                 // Delete the old image
