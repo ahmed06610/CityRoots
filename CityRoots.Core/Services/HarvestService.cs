@@ -229,6 +229,9 @@ namespace CityRoots.Core.Services
            );
             if (harvest is null)
                 throw new Exception($"There is no Harvests with this id {updateharvest.HarvestId}");
+            if(updateharvest.Yield != harvest.Yield && updateharvest.Yield > 0)
+                harvest.status=HarvestStatue.متاح.ToString();
+
             _mapper.Map(updateharvest, harvest);
             if (updateharvest.Image != null)
             {
