@@ -225,18 +225,38 @@ namespace CityRoots.Core.Services
         }
         public async Task<bool> DeleteCycleAsync(int id)
         {
-            var cycle = await _unitOfWork.Cycle.GetByIdAsync(id);
-            if (cycle == null) return false;
-            var openInvestmentCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(o => o.CycleId == id);
-            if (openInvestmentCycle != null)
+            try
             {
-                await _openInvestmentCycleService.DeleteOpenInvestmentCycleAsync(openInvestmentCycle.OpenInvestmentCycleId);
+                var cycle = await _unitOfWork.Cycle.GetByIdAsync(id);
+                if (cycle == null) return false;
+
+                // Check for approved investment requests
+                var approvedInvestments = await _unitOfWork.InvestmentRequest
+                    .FindAllWithIncludes<InvestmentRequest>(r => r.CycleId == id && r.RequestStatus == InvestmentStatues.مقبول.ToString());
+
+                if (approvedInvestments.Any())
+                {
+                    throw new InvalidOperationException("Cannot delete this cycle because it has approved investment requests.");
+                }
+
+
+                var openInvestmentCycle = await _unitOfWork.OpenInvestmentCycle.FindTWithExpression<OpenInvestmentCycle>(o => o.CycleId == id);
+                if (openInvestmentCycle != null)
+                {
+                    await _openInvestmentCycleService.DeleteOpenInvestmentCycleAsync(openInvestmentCycle.OpenInvestmentCycleId);
+                }
+                await _paymentService.DeletePaymentsByCycleIdAsync(id);
+                await _unitOfWork.Cycle.DeleteAsync(cycle);
+
+                await _unitOfWork.CompleteAsync();
+                return true;
             }
-           await _paymentService.DeletePaymentsByCycleIdAsync(id);
-            await _unitOfWork.Cycle.DeleteAsync(cycle);
-            
-            await _unitOfWork.CompleteAsync();
-            return true;
+            catch (Exception )
+            {
+                 
+                throw ;
+            }
+          
         }
         private async Task<CycleForFarmerDTO> mapping(Cycle cycle,bool ForFarmer=true)
         {

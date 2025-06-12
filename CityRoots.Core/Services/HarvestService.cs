@@ -59,16 +59,32 @@ namespace CityRoots.Core.Services
 
         public async Task Delete(int id)
         {
-            var harvest = await _unitOfWork.Harvest.GetByIdAsync(id);
+            var harvest = await _unitOfWork.Harvest.FindTWithIncludes<Harvest>(id, "HarvestId", h => h.Purchases);
+
             if (harvest is null)
             {
-                throw new Exception($"There is no Harvests with this id {id}");
+                throw new Exception($"There is no Harvest with this id {id}");
             }
+
+            if (harvest.Purchases != null)
+            {
+                if (harvest.Purchases.Any(p => p.RequestStatus == PurchaseStatus.مقبول.ToString()))
+                {
+                    throw new InvalidOperationException("You can't delete this harvest because it has accepted purchase requests.");
+                }
+
+                foreach (var purchase in harvest.Purchases)
+                {
+                    await _unitOfWork.Purchase.DeleteAsync(purchase);
+                }
+            }
+
             imageService.DeleteImage(harvest.ImageUrl);
 
             await _unitOfWork.Harvest.DeleteAsync(harvest);
             await _unitOfWork.CompleteAsync();
         }
+
 
         public async Task<HarvestDtoForFarmer> Get(int id)
         {

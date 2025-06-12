@@ -129,21 +129,23 @@ namespace CityRoots.Api.Controllers
         }
         [HttpDelete("{Id}")]
         [Authorize(Roles = "Farmer")]
-
         public async Task<IActionResult> Delete(int Id)
         {
             try
             {
-
                 await _harvestService.Delete(Id);
                 return Ok("Deleted");
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message); // For business rules like accepted purchases
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Message); // For other unexpected errors
             }
-
         }
+
         [HttpGet("GetTheRequestsofHarvest/{harvestId}")]
         [Authorize]
         public async Task<IActionResult> GetAllRequests(int harvestId)

@@ -136,9 +136,22 @@ namespace CityRoots.Api.Controllers
         [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> DeleteCycle(int id)
         {
-            var success = await _cycleService.DeleteCycleAsync(id);
-            if (!success) return NotFound();
-            return Ok();
+            try
+            {
+                var success = await _cycleService.DeleteCycleAsync(id);
+                if (!success) return NotFound();
+
+                return Ok("Cycle deleted successfully.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message); // Business rule violation
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message); // Unexpected error
+            }
         }
+
     }
 }
