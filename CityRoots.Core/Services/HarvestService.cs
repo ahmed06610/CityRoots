@@ -111,7 +111,7 @@ namespace CityRoots.Core.Services
                     har.ReuestsCount = x.Count();
                     har.Status = HarvestStatue.تحت_الطلب.ToString();
                 }
-                else
+                else if(har.Yield != 0)
                 {
                     har.ReuestsCount = 0;
                     har.Status = HarvestStatue.متاح.ToString();
@@ -257,6 +257,12 @@ namespace CityRoots.Core.Services
                 har.ReuestsCount = x.Count();
                 har.Status = HarvestStatue.تحت_الطلب.ToString();
             }
+            else if (har.Yield != 0)
+            {
+                har.ReuestsCount = 0;
+                har.Status = HarvestStatue.متاح.ToString();
+            }
+
             await _unitOfWork.CompleteAsync();
             return har;
 
