@@ -241,7 +241,7 @@ namespace CityRoots.Core.Services
             if (harvest.Yield <= 0)
             {
                 harvest.Yield = 0;
-                harvest.status = HarvestStatus.منتهي.ToString();
+                harvest.status = HarvestStatue.نفذت_الكميه.ToString();
             }
 
             if (updateharvest.Image != null)
