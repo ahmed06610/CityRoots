@@ -272,17 +272,18 @@ namespace CityRoots.Core.Services
             user.PhoneNumber = model.Phone;
 
             // Handle profile image
-            if (model.Image != null)
+           
+                    _imageService.DeleteImage(user.ImageProfileUrl);
+
+
+            if (model.Image != null && !string.IsNullOrEmpty(user.ImageProfileUrl))
             {
                 // Delete the old image if it exists
-                if (!string.IsNullOrEmpty(user.ImageProfileUrl))
-                {
-                    _imageService.DeleteImage(user.ImageProfileUrl);
-                }
 
                 // Save the new image
                 user.ImageProfileUrl = _imageService.SaveImage(model.Image, "uploads/profile");
             }
+            
 
             if (role == Roles.Farmer.ToString())
             {

@@ -7,6 +7,7 @@ using CityRoots.Core.Interfaces;
 using CityRoots.Core.Interfaces.Services;
 using CityRoots.Core.Models;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Linq.Expressions;
 
 namespace CityRoots.Core.Services
@@ -110,7 +111,12 @@ namespace CityRoots.Core.Services
                     har.ReuestsCount = x.Count();
                     har.Status = HarvestStatue.تحت_الطلب.ToString();
                 }
-                _harvests.Add(har);
+                else
+                {
+                    har.ReuestsCount = 0;
+                    har.Status = HarvestStatue.متاح.ToString();
+                }
+                    _harvests.Add(har);
             }
          
 
@@ -215,9 +221,12 @@ namespace CityRoots.Core.Services
         }
 
 
-        public async Task<UpdateHarvestDto> Update(UpdateHarvestDto updateharvest)
+        public async Task<HarvestDtoForFarmer> Update(UpdateHarvestDto updateharvest)
         {
-            var harvest = await _unitOfWork.Harvest.GetByIdAsync(updateharvest.HarvestId);
+            var harvest = await _unitOfWork.Harvest.FindTWithIncludes<Harvest>(updateharvest.HarvestId, "HarvestId", x => x.Crop
+   , x => x.Purchases,
+   x => x.Cycle
+           );
             if (harvest is null)
                 throw new Exception($"There is no Harvests with this id {updateharvest.HarvestId}");
             _mapper.Map(updateharvest, harvest);
@@ -230,9 +239,23 @@ namespace CityRoots.Core.Services
                 harvest.ImageUrl = imageService.SaveImage(updateharvest.Image, ImagesFolder);
             }
             _unitOfWork.Harvest.Update(harvest);
+            var har=_mapper.Map<HarvestDtoForFarmer>(harvest);
+            har.ImageUrl = harvest.ImageUrl;
+            var x = await GetAllPurchasesRequestForHarvest(harvest.HarvestId);
+            har.Purchases = x.ToList();
 
+            if (harvest.Cycle is not null)
+            {
+                har.IsHarvestConnectToCycle = true;
+                har.CycleId = harvest.CycleId;
+            }
+            if (x.Count() > 0)
+            {
+                har.ReuestsCount = x.Count();
+                har.Status = HarvestStatue.تحت_الطلب.ToString();
+            }
             await _unitOfWork.CompleteAsync();
-            return updateharvest;
+            return har;
 
         }
         private async Task <Harvest> CheckStatus(Harvest harvest)

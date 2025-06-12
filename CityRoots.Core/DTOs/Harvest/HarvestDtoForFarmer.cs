@@ -10,6 +10,7 @@ namespace CityRoots.Core.DTOs.Harvest
     public class HarvestDtoForFarmer
     {
         public int HarvestId { get; set; }
+        public int CropId { get; set; }
         public string ImageUrl { get; set; }
         public string Name {  get; set; }
         public double Yield { get; set; }

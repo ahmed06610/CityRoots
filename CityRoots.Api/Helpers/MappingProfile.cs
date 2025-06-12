@@ -90,6 +90,7 @@ namespace CityRoots.Api.Helpers
                 .ForMember(dest => dest.CropType, opt => opt.MapFrom(src => src.Crop.CropType.Name))
                 .ForMember(dest => dest.CropName, opt => opt.MapFrom(src => src.Crop.Name));
 
+         
 
 
 
